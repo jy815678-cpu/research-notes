@@ -285,6 +285,16 @@ pre code { padding: 0; background: none; }
   font-size: 0.85rem;
 }
 </style>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\(', '\)']],
+    displayMath: [['$$', '$$'], ['\[', '\]']],
+    processEscapes: true
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 <header class="site-header">
@@ -386,11 +396,11 @@ pre code { padding: 0; background: none; }
 <h2 id="11-mach-zehnder">1.1 Mach-Zehnder 干涉仪：自由空间版 → 片上版<a class="headerlink" href="#11-mach-zehnder" title="Permanent link"></a></h2>
 <h3 id="mzi">自由空间 MZI：你实验室里的老朋友<a class="headerlink" href="#mzi" title="Permanent link"></a></h3>
 <p>让我们从你熟悉的东西开始。在你的实验室里，一台典型的自由空间马赫-曾德尔干涉仪（MZI）大概长这样：一束激光从左侧射入，打到一个分束器（beam splitter, BS）上。这个分束器可以是一块镀了半透膜的玻璃板，也可以是一个立方体分束器——总之，它将入射光分成两束：一束透射，一束反射。这两束光分别沿着两条不同的路径传播，每条路径上你或许放置了反射镜来改变方向，或许放置了相位调制器（比如压电陶瓷驱动的反射镜，或者空间光调制器 SLM）来引入可控的相位差。最后，两束光在第二个分束器处重新汇合，然后你用一个光电探测器或者相机来观察输出。</p>
-<p>这个装置的核心物理是什么？是两束光的<strong>相干叠加（coherent superposition）</strong>。设第一束光的电场为 $E_1$，第二束为 $E_2$。在第二个分束器的输出端，你实际测量的是光强（intensity），即电场模的平方：</p>
-<p>$$<br />
-I = |E_1 + E_2|^2 = |E_1|^2 + |E_2|^2 + 2|E_1||E_2|\cos(\Delta\phi)<br />
-$$</p>
-<p>其中 $\Delta\phi = \phi_1 - \phi_2$ 是两束光之间的相位差。那个交叉项 $2|E_1||E_2|\cos(\Delta\phi)$ 就是干涉项——它是整个 MZI 的灵魂。通过调节 $\Delta\phi$，你可以让输出光强在最大和最小之间连续变化。当 $\Delta\phi = 0$ 时，两束光<strong>相长干涉（constructive interference）</strong>，输出最强；当 $\Delta\phi = \pi$ 时，两束光<strong>相消干涉（destructive interference）</strong>，输出最弱（理想情况下为零）。</p>
+<p>这个装置的核心物理是什么？是两束光的<strong>相干叠加（coherent superposition）</strong>。设第一束光的电场为 <span class="arithmatex">\(E_1\)</span>，第二束为 <span class="arithmatex">\(E_2\)</span>。在第二个分束器的输出端，你实际测量的是光强（intensity），即电场模的平方：</p>
+<div class="arithmatex">\[
+I = |E_1 + E_2|^2 = |E_1|^2 + |E_2|^2 + 2|E_1||E_2|\cos(\Delta\phi)
+\]</div>
+<p>其中 <span class="arithmatex">\(\Delta\phi = \phi_1 - \phi_2\)</span> 是两束光之间的相位差。那个交叉项 <span class="arithmatex">\(2|E_1||E_2|\cos(\Delta\phi)\)</span> 就是干涉项——它是整个 MZI 的灵魂。通过调节 <span class="arithmatex">\(\Delta\phi\)</span>，你可以让输出光强在最大和最小之间连续变化。当 <span class="arithmatex">\(\Delta\phi = 0\)</span> 时，两束光<strong>相长干涉（constructive interference）</strong>，输出最强；当 <span class="arithmatex">\(\Delta\phi = \pi\)</span> 时，两束光<strong>相消干涉（destructive interference）</strong>，输出最弱（理想情况下为零）。</p>
 <p>这就是你每天都在做的事情。你可能用它来做量子态层析，可能用它来实现一个可控的量子门，也可能只是用它来稳定光路。无论如何，这个物理图像已经深深刻在你的直觉里：<strong>两束相干光相遇，相位决定一切。</strong></p>
 <h3 id="mzi_1">片上 MZI：同样的物理，不同的实现<a class="headerlink" href="#mzi_1" title="Permanent link"></a></h3>
 <p>现在，让我们把这个装置&rdquo;压扁&rdquo;，塞进一块硅片里。这就是片上光子学（on-chip photonics）做的事情。物理原理完全没有变——仍然是两束光的相干叠加——但每一个元件的实现方式都换了。</p>
@@ -407,92 +417,92 @@ $$</p>
 <p>波导臂的长度决定了光程。在自由空间里，你通过移动反射镜来改变光程；在片上，你通过设计不同的波导长度来改变光程。更重要的是，波导臂也是你放置<strong>相位调制器（phase modulator）</strong>的地方。</p>
 <p><strong>相位调制 → 热光/电光效应</strong></p>
 <p>在自由空间里，你可能用压电陶瓷驱动的反射镜来引入相位延迟，或者用液晶 SLM 来调制相位。在片上，PACE 使用的是<strong>热光调制（thermo-optic modulation）</strong>。</p>
-<p>热光效应的物理非常直观：硅的折射率随温度变化。具体来说，硅的折射率温度系数大约是 $dn/dT \approx 1.86 \times 10^{-4} \, \text{K}^{-1}$。如果你在波导上方放置一个微小的金属加热器（通常是钛或铂薄膜），通电加热就会改变波导的温度，从而改变其折射率，进而改变光在波导中传播的有效光程，最终引入一个可控的相位 shift。</p>
-<p>为什么用热光而不是电光效应（比如 Pockels 效应）？因为硅是中心对称晶体，其二阶非线性系数 $\chi^{(2)}$ 为零，所以没有 Pockels 效应。虽然可以通过应力工程或者等离子体色散效应（plasma dispersion effect，即自由载流子浓度改变折射率）来实现电光调制，但热光调制在硅光子学中实现简单、线性度好、不需要特殊的掺杂工艺，因此在大规模矩阵运算中被广泛采用。</p>
+<p>热光效应的物理非常直观：硅的折射率随温度变化。具体来说，硅的折射率温度系数大约是 <span class="arithmatex">\(dn/dT \approx 1.86 \times 10^{-4} \, \text{K}^{-1}\)</span>。如果你在波导上方放置一个微小的金属加热器（通常是钛或铂薄膜），通电加热就会改变波导的温度，从而改变其折射率，进而改变光在波导中传播的有效光程，最终引入一个可控的相位 shift。</p>
+<p>为什么用热光而不是电光效应（比如 Pockels 效应）？因为硅是中心对称晶体，其二阶非线性系数 <span class="arithmatex">\(\chi^{(2)}\)</span> 为零，所以没有 Pockels 效应。虽然可以通过应力工程或者等离子体色散效应（plasma dispersion effect，即自由载流子浓度改变折射率）来实现电光调制，但热光调制在硅光子学中实现简单、线性度好、不需要特殊的掺杂工艺，因此在大规模矩阵运算中被广泛采用。</p>
 <p>热光调制的代价是速度较慢——典型响应时间在微秒到百微秒量级，因为热量需要扩散。PACE 的 1 GHz 时钟速度并不是由热光调制器决定的，而是由整个系统的电学接口和数字控制决定的。实际上，PACE 中 MZI 的权重是预先配置好的，在计算过程中保持不变（或者说，在&rdquo;加载权重&rdquo;和&rdquo;执行计算&rdquo;这两个时间尺度上是分离的）。</p>
 <h3 id="_6">传输函数：从物理图像到公式<a class="headerlink" href="#_6" title="Permanent link"></a></h3>
-<p>让我们把上述物理图像翻译成数学。考虑一个对称的 MZI：两个 50:50 定向耦合器，中间有两条波导臂，在其中一条臂上（或者两条臂上）有相位调制器，引入相位差 $\Delta\phi$。</p>
-<p>我们从输入端开始跟踪光场。设输入光场为 $E_{\text{in}}$，功率为 $P_{\text{in}} = |E_{\text{in}}|^2$。</p>
+<p>让我们把上述物理图像翻译成数学。考虑一个对称的 MZI：两个 50:50 定向耦合器，中间有两条波导臂，在其中一条臂上（或者两条臂上）有相位调制器，引入相位差 <span class="arithmatex">\(\Delta\phi\)</span>。</p>
+<p>我们从输入端开始跟踪光场。设输入光场为 <span class="arithmatex">\(E_{\text{in}}\)</span>，功率为 <span class="arithmatex">\(P_{\text{in}} = |E_{\text{in}}|^2\)</span>。</p>
 <p><strong>第一个定向耦合器（50:50）</strong>：</p>
 <p>定向耦合器的散射矩阵（scattering matrix）可以写成：</p>
-<p>$$<br />
-\begin{pmatrix} E_{1} \ E_{2} \end{pmatrix}<br />
-= \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \ i &amp; 1 \end{pmatrix}<br />
-\begin{pmatrix} E_{\text{in}} \ 0 \end{pmatrix}<br />
-= \frac{E_{\text{in}}}{\sqrt{2}} \begin{pmatrix} 1 \ i \end{pmatrix}<br />
-$$</p>
-<p>这里 $E_1$ 和 $E_2$ 是两条臂中的光场。注意矩阵元中的 $i$（虚数单位）——它来自于定向耦合器的耦合特性，对应于一个 $\pi/2$ 的相位 jump。这个 $i$ 和自由空间分束器的散射矩阵中的 $i$ 是同一个东西，只是自由空间分束器的矩阵形式通常写作：</p>
-<p>$$<br />
-\frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \ i &amp; 1 \end{pmatrix}<br />
-$$</p>
+<div class="arithmatex">\[
+\begin{pmatrix} E_{1} \\ E_{2} \end{pmatrix}
+= \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \\ i &amp; 1 \end{pmatrix}
+\begin{pmatrix} E_{\text{in}} \\ 0 \end{pmatrix}
+= \frac{E_{\text{in}}}{\sqrt{2}} \begin{pmatrix} 1 \\ i \end{pmatrix}
+\]</div>
+<p>这里 <span class="arithmatex">\(E_1\)</span> 和 <span class="arithmatex">\(E_2\)</span> 是两条臂中的光场。注意矩阵元中的 <span class="arithmatex">\(i\)</span>（虚数单位）——它来自于定向耦合器的耦合特性，对应于一个 <span class="arithmatex">\(\pi/2\)</span> 的相位 jump。这个 <span class="arithmatex">\(i\)</span> 和自由空间分束器的散射矩阵中的 <span class="arithmatex">\(i\)</span> 是同一个东西，只是自由空间分束器的矩阵形式通常写作：</p>
+<div class="arithmatex">\[
+\frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \\ i &amp; 1 \end{pmatrix}
+\]</div>
 <p>或者有时用实数矩阵加上额外的相位项来表示。不同的约定不影响最终可观测的物理结果。</p>
 <p><strong>波导臂传播</strong>：</p>
-<p>光在两条臂中传播。假设上臂引入相位 $\phi_1$，下臂引入相位 $\phi_2$。那么：</p>
-<p>$$<br />
-E_1&rsquo; = E_1 e^{i\phi_1} = \frac{E_{\text{in}}}{\sqrt{2}} e^{i\phi_1}<br />
-$$</p>
-<p>$$<br />
-E_2&rsquo; = E_2 e^{i\phi_2} = \frac{i E_{\text{in}}}{\sqrt{2}} e^{i\phi_2}<br />
-$$</p>
+<p>光在两条臂中传播。假设上臂引入相位 <span class="arithmatex">\(\phi_1\)</span>，下臂引入相位 <span class="arithmatex">\(\phi_2\)</span>。那么：</p>
+<div class="arithmatex">\[
+E_1' = E_1 e^{i\phi_1} = \frac{E_{\text{in}}}{\sqrt{2}} e^{i\phi_1}
+\]</div>
+<div class="arithmatex">\[
+E_2' = E_2 e^{i\phi_2} = \frac{i E_{\text{in}}}{\sqrt{2}} e^{i\phi_2}
+\]</div>
 <p><strong>第二个定向耦合器（50:50）</strong>：</p>
-<p>同样的散射矩阵作用于 $(E_1&rsquo;, E_2&rsquo;)$：</p>
-<p>$$<br />
-\begin{pmatrix} E_{\text{out},1} \ E_{\text{out},2} \end{pmatrix}<br />
-= \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \ i &amp; 1 \end{pmatrix}<br />
-\begin{pmatrix} E_1&rsquo; \ E_2&rsquo; \end{pmatrix}<br />
-$$</p>
+<p>同样的散射矩阵作用于 <span class="arithmatex">\((E_1', E_2')\)</span>：</p>
+<div class="arithmatex">\[
+\begin{pmatrix} E_{\text{out},1} \\ E_{\text{out},2} \end{pmatrix}
+= \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \\ i &amp; 1 \end{pmatrix}
+\begin{pmatrix} E_1' \\ E_2' \end{pmatrix}
+\]</div>
 <p>让我们计算上输出端（通常称为&rdquo; bar &ldquo;端口，即与输入同侧的输出）的光场：</p>
-<p>$$<br />
-E_{\text{out},1} = \frac{1}{\sqrt{2}} (E_1&rsquo; + i E_2&rsquo;)<br />
-= \frac{1}{\sqrt{2}} \left( \frac{E_{\text{in}}}{\sqrt{2}} e^{i\phi_1} + i \cdot \frac{i E_{\text{in}}}{\sqrt{2}} e^{i\phi_2} \right)<br />
-$$</p>
-<p>$$<br />
-= \frac{E_{\text{in}}}{2} \left( e^{i\phi_1} + i^2 e^{i\phi_2} \right)<br />
-= \frac{E_{\text{in}}}{2} \left( e^{i\phi_1} - e^{i\phi_2} \right)<br />
-$$</p>
-<p>提取公因子 $e^{i(\phi_1 + \phi_2)/2}$：</p>
-<p>$$<br />
-E_{\text{out},1} = \frac{E_{\text{in}}}{2} e^{i(\phi_1 + \phi_2)/2} \left( e^{i(\phi_1 - \phi_2)/2} - e^{-i(\phi_1 - \phi_2)/2} \right)<br />
-$$</p>
-<p>利用欧拉公式 $e^{ix} - e^{-ix} = 2i\sin(x)$：</p>
-<p>$$<br />
-E_{\text{out},1} = \frac{E_{\text{in}}}{2} e^{i(\phi_1 + \phi_2)/2} \cdot 2i \sin\left(\frac{\Delta\phi}{2}\right)<br />
-= i E_{\text{in}} e^{i(\phi_1 + \phi_2)/2} \sin\left(\frac{\Delta\phi}{2}\right)<br />
-$$</p>
-<p>其中 $\Delta\phi = \phi_1 - \phi_2$。</p>
+<div class="arithmatex">\[
+E_{\text{out},1} = \frac{1}{\sqrt{2}} (E_1' + i E_2')
+= \frac{1}{\sqrt{2}} \left( \frac{E_{\text{in}}}{\sqrt{2}} e^{i\phi_1} + i \cdot \frac{i E_{\text{in}}}{\sqrt{2}} e^{i\phi_2} \right)
+\]</div>
+<div class="arithmatex">\[
+= \frac{E_{\text{in}}}{2} \left( e^{i\phi_1} + i^2 e^{i\phi_2} \right)
+= \frac{E_{\text{in}}}{2} \left( e^{i\phi_1} - e^{i\phi_2} \right)
+\]</div>
+<p>提取公因子 <span class="arithmatex">\(e^{i(\phi_1 + \phi_2)/2}\)</span>：</p>
+<div class="arithmatex">\[
+E_{\text{out},1} = \frac{E_{\text{in}}}{2} e^{i(\phi_1 + \phi_2)/2} \left( e^{i(\phi_1 - \phi_2)/2} - e^{-i(\phi_1 - \phi_2)/2} \right)
+\]</div>
+<p>利用欧拉公式 <span class="arithmatex">\(e^{ix} - e^{-ix} = 2i\sin(x)\)</span>：</p>
+<div class="arithmatex">\[
+E_{\text{out},1} = \frac{E_{\text{in}}}{2} e^{i(\phi_1 + \phi_2)/2} \cdot 2i \sin\left(\frac{\Delta\phi}{2}\right)
+= i E_{\text{in}} e^{i(\phi_1 + \phi_2)/2} \sin\left(\frac{\Delta\phi}{2}\right)
+\]</div>
+<p>其中 <span class="arithmatex">\(\Delta\phi = \phi_1 - \phi_2\)</span>。</p>
 <p>输出光强为：</p>
-<p>$$<br />
-P_{\text{out},1} = |E_{\text{out},1}|^2 = |E_{\text{in}}|^2 \sin^2\left(\frac{\Delta\phi}{2}\right) = P_{\text{in}} \sin^2\left(\frac{\Delta\phi}{2}\right)<br />
-$$</p>
+<div class="arithmatex">\[
+P_{\text{out},1} = |E_{\text{out},1}|^2 = |E_{\text{in}}|^2 \sin^2\left(\frac{\Delta\phi}{2}\right) = P_{\text{in}} \sin^2\left(\frac{\Delta\phi}{2}\right)
+\]</div>
 <p>类似地，交叉端口（cross port）的输出为：</p>
-<p>$$<br />
-P_{\text{out},2} = P_{\text{in}} \cos^2\left(\frac{\Delta\phi}{2}\right)<br />
-$$</p>
-<p>（如果你选择不同的端口作为&rdquo;输出&rdquo;，正弦和余弦会互换。关键是：一个端口的功率是 $\cos^2(\Delta\phi/2)$，另一个是 $\sin^2(\Delta\phi/2)$，两者之和恒等于 $P_{\text{in}}$，满足能量守恒。）</p>
-<p>这就是片上 MZI 的传输函数。它和自由空间 MZI 的传输函数<strong>完全相同</strong>。唯一的区别是：在自由空间里，你通过移动反射镜来改变 $\Delta\phi$；在片上，你通过给加热器通电来改变 $\Delta\phi$。</p>
+<div class="arithmatex">\[
+P_{\text{out},2} = P_{\text{in}} \cos^2\left(\frac{\Delta\phi}{2}\right)
+\]</div>
+<p>（如果你选择不同的端口作为&rdquo;输出&rdquo;，正弦和余弦会互换。关键是：一个端口的功率是 <span class="arithmatex">\(\cos^2(\Delta\phi/2)\)</span>，另一个是 <span class="arithmatex">\(\sin^2(\Delta\phi/2)\)</span>，两者之和恒等于 <span class="arithmatex">\(P_{\text{in}}\)</span>，满足能量守恒。）</p>
+<p>这就是片上 MZI 的传输函数。它和自由空间 MZI 的传输函数<strong>完全相同</strong>。唯一的区别是：在自由空间里，你通过移动反射镜来改变 <span class="arithmatex">\(\Delta\phi\)</span>；在片上，你通过给加热器通电来改变 <span class="arithmatex">\(\Delta\phi\)</span>。</p>
 <h3 id="_7">为什么这个公式很重要<a class="headerlink" href="#_7" title="Permanent link"></a></h3>
-<p>$P_{\text{out}} = P_{\text{in}} \cos^2(\Delta\phi/2)$ 这个公式告诉我们：通过控制相位差 $\Delta\phi$，我们可以连续地调节 MZI 的透射率（transmittance）从 0 到 1。如果我们把 MZI 看作一个&rdquo;光阀门&rdquo;，那么 $\Delta\phi$ 就是阀门的旋钮。</p>
-<p>更进一步，如果我们有两条这样的 MZI 臂，并且只在其中一条臂上放置调制器，那么输入功率就被分成了两部分，一部分透射，一部分反射，分配比例由 $\Delta\phi$ 决定。这正是一个<strong>可调分束器（tunable beam splitter）</strong>——而在 PACE 中，可调分束器就是实现矩阵乘法中&rdquo;权重&rdquo;的基本单元。</p>
+<p><span class="arithmatex">\(P_{\text{out}} = P_{\text{in}} \cos^2(\Delta\phi/2)\)</span> 这个公式告诉我们：通过控制相位差 <span class="arithmatex">\(\Delta\phi\)</span>，我们可以连续地调节 MZI 的透射率（transmittance）从 0 到 1。如果我们把 MZI 看作一个&rdquo;光阀门&rdquo;，那么 <span class="arithmatex">\(\Delta\phi\)</span> 就是阀门的旋钮。</p>
+<p>更进一步，如果我们有两条这样的 MZI 臂，并且只在其中一条臂上放置调制器，那么输入功率就被分成了两部分，一部分透射，一部分反射，分配比例由 <span class="arithmatex">\(\Delta\phi\)</span> 决定。这正是一个<strong>可调分束器（tunable beam splitter）</strong>——而在 PACE 中，可调分束器就是实现矩阵乘法中&rdquo;权重&rdquo;的基本单元。</p>
 <hr />
 <h2 id="12-vs">1.2 相干叠加 vs 非相干叠加<a class="headerlink" href="#12-vs" title="Permanent link"></a></h2>
 <h3 id="_8">你熟悉的相干叠加<a class="headerlink" href="#_8" title="Permanent link"></a></h3>
 <p>在量子干涉实验里，你处理的是<strong>相干光（coherent light）</strong>。相干意味着：两束光相遇时，它们的相位关系是固定的、确定的。你测量的光强不是两束光各自强度的简单相加，而是电场振幅叠加后的模平方：</p>
-<p>$$<br />
-I_{\text{coherent}} = |E_1 + E_2|^2 = I_1 + I_2 + 2\sqrt{I_1 I_2} \cos(\Delta\phi)<br />
-$$</p>
-<p>那个干涉项 $2\sqrt{I_1 I_2} \cos(\Delta\phi)$ 可以正可以负。当 $\Delta\phi = 0$ 时，总强度大于两束光强度之和；当 $\Delta\phi = \pi$ 时，总强度小于两束光强度之和，甚至可以为零。</p>
+<div class="arithmatex">\[
+I_{\text{coherent}} = |E_1 + E_2|^2 = I_1 + I_2 + 2\sqrt{I_1 I_2} \cos(\Delta\phi)
+\]</div>
+<p>那个干涉项 <span class="arithmatex">\(2\sqrt{I_1 I_2} \cos(\Delta\phi)\)</span> 可以正可以负。当 <span class="arithmatex">\(\Delta\phi = 0\)</span> 时，总强度大于两束光强度之和；当 <span class="arithmatex">\(\Delta\phi = \pi\)</span> 时，总强度小于两束光强度之和，甚至可以为零。</p>
 <p>这就是相干叠加的魔力，也是你能够在实验室里观察到干涉条纹的原因。但相干叠加有一个致命的弱点：<strong>它对相位极度敏感</strong>。</p>
-<p>想象你在做一个长时间的量子态层析实验。如果实验室的温度波动了 0.1 度，光程可能就变了几十个波长，相位 $\Delta\phi$ 就漂移了几十弧度。你的干涉条纹会&rdquo;跑&rdquo;掉，测量结果就全乱了。这就是为什么你的干涉仪需要隔振台、需要罩子、需要主动相位稳定反馈——你在和环境的随机涨落作斗争。</p>
+<p>想象你在做一个长时间的量子态层析实验。如果实验室的温度波动了 0.1 度，光程可能就变了几十个波长，相位 <span class="arithmatex">\(\Delta\phi\)</span> 就漂移了几十弧度。你的干涉条纹会&rdquo;跑&rdquo;掉，测量结果就全乱了。这就是为什么你的干涉仪需要隔振台、需要罩子、需要主动相位稳定反馈——你在和环境的随机涨落作斗争。</p>
 <h3 id="_9">非相干叠加：另一种可能性<a class="headerlink" href="#_9" title="Permanent link"></a></h3>
-<p>现在考虑另一种情况：两束光<strong>不相干（incoherent）</strong>。这意味着什么？意味着两束光之间没有固定的相位关系。可能是它们来自不同的光源，可能是它们经历了不同的随机路径，也可能是它们的波长不同。无论如何，在测量时间尺度内（光电探测器的响应时间通常远大于光的相干时间），相位差 $\Delta\phi$ 随机变化，均匀地分布在 $[0, 2\pi)$ 上。</p>
+<p>现在考虑另一种情况：两束光<strong>不相干（incoherent）</strong>。这意味着什么？意味着两束光之间没有固定的相位关系。可能是它们来自不同的光源，可能是它们经历了不同的随机路径，也可能是它们的波长不同。无论如何，在测量时间尺度内（光电探测器的响应时间通常远大于光的相干时间），相位差 <span class="arithmatex">\(\Delta\phi\)</span> 随机变化，均匀地分布在 <span class="arithmatex">\([0, 2\pi)\)</span> 上。</p>
 <p>那么干涉项的时间平均为：</p>
-<p>$$<br />
-\langle \cos(\Delta\phi) \rangle = \frac{1}{2\pi} \int_0^{2\pi} \cos(\Delta\phi) \, d(\Delta\phi) = 0<br />
-$$</p>
+<div class="arithmatex">\[
+\langle \cos(\Delta\phi) \rangle = \frac{1}{2\pi} \int_0^{2\pi} \cos(\Delta\phi) \, d(\Delta\phi) = 0
+\]</div>
 <p>于是：</p>
-<p>$$<br />
-I_{\text{incoherent}} = I_1 + I_2<br />
-$$</p>
+<div class="arithmatex">\[
+I_{\text{incoherent}} = I_1 + I_2
+\]</div>
 <p>光强直接相加，没有干涉项。这看起来&rdquo;无趣&rdquo;——你失去了干涉的精细结构。但换个角度看，你获得了一样极其宝贵的东西：<strong>鲁棒性（robustness）</strong>。</p>
 <p>因为非相干叠加不依赖相位，温度漂移、机械振动、应力变化——所有这些在相干光学中令人头疼的问题，在非相干光学中统统消失了。你不需要隔振台，不需要主动反馈，不需要恒温箱。光强就是光强，它只取决于每束光自身的功率，不取决于它们之间的神秘相位关系。</p>
 <h3 id="pace_1">PACE 为什么选择非相干<a class="headerlink" href="#pace_1" title="Permanent link"></a></h3>
@@ -503,46 +513,46 @@ $$</p>
 <p><strong>稳定性</strong>：PACE 芯片上有超过 16,000 个光子器件，封装在 2.5D 倒装芯片（flip-chip）中。如果采用相干架构，这 16,000 个器件的相位都需要精确控制并维持稳定。任何温度梯度、任何应力不均匀、任何制造偏差都会导致相位漂移，从而破坏计算结果。这在工程上是几乎不可能完成的任务。而非相干架构下，每个通道独立工作，互不影响。</p>
 </li>
 <li>
-<p><strong>校准简单性</strong>：相干 MZI 矩阵需要校准每一个单元的相位响应，而且校准结果会随温度变化。非相干架构只需要校准每个 MZI 的透射率（即 $\cos^2(\Delta\phi/2)$ 的值），这是一个单参数标定，而且主要受温度影响的是调制器本身的漂移，而不是通道间的相对相位。</p>
+<p><strong>校准简单性</strong>：相干 MZI 矩阵需要校准每一个单元的相位响应，而且校准结果会随温度变化。非相干架构只需要校准每个 MZI 的透射率（即 <span class="arithmatex">\(\cos^2(\Delta\phi/2)\)</span> 的值），这是一个单参数标定，而且主要受温度影响的是调制器本身的漂移，而不是通道间的相对相位。</p>
 </li>
 <li>
-<p><strong>温度不敏感性</strong>：在相干系统中，硅波导的热光系数（$dn/dT \approx 1.86 \times 10^{-4} \, \text{K}^{-1}$）意味着温度变化 1 K 会引起约 $10^{-4}$ 量级的折射率变化，对应每毫米波导约 $0.1\pi$ 的相位变化。对于厘米量级的芯片，几度的温度变化就足以让相干计算完全失效。而在非相干系统中，温度变化对每个通道的影响是均匀的（只要温度梯度不大），而且主要影响的是调制器的设定值，而不是通道间的相对相位——因为本来就没有相对相位这回事。</p>
+<p><strong>温度不敏感性</strong>：在相干系统中，硅波导的热光系数（<span class="arithmatex">\(dn/dT \approx 1.86 \times 10^{-4} \, \text{K}^{-1}\)</span>）意味着温度变化 1 K 会引起约 <span class="arithmatex">\(10^{-4}\)</span> 量级的折射率变化，对应每毫米波导约 <span class="arithmatex">\(0.1\pi\)</span> 的相位变化。对于厘米量级的芯片，几度的温度变化就足以让相干计算完全失效。而在非相干系统中，温度变化对每个通道的影响是均匀的（只要温度梯度不大），而且主要影响的是调制器的设定值，而不是通道间的相对相位——因为本来就没有相对相位这回事。</p>
 </li>
 </ol>
 <h3 id="vs">数学比较：相干 vs 非相干矩阵乘法<a class="headerlink" href="#vs" title="Permanent link"></a></h3>
 <p>让我们用数学来精确比较两种架构如何实现矩阵-向量乘法（Matrix-Vector Multiplication, MVM），这是 AI 推理的核心运算。</p>
 <p><strong>相干矩阵乘法</strong>：</p>
-<p>在相干光子神经网络中（例如基于 MZI 网格的酉矩阵实现），输入向量 $\mathbf{x}$ 被编码为光场的复振幅：</p>
-<p>$$<br />
-E_j^{\text{in}} \propto x_j<br />
-$$</p>
-<p>权重矩阵 $W$ 被编码为 MZI 网格的传输矩阵。每个 MZI 实现一个 $2 \times 2$ 的酉变换。整个网格实现：</p>
-<p>$$<br />
-\mathbf{E}^{\text{out}} = W \mathbf{E}^{\text{in}}<br />
-$$</p>
+<p>在相干光子神经网络中（例如基于 MZI 网格的酉矩阵实现），输入向量 <span class="arithmatex">\(\mathbf{x}\)</span> 被编码为光场的复振幅：</p>
+<div class="arithmatex">\[
+E_j^{\text{in}} \propto x_j
+\]</div>
+<p>权重矩阵 <span class="arithmatex">\(W\)</span> 被编码为 MZI 网格的传输矩阵。每个 MZI 实现一个 <span class="arithmatex">\(2 \times 2\)</span> 的酉变换。整个网格实现：</p>
+<div class="arithmatex">\[
+\mathbf{E}^{\text{out}} = W \mathbf{E}^{\text{in}}
+\]</div>
 <p>输出光强为：</p>
-<p>$$<br />
-I_i^{\text{out}} = |E_i^{\text{out}}|^2 = \left|\sum_j W_{ij} E_j^{\text{in}}\right|^2<br />
-$$</p>
-<p>注意这里的交叉项：如果 $W_{ij}$ 和 $E_j^{\text{in}}$ 有相位，那么输出光强不仅包含我们想要的 $\sum_j |W_{ij}|^2 |E_j^{\text{in}}|^2$，还包含所有 $j \neq k$ 的交叉干涉项 $W_{ij} W_{ik}^<em> E_j^{\text{in}} (E_k^{\text{in}})^</em>$。这些交叉项必须被精确控制，否则它们会污染计算结果。这就是相干架构的复杂性所在。</p>
+<div class="arithmatex">\[
+I_i^{\text{out}} = |E_i^{\text{out}}|^2 = \left|\sum_j W_{ij} E_j^{\text{in}}\right|^2
+\]</div>
+<p>注意这里的交叉项：如果 <span class="arithmatex">\(W_{ij}\)</span> 和 <span class="arithmatex">\(E_j^{\text{in}}\)</span> 有相位，那么输出光强不仅包含我们想要的 <span class="arithmatex">\(\sum_j |W_{ij}|^2 |E_j^{\text{in}}|^2\)</span>，还包含所有 <span class="arithmatex">\(j \neq k\)</span> 的交叉干涉项 <span class="arithmatex">\(W_{ij} W_{ik}^* E_j^{\text{in}} (E_k^{\text{in}})^*\)</span>。这些交叉项必须被精确控制，否则它们会污染计算结果。这就是相干架构的复杂性所在。</p>
 <p><strong>非相干（强度型）矩阵乘法</strong>：</p>
-<p>在 PACE 的非相干架构中，输入向量 $\mathbf{x}$ 被编码为<strong>光强</strong>：</p>
-<p>$$<br />
-I_j^{\text{in}} \propto x_j<br />
-$$</p>
-<p>注意：这里编码的是强度，不是振幅。每个输入通道 $j$ 对应一个独立的光波长（或者时间片，或者空间通道）。权重 $W_{ij}$ 通过 MZI 的透射率来实现：</p>
-<p>$$<br />
-T_{ij} = \cos^2\left(\frac{\Delta\phi_{ij}}{2}\right) \in [0, 1]<br />
-$$</p>
-<p>通过设定 $\Delta\phi_{ij}$，我们可以让 $T_{ij}$ 取 $[0, 1]$ 之间的任意值（实际上受限于消光比，但原理上如此）。</p>
-<p>每个输入通道 $j$ 的光强 $I_j^{\text{in}}$ 经过权重调制后变为 $T_{ij} I_j^{\text{in}}$，然后所有通道的光在波导中汇合。由于是<strong>非相干叠加</strong>，总输出光强就是各通道贡献的简单相加：</p>
-<p>$$<br />
-I_i^{\text{out}} = \sum_j T_{ij} I_j^{\text{in}}<br />
-$$</p>
-<p>如果我们将 $T_{ij}$ 映射为权重 $W_{ij}$（通过适当的缩放），这就精确实现了矩阵-向量乘法：</p>
-<p>$$<br />
-\mathbf{y} = W \mathbf{x}<br />
-$$</p>
+<p>在 PACE 的非相干架构中，输入向量 <span class="arithmatex">\(\mathbf{x}\)</span> 被编码为<strong>光强</strong>：</p>
+<div class="arithmatex">\[
+I_j^{\text{in}} \propto x_j
+\]</div>
+<p>注意：这里编码的是强度，不是振幅。每个输入通道 <span class="arithmatex">\(j\)</span> 对应一个独立的光波长（或者时间片，或者空间通道）。权重 <span class="arithmatex">\(W_{ij}\)</span> 通过 MZI 的透射率来实现：</p>
+<div class="arithmatex">\[
+T_{ij} = \cos^2\left(\frac{\Delta\phi_{ij}}{2}\right) \in [0, 1]
+\]</div>
+<p>通过设定 <span class="arithmatex">\(\Delta\phi_{ij}\)</span>，我们可以让 <span class="arithmatex">\(T_{ij}\)</span> 取 <span class="arithmatex">\([0, 1]\)</span> 之间的任意值（实际上受限于消光比，但原理上如此）。</p>
+<p>每个输入通道 <span class="arithmatex">\(j\)</span> 的光强 <span class="arithmatex">\(I_j^{\text{in}}\)</span> 经过权重调制后变为 <span class="arithmatex">\(T_{ij} I_j^{\text{in}}\)</span>，然后所有通道的光在波导中汇合。由于是<strong>非相干叠加</strong>，总输出光强就是各通道贡献的简单相加：</p>
+<div class="arithmatex">\[
+I_i^{\text{out}} = \sum_j T_{ij} I_j^{\text{in}}
+\]</div>
+<p>如果我们将 <span class="arithmatex">\(T_{ij}\)</span> 映射为权重 <span class="arithmatex">\(W_{ij}\)</span>（通过适当的缩放），这就精确实现了矩阵-向量乘法：</p>
+<div class="arithmatex">\[
+\mathbf{y} = W \mathbf{x}
+\]</div>
 <p>没有交叉干涉项，没有相位敏感问题，每个通道独立工作，互不干扰。</p>
 <h3 id="_10">物理直觉：不同颜色的光束<a class="headerlink" href="#_10" title="Permanent link"></a></h3>
 <p>一个直观的类比是：<strong>非相干叠加就像不同颜色的光束。</strong></p>
@@ -557,31 +567,31 @@ $$</p>
 <p>在光子学中，情况完全不同。光有一个奇妙的性质：<strong>不同波长的光可以在同一根波导中独立传播，互不干扰。</strong> 这是因为波导中的光场满足线性波动方程，不同频率的模式是正交的（在理想无耦合近似下）。</p>
 <p>这就是<strong>波分复用（Wavelength Division Multiplexing, WDM）</strong>的物理基础。</p>
 <h3 id="wdm">WDM 的物理图像<a class="headerlink" href="#wdm" title="Permanent link"></a></h3>
-<p>想象一根光纤（或者片上波导）就像一条多车道高速公路。但在光子学的高速公路上，&rdquo;车道&rdquo;不是空间上分开的，而是频率上分开的。波长 $\lambda_1$ 的光在&rdquo;车道 1&rdquo;上行驶，波长 $\lambda_2$ 的光在&rdquo;车道 2&rdquo;上行驶，以此类推。它们在空间上重叠——都挤在同一根波导里——但由于频率不同，它们不会&rdquo;撞车&rdquo;（即不会干涉）。</p>
+<p>想象一根光纤（或者片上波导）就像一条多车道高速公路。但在光子学的高速公路上，&rdquo;车道&rdquo;不是空间上分开的，而是频率上分开的。波长 <span class="arithmatex">\(\lambda_1\)</span> 的光在&rdquo;车道 1&rdquo;上行驶，波长 <span class="arithmatex">\(\lambda_2\)</span> 的光在&rdquo;车道 2&rdquo;上行驶，以此类推。它们在空间上重叠——都挤在同一根波导里——但由于频率不同，它们不会&rdquo;撞车&rdquo;（即不会干涉）。</p>
 <p>在接收端，你可以用一个<strong>解复用器（demultiplexer）</strong>来把它们分开。解复用器的工作原理类似于棱镜或者光栅：不同波长的光由于色散（dispersion）而偏转到不同的方向，从而被不同的探测器接收。</p>
 <p>在片上光子学中，解复用器通常用<strong>阵列波导光栅（Arrayed Waveguide Grating, AWG）</strong>或者<strong>微环谐振器（microring resonator）</strong>来实现。AWG 的工作原理类似于传统光栅：不同波长的光经过不同长度的波导阵列后产生不同的相位积累，在输出端发生相长干涉的位置随波长变化，从而将不同波长引导到不同的输出波导。</p>
 <h3 id="wdm_1">WDM 如何倍增光子计算的吞吐量<a class="headerlink" href="#wdm_1" title="Permanent link"></a></h3>
 <p>现在让我们把 WDM 和矩阵-向量乘法结合起来看。</p>
-<p>在 PACE 的非相干架构中，每个输入向量元素 $x_j$ 被编码为某个特定波长 $\lambda_j$ 的光强。假设我们有 $N$ 个输入通道，就使用 $N$ 个不同的波长，通过 WDM 复用到同一根输入波导中。</p>
+<p>在 PACE 的非相干架构中，每个输入向量元素 <span class="arithmatex">\(x_j\)</span> 被编码为某个特定波长 <span class="arithmatex">\(\lambda_j\)</span> 的光强。假设我们有 <span class="arithmatex">\(N\)</span> 个输入通道，就使用 <span class="arithmatex">\(N\)</span> 个不同的波长，通过 WDM 复用到同一根输入波导中。</p>
 <p>这些复用的光信号进入 MZI 网格。每个 MZI 对通过的每个波长都有相同的透射率（在理想情况下，忽略色散）。因此，同一个 MZI 的物理结构同时作用于所有波长，实现了并行的权重乘法。</p>
 <p>在输出端，解复用器将不同波长的光分开，分别探测。每个波长对应矩阵-向量乘法结果的一个分量：</p>
-<p>$$<br />
-I_i^{\text{out}}(\lambda_j) \propto W_{ij} x_j<br />
-$$</p>
-<p>等等——如果所有波长都走同一个 MZI，它们都被同一个透射率 $T_{ij}$ 调制，那输出端的每个波长不都是 $T_{ij} x_j$ 吗？那怎么得到求和 $\sum_j W_{ij} x_j$？</p>
+<div class="arithmatex">\[
+I_i^{\text{out}}(\lambda_j) \propto W_{ij} x_j
+\]</div>
+<p>等等——如果所有波长都走同一个 MZI，它们都被同一个透射率 <span class="arithmatex">\(T_{ij}\)</span> 调制，那输出端的每个波长不都是 <span class="arithmatex">\(T_{ij} x_j\)</span> 吗？那怎么得到求和 <span class="arithmatex">\(\sum_j W_{ij} x_j\)</span>？</p>
 <p>关键在于：<strong>每个输入波长对应矩阵的一列，而每个输出端口对应矩阵的一行。</strong></p>
 <p>让我更仔细地解释 PACE 的架构（我们会在第二章详细展开）：</p>
-<p>在 PACE 的 $64 \times 64$ 矩阵乘法器中：<br />
+<p>在 PACE 的 <span class="arithmatex">\(64 \times 64\)</span> 矩阵乘法器中：<br />
 - 有 64 个输入波导，每个输入波导承载一个波长的光（或者每个输入承载多个波长，取决于具体设计）。<br />
 - 光通过 MZI 网格，每个 MZI 的透射率设为一个权重值。<br />
 - 在输出端，光强在波导中自然叠加（非相干叠加），然后被光电探测器接收。</p>
 <p>实际上，PACE 采用的是一种更巧妙的架构：<strong>每个输入对应一个波长，所有波长通过 WDM 进入芯片，然后每个波长被分配到不同的输入端口，经过各自的 MZI 调制后，在输出波导中叠加。</strong></p>
 <p>或者换一种理解方式（这也是更常见的光子 MVM 实现）：<br />
-- 输入向量 $\mathbf{x}$ 的每个元素 $x_j$ 被编码为波长 $\lambda_j$ 的光强。<br />
+- 输入向量 <span class="arithmatex">\(\mathbf{x}\)</span> 的每个元素 <span class="arithmatex">\(x_j\)</span> 被编码为波长 <span class="arithmatex">\(\lambda_j\)</span> 的光强。<br />
 - 所有波长的光通过 WDM 耦合到芯片上。<br />
-- 在芯片内部，每个波长被路由到对应的&rdquo;列&rdquo;（即对应输入 $x_j$ 的 MZI 列）。<br />
-- 每个 MZI 的透射率设定为 $W_{ij}$。<br />
-- 在输出端，所有波长（即所有列的贡献）汇聚到同一个探测器，由于非相干叠加，探测器测到的总光强就是 $\sum_j W_{ij} x_j$。</p>
+- 在芯片内部，每个波长被路由到对应的&rdquo;列&rdquo;（即对应输入 <span class="arithmatex">\(x_j\)</span> 的 MZI 列）。<br />
+- 每个 MZI 的透射率设定为 <span class="arithmatex">\(W_{ij}\)</span>。<br />
+- 在输出端，所有波长（即所有列的贡献）汇聚到同一个探测器，由于非相干叠加，探测器测到的总光强就是 <span class="arithmatex">\(\sum_j W_{ij} x_j\)</span>。</p>
 <p>这种架构的美妙之处在于：<strong>一次光通过，就完成了整个矩阵-向量乘法。</strong> 不需要时钟周期来逐个计算元素，不需要存储中间结果，光本身就在传播过程中完成了所有的乘法和加法。</p>
 <h3 id="wdm_2">WDM 的容量<a class="headerlink" href="#wdm_2" title="Permanent link"></a></h3>
 <p>现代光通信中，WDM 系统可以在一根光纤中复用上百个波长，每个波长承载几十 Gbps 的数据。在片上光子学中，受限于波导损耗、串扰（crosstalk）和解复用器的复杂度，典型的 WDM 通道数在几十到几百之间。</p>
@@ -599,36 +609,36 @@ $$</p>
 <h2 id="21">2.1 神经网络的计算 = 矩阵乘法<a class="headerlink" href="#21" title="Permanent link"></a></h2>
 <h3 id="_13">从一个简单的神经网络层开始<a class="headerlink" href="#_13" title="Permanent link"></a></h3>
 <p>如果你曾经扫过一眼神经网络的数学描述，你可能会看到这样一个公式：</p>
-<p>$$<br />
-\mathbf{y} = W\mathbf{x} + \mathbf{b}<br />
-$$</p>
+<div class="arithmatex">\[
+\mathbf{y} = W\mathbf{x} + \mathbf{b}
+\]</div>
 <p>这看起来很简单，但它几乎包含了现代深度学习 90% 以上的计算量。让我们拆解它，看看它到底在做什么。</p>
-<p>假设我们有一个单层神经网络（或者叫全连接层，fully connected layer）。输入是一个向量 $\mathbf{x} = (x_1, x_2, \ldots, x_N)^T$，代表 $N$ 个输入特征。输出是一个向量 $\mathbf{y} = (y_1, y_2, \ldots, y_M)^T$，代表 $M$ 个输出特征。</p>
-<p>$W$ 是一个 $M \times N$ 的矩阵，称为<strong>权重矩阵（weight matrix）</strong>。它的每个元素 $W_{ij}$ 表示从输入 $j$ 到输出 $i$ 的连接强度。$\mathbf{b}$ 是一个 $M$ 维的偏置向量（bias vector），每个输出神经元有一个偏置项。</p>
-<p>让我们写出输出向量第 $i$ 个分量的显式表达式：</p>
-<p>$$<br />
-y_i = \sum_{j=1}^{N} W_{ij} x_j + b_i<br />
-$$</p>
-<p>这个公式说的是：第 $i$ 个输出神经元，它&rdquo;看&rdquo;到了所有的输入 $x_1, x_2, \ldots, x_N$，但它对每个输入的重视程度不同——由权重 $W_{i1}, W_{i2}, \ldots, W_{iN}$ 决定。它把所有输入按照权重加权求和，再加上一个偏置 $b_i$，就得到了自己的输出 $y_i$。</p>
+<p>假设我们有一个单层神经网络（或者叫全连接层，fully connected layer）。输入是一个向量 <span class="arithmatex">\(\mathbf{x} = (x_1, x_2, \ldots, x_N)^T\)</span>，代表 <span class="arithmatex">\(N\)</span> 个输入特征。输出是一个向量 <span class="arithmatex">\(\mathbf{y} = (y_1, y_2, \ldots, y_M)^T\)</span>，代表 <span class="arithmatex">\(M\)</span> 个输出特征。</p>
+<p><span class="arithmatex">\(W\)</span> 是一个 <span class="arithmatex">\(M \times N\)</span> 的矩阵，称为<strong>权重矩阵（weight matrix）</strong>。它的每个元素 <span class="arithmatex">\(W_{ij}\)</span> 表示从输入 <span class="arithmatex">\(j\)</span> 到输出 <span class="arithmatex">\(i\)</span> 的连接强度。<span class="arithmatex">\(\mathbf{b}\)</span> 是一个 <span class="arithmatex">\(M\)</span> 维的偏置向量（bias vector），每个输出神经元有一个偏置项。</p>
+<p>让我们写出输出向量第 <span class="arithmatex">\(i\)</span> 个分量的显式表达式：</p>
+<div class="arithmatex">\[
+y_i = \sum_{j=1}^{N} W_{ij} x_j + b_i
+\]</div>
+<p>这个公式说的是：第 <span class="arithmatex">\(i\)</span> 个输出神经元，它&rdquo;看&rdquo;到了所有的输入 <span class="arithmatex">\(x_1, x_2, \ldots, x_N\)</span>，但它对每个输入的重视程度不同——由权重 <span class="arithmatex">\(W_{i1}, W_{i2}, \ldots, W_{iN}\)</span> 决定。它把所有输入按照权重加权求和，再加上一个偏置 <span class="arithmatex">\(b_i\)</span>，就得到了自己的输出 <span class="arithmatex">\(y_i\)</span>。</p>
 <h3 id="_14">物理直觉：神经元在做什么<a class="headerlink" href="#_14" title="Permanent link"></a></h3>
-<p>从物理直觉上理解，每个神经元就是一个<strong>加权求和器（weighted summer）</strong>。想象一个神经元有 $N$ 根&rdquo;输入 dendrites&rdquo;，每根 dendrite 上有一个&rdquo;音量旋钮&rdquo; $W_{ij}$。输入信号 $x_j$ 从第 $j$ 根 dendrite 进来，被旋钮调节音量后，所有调节后的信号在神经元体内混合（求和），最后从&rdquo;输出 axon&rdquo; 发射出去。</p>
+<p>从物理直觉上理解，每个神经元就是一个<strong>加权求和器（weighted summer）</strong>。想象一个神经元有 <span class="arithmatex">\(N\)</span> 根&rdquo;输入 dendrites&rdquo;，每根 dendrite 上有一个&rdquo;音量旋钮&rdquo; <span class="arithmatex">\(W_{ij}\)</span>。输入信号 <span class="arithmatex">\(x_j\)</span> 从第 <span class="arithmatex">\(j\)</span> 根 dendrite 进来，被旋钮调节音量后，所有调节后的信号在神经元体内混合（求和），最后从&rdquo;输出 axon&rdquo; 发射出去。</p>
 <p>在真实的生物神经元中，这个&rdquo;混合&rdquo;过程涉及复杂的电化学信号。在人工神经网络中，它就是简单的算术：乘法（调节音量）和加法（混合信号）。</p>
 <h3 id="_15">深度网络：矩阵乘法的堆叠<a class="headerlink" href="#_15" title="Permanent link"></a></h3>
-<p>当然，真正的深度神经网络不止一层。一个 $L$ 层的网络看起来像这样：</p>
-<p>$$<br />
-\mathbf{y}^{(1)} = f(W^{(1)}\mathbf{x} + \mathbf{b}^{(1)})<br />
-$$</p>
-<p>$$<br />
-\mathbf{y}^{(2)} = f(W^{(2)}\mathbf{y}^{(1)} + \mathbf{b}^{(2)})<br />
-$$</p>
-<p>$$<br />
-\vdots<br />
-$$</p>
-<p>$$<br />
-\mathbf{y}^{(L)} = f(W^{(L)}\mathbf{y}^{(L-1)} + \mathbf{b}^{(L)})<br />
-$$</p>
-<p>其中 $f(\cdot)$ 是<strong>激活函数（activation function）</strong>，比如 ReLU（$f(z) = \max(0, z)$）或者 Sigmoid。激活函数引入了非线性，使神经网络能够逼近任意复杂的函数（这就是著名的通用近似定理）。</p>
-<p>但注意：激活函数通常是一个逐元素的操作，计算量很小。真正消耗计算资源的是矩阵乘法 $W^{(l)}\mathbf{y}^{(l-1)}$。在大型神经网络中，权重矩阵可能有数百万甚至数十亿个元素，而每一次前向传播（forward pass）都需要执行多次这样的矩阵乘法。</p>
+<p>当然，真正的深度神经网络不止一层。一个 <span class="arithmatex">\(L\)</span> 层的网络看起来像这样：</p>
+<div class="arithmatex">\[
+\mathbf{y}^{(1)} = f(W^{(1)}\mathbf{x} + \mathbf{b}^{(1)})
+\]</div>
+<div class="arithmatex">\[
+\mathbf{y}^{(2)} = f(W^{(2)}\mathbf{y}^{(1)} + \mathbf{b}^{(2)})
+\]</div>
+<div class="arithmatex">\[
+\vdots
+\]</div>
+<div class="arithmatex">\[
+\mathbf{y}^{(L)} = f(W^{(L)}\mathbf{y}^{(L-1)} + \mathbf{b}^{(L)})
+\]</div>
+<p>其中 <span class="arithmatex">\(f(\cdot)\)</span> 是<strong>激活函数（activation function）</strong>，比如 ReLU（<span class="arithmatex">\(f(z) = \max(0, z)\)</span>）或者 Sigmoid。激活函数引入了非线性，使神经网络能够逼近任意复杂的函数（这就是著名的通用近似定理）。</p>
+<p>但注意：激活函数通常是一个逐元素的操作，计算量很小。真正消耗计算资源的是矩阵乘法 <span class="arithmatex">\(W^{(l)}\mathbf{y}^{(l-1)}\)</span>。在大型神经网络中，权重矩阵可能有数百万甚至数十亿个元素，而每一次前向传播（forward pass）都需要执行多次这样的矩阵乘法。</p>
 <h3 id="_16">卷积也是矩阵乘法<a class="headerlink" href="#_16" title="Permanent link"></a></h3>
 <p>你可能会说：&rdquo;等等，很多神经网络用卷积层（convolutional layer），不是全连接层。卷积不是矩阵乘法吧？&rdquo;</p>
 <p>实际上，<strong>卷积可以等价地写成矩阵乘法</strong>。具体来说，一个卷积操作可以通过<strong>Toeplitz 矩阵</strong>或者<strong>im2col</strong>变换转化为矩阵乘法。在 GPU 的实际实现中，卷积层通常就是用高度优化的矩阵乘法库（如 cuBLAS）来计算的。</p>
@@ -637,20 +647,20 @@ $$</p>
 <h2 id="22-macmultiply-accumulate">2.2 从矩阵乘法到 MAC（Multiply-Accumulate）<a class="headerlink" href="#22-macmultiply-accumulate" title="Permanent link"></a></h2>
 <h3 id="_17">一个神经元 = 一个内积<a class="headerlink" href="#_17" title="Permanent link"></a></h3>
 <p>让我们回到单层神经网络的公式：</p>
-<p>$$<br />
-y_i = \sum_{j=1}^{N} W_{ij} x_j + b_i<br />
-$$</p>
-<p>忽略偏置项 $b_i$（它只是一个加法，计算量相对于求和可以忽略），这个公式本质上是一个<strong>内积（inner product）</strong>或者说<strong>点积（dot product）</strong>：</p>
-<p>$$<br />
-y_i = \mathbf{w}<em j="1">i \cdot \mathbf{x} = \sum</em> x_j}^{N} W_{ij<br />
-$$</p>
-<p>其中 $\mathbf{w}<em i1="i1">i = (W</em>)$ 是权重矩阵的第 $i$ 行。}, W_{i2}, \ldots, W_{iN</p>
-<p>内积由什么组成？由 $N$ 次乘法和 $N-1$ 次加法（或者 $N$ 次加法，如果把初始累加器设为零）。在数字信号处理和计算机工程中，这种&rdquo;乘然后累加&rdquo;的操作有一个专门的名字：<strong>MAC（Multiply-Accumulate）</strong>。</p>
+<div class="arithmatex">\[
+y_i = \sum_{j=1}^{N} W_{ij} x_j + b_i
+\]</div>
+<p>忽略偏置项 <span class="arithmatex">\(b_i\)</span>（它只是一个加法，计算量相对于求和可以忽略），这个公式本质上是一个<strong>内积（inner product）</strong>或者说<strong>点积（dot product）</strong>：</p>
+<div class="arithmatex">\[
+y_i = \mathbf{w}_i \cdot \mathbf{x} = \sum_{j=1}^{N} W_{ij} x_j
+\]</div>
+<p>其中 <span class="arithmatex">\(\mathbf{w}_i = (W_{i1}, W_{i2}, \ldots, W_{iN})\)</span> 是权重矩阵的第 <span class="arithmatex">\(i\)</span> 行。</p>
+<p>内积由什么组成？由 <span class="arithmatex">\(N\)</span> 次乘法和 <span class="arithmatex">\(N-1\)</span> 次加法（或者 <span class="arithmatex">\(N\)</span> 次加法，如果把初始累加器设为零）。在数字信号处理和计算机工程中，这种&rdquo;乘然后累加&rdquo;的操作有一个专门的名字：<strong>MAC（Multiply-Accumulate）</strong>。</p>
 <p>一个 MAC 操作就是：</p>
-<p>$$<br />
-\text{accumulator} \leftarrow \text{accumulator} + a \times b<br />
-$$</p>
-<p>计算一个 $N$ 维内积需要 $N$ 次 MAC。计算整个矩阵-向量乘法（$M$ 个输出神经元，每个做 $N$ 维内积）需要 $M \times N$ 次 MAC。</p>
+<div class="arithmatex">\[
+\text{accumulator} \leftarrow \text{accumulator} + a \times b
+\]</div>
+<p>计算一个 <span class="arithmatex">\(N\)</span> 维内积需要 <span class="arithmatex">\(N\)</span> 次 MAC。计算整个矩阵-向量乘法（<span class="arithmatex">\(M\)</span> 个输出神经元，每个做 <span class="arithmatex">\(N\)</span> 维内积）需要 <span class="arithmatex">\(M \times N\)</span> 次 MAC。</p>
 <h3 id="mac-ai">为什么 MAC 是 AI 的基本运算<a class="headerlink" href="#mac-ai" title="Permanent link"></a></h3>
 <p>MAC 之所以成为 AI 计算的&rdquo;原子操作&rdquo;，有几个原因：</p>
 <ol>
@@ -661,12 +671,12 @@ $$</p>
 <p>在硬件设计中，处理器的性能经常用&rdquo;每秒多少 GMAC&rdquo;（Giga MAC operations per second）来衡量。例如，NVIDIA A100 GPU 的峰值性能大约是 312 TFLOPS（FP16），其中大部分就是 MAC 操作。</p>
 <h3 id="mac">MAC 的数学结构<a class="headerlink" href="#mac" title="Permanent link"></a></h3>
 <p>让我们更仔细地看看 MAC 的数学结构。一个矩阵-向量乘法：</p>
-<p>$$<br />
-y_i = \sum_{j=1}^{N} W_{ij} x_j, \quad i = 1, 2, \ldots, M<br />
-$$</p>
-<p>可以看作 $M$ 个并行的内积计算。每个内积是 $N$ 个乘积项的和。</p>
-<p>如果我们把权重 $W_{ij}$ 看作&rdquo;系数&rdquo;，输入 $x_j$ 看作&rdquo;变量&rdquo;，那么每个输出 $y_i$ 就是变量 $x_j$ 的线性组合。这正是线性代数中&rdquo;线性变换&rdquo;的定义：矩阵 $W$ 定义了一个从 $N$ 维输入空间到 $M$ 维输出空间的线性映射。</p>
-<p>在神经网络的语境下，这个线性变换被激活函数 $f(\cdot)$ 所&rdquo;弯曲&rdquo;，从而能够表示非线性函数。但没有这个线性部分（即矩阵乘法），再多的非线性叠加也没有意义——一层只有激活函数而没有权重的网络，等价于一个固定的非线性变换，不具备学习能力。</p>
+<div class="arithmatex">\[
+y_i = \sum_{j=1}^{N} W_{ij} x_j, \quad i = 1, 2, \ldots, M
+\]</div>
+<p>可以看作 <span class="arithmatex">\(M\)</span> 个并行的内积计算。每个内积是 <span class="arithmatex">\(N\)</span> 个乘积项的和。</p>
+<p>如果我们把权重 <span class="arithmatex">\(W_{ij}\)</span> 看作&rdquo;系数&rdquo;，输入 <span class="arithmatex">\(x_j\)</span> 看作&rdquo;变量&rdquo;，那么每个输出 <span class="arithmatex">\(y_i\)</span> 就是变量 <span class="arithmatex">\(x_j\)</span> 的线性组合。这正是线性代数中&rdquo;线性变换&rdquo;的定义：矩阵 <span class="arithmatex">\(W\)</span> 定义了一个从 <span class="arithmatex">\(N\)</span> 维输入空间到 <span class="arithmatex">\(M\)</span> 维输出空间的线性映射。</p>
+<p>在神经网络的语境下，这个线性变换被激活函数 <span class="arithmatex">\(f(\cdot)\)</span> 所&rdquo;弯曲&rdquo;，从而能够表示非线性函数。但没有这个线性部分（即矩阵乘法），再多的非线性叠加也没有意义——一层只有激活函数而没有权重的网络，等价于一个固定的非线性变换，不具备学习能力。</p>
 <hr />
 <h2 id="23-ai-mac">2.3 AI 为什么需要大规模 MAC？<a class="headerlink" href="#23-ai-mac" title="Permanent link"></a></h2>
 <h3 id="_18">数字的震撼<a class="headerlink" href="#_18" title="Permanent link"></a></h3>
@@ -684,7 +694,7 @@ $$</p>
 - 从片外 DRAM（即内存条）读取一个 8 位操作数的能耗：约 <strong>100 pJ</strong></p>
 <p>看到问题了吗？从内存读取一个数所消耗的能量，是做一次乘法累加运算的几十倍甚至上千倍。在矩阵乘法中，每个权重和每个输入都需要从内存读取。如果权重矩阵太大放不进片上缓存（cache），就需要反复从 DRAM 读取——这就是著名的<strong>内存墙（memory wall）</strong>问题。</p>
 <h3 id="_20">内存墙的具体表现<a class="headerlink" href="#_20" title="Permanent link"></a></h3>
-<p>考虑一个 $M \times N$ 的矩阵乘以一个 $N$ 维向量。需要读取 $M \times N$ 个权重和 $N$ 个输入，产生 $M$ 个输出。如果 $M = N = 4096$（这在神经网络中很常见），权重矩阵有 1600 万个元素。如果每个权重是 8 位（1 字节），整个权重矩阵就是 16 MB。</p>
+<p>考虑一个 <span class="arithmatex">\(M \times N\)</span> 的矩阵乘以一个 <span class="arithmatex">\(N\)</span> 维向量。需要读取 <span class="arithmatex">\(M \times N\)</span> 个权重和 <span class="arithmatex">\(N\)</span> 个输入，产生 <span class="arithmatex">\(M\)</span> 个输出。如果 <span class="arithmatex">\(M = N = 4096\)</span>（这在神经网络中很常见），权重矩阵有 1600 万个元素。如果每个权重是 8 位（1 字节），整个权重矩阵就是 16 MB。</p>
 <p>现代 GPU 的片上 SRAM（L2 cache）通常在几 MB 到几十 MB 的量级。16 MB 的权重矩阵可能勉强能放下，但如果网络更深、批量更大，很快就会超出缓存容量。一旦需要从 DRAM 读取权重，性能就会急剧下降——因为 DRAM 的带宽（每秒能传输多少字节）远远跟不上计算核心的速度。</p>
 <p>这就是 AI 加速器（如 Google 的 TPU、NVIDIA 的 Tensor Core）试图解决的问题：通过更大的片上 SRAM、更智能的数据流（dataflow）和专门的 MAC 阵列，尽量减少数据移动。但无论如何，电子计算的基本限制仍然存在：数据必须在电线中移动，而电线有电阻、电容和延迟。</p>
 <hr />
@@ -710,25 +720,25 @@ $$</p>
 <p>PACE 芯片中的波导就相当于这个暗室中的空间。不同输入通道的光（不同波长，或者不同波导）汇聚到输出波导中，它们的光强直接相加。光电探测器测量的是总光强，这个总光强就是所有输入通道的加权贡献之和——正是我们想要的 MAC 结果。</p>
 <h3 id="_23">为什么光的&rdquo;加法&rdquo;是&rdquo;免费&rdquo;的<a class="headerlink" href="#_23" title="Permanent link"></a></h3>
 <p>让我们更精确地理解为什么光的强度叠加不需要消耗能量。</p>
-<p>在量子力学中，光子是玻色子（bosons），多个光子可以占据同一个量子态。在经典电磁学中，真空中的麦克斯韦方程是线性的：如果 $E_1(\mathbf{r}, t)$ 和 $E_2(\mathbf{r}, t)$ 都是解，那么它们的线性叠加 $E_1 + E_2$ 也是解。</p>
+<p>在量子力学中，光子是玻色子（bosons），多个光子可以占据同一个量子态。在经典电磁学中，真空中的麦克斯韦方程是线性的：如果 <span class="arithmatex">\(E_1(\mathbf{r}, t)\)</span> 和 <span class="arithmatex">\(E_2(\mathbf{r}, t)\)</span> 都是解，那么它们的线性叠加 <span class="arithmatex">\(E_1 + E_2\)</span> 也是解。</p>
 <p>这个线性意味着：两束光在同一区域传播时，它们不会&rdquo;相互干扰&rdquo;（在非相干的意义上）。每束光携带自己的能量，总能量就是各束光能量之和。没有能量在&rdquo;相加&rdquo;的过程中损失或额外消耗。</p>
-<p>相比之下，电子计算中的加法需要主动器件（晶体管）来改变电压状态。晶体管的开关涉及电荷的充放电（对电容充放电），而这个过程不可避免地消耗能量 $E = \frac{1}{2}CV^2$。即使在最先进的工艺下，这个能量也无法降为零。</p>
+<p>相比之下，电子计算中的加法需要主动器件（晶体管）来改变电压状态。晶体管的开关涉及电荷的充放电（对电容充放电），而这个过程不可避免地消耗能量 <span class="arithmatex">\(E = \frac{1}{2}CV^2\)</span>。即使在最先进的工艺下，这个能量也无法降为零。</p>
 <h3 id="_24">光做乘法的部分<a class="headerlink" href="#_24" title="Permanent link"></a></h3>
 <p>光的&rdquo;加法&rdquo;是免费的，但&rdquo;乘法&rdquo;呢？在 PACE 中，乘法是通过 MZI 的透射率来实现的：</p>
-<p>$$<br />
-I_{\text{out}} = T \cdot I_{\text{in}} = \cos^2\left(\frac{\Delta\phi}{2}\right) \cdot I_{\text{in}}<br />
-$$</p>
-<p>这里 $T$ 就是&rdquo;乘法系数&rdquo;，由 MZI 的相位设定。输入光强 $I_{\text{in}}$ 被乘以 $T$，得到输出光强 $I_{\text{out}}$。</p>
-<p>这个乘法也是&rdquo;被动&rdquo;的——光只是通过了一个无源器件（MZI），一部分透射，一部分反射（或者被导向另一个端口），不需要外部能量来&rdquo;执行&rdquo;乘法。设定相位 $\Delta\phi$ 需要消耗能量（给加热器通电），但这个消耗是<strong>静态</strong>的：一旦设定好，光在通过 MZI 的过程中不再消耗额外能量。</p>
+<div class="arithmatex">\[
+I_{\text{out}} = T \cdot I_{\text{in}} = \cos^2\left(\frac{\Delta\phi}{2}\right) \cdot I_{\text{in}}
+\]</div>
+<p>这里 <span class="arithmatex">\(T\)</span> 就是&rdquo;乘法系数&rdquo;，由 MZI 的相位设定。输入光强 <span class="arithmatex">\(I_{\text{in}}\)</span> 被乘以 <span class="arithmatex">\(T\)</span>，得到输出光强 <span class="arithmatex">\(I_{\text{out}}\)</span>。</p>
+<p>这个乘法也是&rdquo;被动&rdquo;的——光只是通过了一个无源器件（MZI），一部分透射，一部分反射（或者被导向另一个端口），不需要外部能量来&rdquo;执行&rdquo;乘法。设定相位 <span class="arithmatex">\(\Delta\phi\)</span> 需要消耗能量（给加热器通电），但这个消耗是<strong>静态</strong>的：一旦设定好，光在通过 MZI 的过程中不再消耗额外能量。</p>
 <p>这和电子计算形成鲜明对比：在电子计算中，每次 MAC 都需要晶体管开关，每次开关都消耗动态能量。而在光子计算中，权重的设定（调相位）是一次性的，之后光通过 MZI 执行乘法的过程本身几乎不消耗能量（忽略波导损耗的话）。</p>
 <h3 id="_25">光电探测：从光回到电<a class="headerlink" href="#_25" title="Permanent link"></a></h3>
 <p>当然，最终我们需要把光信号转换回电信号，以便后续的数字处理（比如应用激活函数、传递到下一层网络）。这个转换由<strong>光电探测器（photodetector）</strong>完成。</p>
 <p>PACE 使用的是<strong>锗（Germanium, Ge）光电探测器</strong>，集成在硅光子芯片上。锗对通信波段（C 波段，约 1550 nm）的光有强吸收，当光照射到锗层时，光子被吸收，产生电子-空穴对。在内建电场（或外加偏压）的作用下，这些载流子被分离，形成光电流。</p>
-<p>光电流 $I_{\text{pd}}$ 与入射光功率 $P_{\text{in}}$ 成正比：</p>
-<p>$$<br />
-I_{\text{pd}} = R \cdot P_{\text{in}}<br />
-$$</p>
-<p>其中 $R$ 是探测器的响应度（responsivity），单位是 A/W（安培每瓦特）。典型的锗探测器在 1550 nm 的响应度约为 0.8-1.0 A/W。</p>
+<p>光电流 <span class="arithmatex">\(I_{\text{pd}}\)</span> 与入射光功率 <span class="arithmatex">\(P_{\text{in}}\)</span> 成正比：</p>
+<div class="arithmatex">\[
+I_{\text{pd}} = R \cdot P_{\text{in}}
+\]</div>
+<p>其中 <span class="arithmatex">\(R\)</span> 是探测器的响应度（responsivity），单位是 A/W（安培每瓦特）。典型的锗探测器在 1550 nm 的响应度约为 0.8-1.0 A/W。</p>
 <p>这个光电转换过程确实消耗能量（需要给探测器加反向偏压），但它是一个<strong>模拟-数字接口</strong>的操作，而不是计算本身。计算（乘法和加法）在光域中已经完成，探测器只是&rdquo;读取&rdquo;结果。</p>
 <h3 id="_26">能效对比的总结<a class="headerlink" href="#_26" title="Permanent link"></a></h3>
 <p>让我们总结一下光子 MAC 和电子 MAC 的能效对比：</p>
@@ -778,7 +788,7 @@ $$</p>
 <li>AI 需要海量 MAC，电子计算的瓶颈在于数据移动（内存墙）。</li>
 <li>光子学天然适合做 MAC：乘法通过 MZI 透射率实现，加法通过光强非相干叠加实现，两者都是被动过程，几乎不消耗能量。</li>
 </ol>
-<p>但这只是故事的一半。在下一章中，我们将深入 PACE 的具体架构：如何将成千上万个 MZI 组织成一个 $64 \times 64$ 的矩阵乘法器？如何处理光损耗和串扰？如何实现 1 GHz 的时钟速度和 3 ns 的每周期延迟？以及，非相干架构如何在保持简单性的同时，实现足够高的计算精度来运行真实的 AI 模型？</p>
+<p>但这只是故事的一半。在下一章中，我们将深入 PACE 的具体架构：如何将成千上万个 MZI 组织成一个 <span class="arithmatex">\(64 \times 64\)</span> 的矩阵乘法器？如何处理光损耗和串扰？如何实现 1 GHz 的时钟速度和 3 ns 的每周期延迟？以及，非相干架构如何在保持简单性的同时，实现足够高的计算精度来运行真实的 AI 模型？</p>
 <p>光子计算不是魔法，但它确实提供了一种 fundamentally different 的计算范式——一种利用光在物理世界中的自然行为来完成计算的范式。理解这一点，就是理解 PACE 的起点。</p>
 <hr />
 <p><em>本章完。下一章将介绍 PACE 芯片的完整架构：从光栅耦合器到 MZI 网格，从 WDM 复用到光电探测，以及 2.5D 封装如何将所有这些集成在一起。</em></p>
@@ -788,17 +798,17 @@ $$</p>
 <hr />
 <h2 id="31">3.1 硅波导：把光&rdquo;关&rdquo;在芯片里<a class="headerlink" href="#31" title="Permanent link"></a></h2>
 <h3 id="311">3.1.1 从麦克斯韦方程组到波导模式<a class="headerlink" href="#311" title="Permanent link"></a></h3>
-<p>让我们从最基本的出发点开始。在均匀各向同性介质中，麦克斯韦方程组给出电场 $\mathbf{E}$ 的波动方程：</p>
-<p>$$<br />
-\nabla^2 \mathbf{E} - \mu_0 \varepsilon \frac{\partial^2 \mathbf{E}}{\partial t^2} = 0<br />
-$$</p>
-<p>对于单色光，设时间依赖为 $e^{-i\omega t}$，上式化为亥姆霍兹方程（Helmholtz equation）：</p>
-<p>$$<br />
-\nabla^2 \mathbf{E} + k_0^2 n^2 \mathbf{E} = 0<br />
-$$</p>
-<p>其中 $k_0 = \omega/c = 2\pi/\lambda_0$ 是真空波数，$n$ 是介质的折射率。</p>
-<p><strong>物理图像</strong>：在自由空间中，这个方程的解是平面波，可以向任意方向传播。但在波导中，我们希望在某一特定方向（设为 $z$ 方向）引导光的传播，同时将其横向（$x$-$y$ 平面）限制在波导核心区域内。</p>
-<p>考虑一个最简单的模型——平板波导（slab waveguide），即在 $x$ 方向无限延伸、在 $y$ 方向具有有限厚度的三层结构。更具体地，我们采用 SOI（Silicon on Insulator）结构：</p>
+<p>让我们从最基本的出发点开始。在均匀各向同性介质中，麦克斯韦方程组给出电场 <span class="arithmatex">\(\mathbf{E}\)</span> 的波动方程：</p>
+<div class="arithmatex">\[
+\nabla^2 \mathbf{E} - \mu_0 \varepsilon \frac{\partial^2 \mathbf{E}}{\partial t^2} = 0
+\]</div>
+<p>对于单色光，设时间依赖为 <span class="arithmatex">\(e^{-i\omega t}\)</span>，上式化为亥姆霍兹方程（Helmholtz equation）：</p>
+<div class="arithmatex">\[
+\nabla^2 \mathbf{E} + k_0^2 n^2 \mathbf{E} = 0
+\]</div>
+<p>其中 <span class="arithmatex">\(k_0 = \omega/c = 2\pi/\lambda_0\)</span> 是真空波数，<span class="arithmatex">\(n\)</span> 是介质的折射率。</p>
+<p><strong>物理图像</strong>：在自由空间中，这个方程的解是平面波，可以向任意方向传播。但在波导中，我们希望在某一特定方向（设为 <span class="arithmatex">\(z\)</span> 方向）引导光的传播，同时将其横向（<span class="arithmatex">\(x\)</span>-<span class="arithmatex">\(y\)</span> 平面）限制在波导核心区域内。</p>
+<p>考虑一个最简单的模型——平板波导（slab waveguide），即在 <span class="arithmatex">\(x\)</span> 方向无限延伸、在 <span class="arithmatex">\(y\)</span> 方向具有有限厚度的三层结构。更具体地，我们采用 SOI（Silicon on Insulator）结构：</p>
 <table>
 <thead>
 <tr>
@@ -813,105 +823,105 @@ $$</p>
 <tr>
 <td>上包层</td>
 <td>SiO₂</td>
-<td>$n_{\text{clad}} \approx 1.44$</td>
+<td><span class="arithmatex">\(n_{\text{clad}} \approx 1.44\)</span></td>
 <td>~2 μm</td>
 <td>光学隔离</td>
 </tr>
 <tr>
 <td>核心层</td>
 <td>Si</td>
-<td>$n_{\text{core}} \approx 3.48$</td>
+<td><span class="arithmatex">\(n_{\text{core}} \approx 3.48\)</span></td>
 <td>~220 nm</td>
 <td>光传输</td>
 </tr>
 <tr>
 <td>下包层</td>
 <td>SiO₂（埋氧层）</td>
-<td>$n_{\text{clad}} \approx 1.44$</td>
+<td><span class="arithmatex">\(n_{\text{clad}} \approx 1.44\)</span></td>
 <td>~2 μm</td>
 <td>光学隔离 + 衬底隔离</td>
 </tr>
 </tbody>
 </table>
 <p><strong>为什么这种结构能&rdquo;关&rdquo;住光？</strong></p>
-<p>核心物理机制是<strong>全内反射（Total Internal Reflection, TIR）</strong>。当光从光密介质（折射率 $n_{\text{core}}$）射向光疏介质（折射率 $n_{\text{clad}}$）时，如果入射角大于临界角：</p>
-<p>$$<br />
-\theta_c = \arcsin\left(\frac{n_{\text{clad}}}{n_{\text{core}}}\right)<br />
-$$</p>
+<p>核心物理机制是<strong>全内反射（Total Internal Reflection, TIR）</strong>。当光从光密介质（折射率 <span class="arithmatex">\(n_{\text{core}}\)</span>）射向光疏介质（折射率 <span class="arithmatex">\(n_{\text{clad}}\)</span>）时，如果入射角大于临界角：</p>
+<div class="arithmatex">\[
+\theta_c = \arcsin\left(\frac{n_{\text{clad}}}{n_{\text{core}}}\right)
+\]</div>
 <p>则光将完全反射回核心层，不会透射到包层中。</p>
-<p>对于硅-二氧化硅界面，$n_{\text{core}}/n_{\text{clad}} \approx 3.48/1.44 \approx 2.42$，临界角约为 $24.3°$。这意味着只要光在波导中的传播角度足够&rdquo;陡峭&rdquo;（接近平行于波导表面），它就会被反复全内反射，被限制在硅层内传播。</p>
+<p>对于硅-二氧化硅界面，<span class="arithmatex">\(n_{\text{core}}/n_{\text{clad}} \approx 3.48/1.44 \approx 2.42\)</span>，临界角约为 <span class="arithmatex">\(24.3°\)</span>。这意味着只要光在波导中的传播角度足够&rdquo;陡峭&rdquo;（接近平行于波导表面），它就会被反复全内反射，被限制在硅层内传播。</p>
 <h3 id="312">3.1.2 模式方程的推导<a class="headerlink" href="#312" title="Permanent link"></a></h3>
-<p>现在让我们更定量地分析。假设波沿 $z$ 方向传播，在 $x$ 方向均匀（平板波导近似），电场在 $y$ 方向受限。设电场形式为：</p>
-<p>$$<br />
-E(y, z, t) = \mathcal{E}(y) \, e^{i(\beta z - \omega t)}<br />
-$$</p>
-<p>其中 $\beta$ 是传播常数（propagation constant），它描述了光沿波导传播时的相位累积速率。</p>
-<p>将上式代入亥姆霍兹方程，得到关于 $\mathcal{E}(y)$ 的方程：</p>
-<p>$$<br />
-\frac{d^2 \mathcal{E}}{dy^2} + \left(k_0^2 n^2(y) - \beta^2\right) \mathcal{E} = 0<br />
-$$</p>
+<p>现在让我们更定量地分析。假设波沿 <span class="arithmatex">\(z\)</span> 方向传播，在 <span class="arithmatex">\(x\)</span> 方向均匀（平板波导近似），电场在 <span class="arithmatex">\(y\)</span> 方向受限。设电场形式为：</p>
+<div class="arithmatex">\[
+E(y, z, t) = \mathcal{E}(y) \, e^{i(\beta z - \omega t)}
+\]</div>
+<p>其中 <span class="arithmatex">\(\beta\)</span> 是传播常数（propagation constant），它描述了光沿波导传播时的相位累积速率。</p>
+<p>将上式代入亥姆霍兹方程，得到关于 <span class="arithmatex">\(\mathcal{E}(y)\)</span> 的方程：</p>
+<div class="arithmatex">\[
+\frac{d^2 \mathcal{E}}{dy^2} + \left(k_0^2 n^2(y) - \beta^2\right) \mathcal{E} = 0
+\]</div>
 <p>在三个区域中分别求解：</p>
-<p><strong>核心层</strong>（$|y| &lt; d/2$，$d$ 为波导厚度）：</p>
-<p>$$<br />
-\frac{d^2 \mathcal{E}}{dy^2} + \kappa^2 \mathcal{E} = 0, \quad \kappa^2 = k_0^2 n_{\text{core}}^2 - \beta^2<br />
-$$</p>
-<p>解为振荡形式：$\mathcal{E}(y) = A \cos(\kappa y)$ 或 $A \sin(\kappa y)$（对称或反对称模式）。</p>
-<p><strong>包层</strong>（$|y| &gt; d/2$）：</p>
-<p>$$<br />
-\frac{d^2 \mathcal{E}}{dy^2} - \gamma^2 \mathcal{E} = 0, \quad \gamma^2 = \beta^2 - k_0^2 n_{\text{clad}}^2<br />
-$$</p>
-<p>为了在 $|y| \to \infty$ 时场有限，需要 $\gamma &gt; 0$，解为指数衰减形式：$\mathcal{E}(y) \propto e^{-\gamma|y|}$。</p>
+<p><strong>核心层</strong>（<span class="arithmatex">\(|y| &lt; d/2\)</span>，<span class="arithmatex">\(d\)</span> 为波导厚度）：</p>
+<div class="arithmatex">\[
+\frac{d^2 \mathcal{E}}{dy^2} + \kappa^2 \mathcal{E} = 0, \quad \kappa^2 = k_0^2 n_{\text{core}}^2 - \beta^2
+\]</div>
+<p>解为振荡形式：<span class="arithmatex">\(\mathcal{E}(y) = A \cos(\kappa y)\)</span> 或 <span class="arithmatex">\(A \sin(\kappa y)\)</span>（对称或反对称模式）。</p>
+<p><strong>包层</strong>（<span class="arithmatex">\(|y| &gt; d/2\)</span>）：</p>
+<div class="arithmatex">\[
+\frac{d^2 \mathcal{E}}{dy^2} - \gamma^2 \mathcal{E} = 0, \quad \gamma^2 = \beta^2 - k_0^2 n_{\text{clad}}^2
+\]</div>
+<p>为了在 <span class="arithmatex">\(|y| \to \infty\)</span> 时场有限，需要 <span class="arithmatex">\(\gamma &gt; 0\)</span>，解为指数衰减形式：<span class="arithmatex">\(\mathcal{E}(y) \propto e^{-\gamma|y|}\)</span>。</p>
 <p><strong>关键约束</strong>：为了同时满足核心层振荡和包层衰减，传播常数必须满足：</p>
-<p>$$<br />
-k_0 n_{\text{clad}} &lt; \beta &lt; k_0 n_{\text{core}}<br />
-$$</p>
+<div class="arithmatex">\[
+k_0 n_{\text{clad}} &lt; \beta &lt; k_0 n_{\text{core}}
+\]</div>
 <p>这个不等式有深刻的物理意义：<br />
-- $\beta &lt; k_0 n_{\text{core}}$：核心层中光场呈振荡分布（传播行为）<br />
-- $\beta &gt; k_0 n_{\text{clad}}$：包层中光场呈指数衰减（倏逝行为，evanescent decay）</p>
+- <span class="arithmatex">\(\beta &lt; k_0 n_{\text{core}}\)</span>：核心层中光场呈振荡分布（传播行为）<br />
+- <span class="arithmatex">\(\beta &gt; k_0 n_{\text{clad}}\)</span>：包层中光场呈指数衰减（倏逝行为，evanescent decay）</p>
 <h3 id="313-effective-index">3.1.3 有效折射率（Effective Index）<a class="headerlink" href="#313-effective-index" title="Permanent link"></a></h3>
 <p>定义<strong>有效折射率</strong>（effective index）：</p>
-<p>$$<br />
-n_{\text{eff}} = \frac{\beta}{k_0} = \frac{\beta \lambda_0}{2\pi}<br />
-$$</p>
-<p>它表示光在波导中传播时，其相位速度 $v_p = \omega/\beta = c/n_{\text{eff}}$ 对应的等效折射率。有效折射率满足：</p>
-<p>$$<br />
-n_{\text{clad}} &lt; n_{\text{eff}} &lt; n_{\text{core}}<br />
-$$</p>
+<div class="arithmatex">\[
+n_{\text{eff}} = \frac{\beta}{k_0} = \frac{\beta \lambda_0}{2\pi}
+\]</div>
+<p>它表示光在波导中传播时，其相位速度 <span class="arithmatex">\(v_p = \omega/\beta = c/n_{\text{eff}}\)</span> 对应的等效折射率。有效折射率满足：</p>
+<div class="arithmatex">\[
+n_{\text{clad}} &lt; n_{\text{eff}} &lt; n_{\text{core}}
+\]</div>
 <p><strong>有效折射率方法</strong>（Effective Index Method）是一种常用的近似技术，用于将二维波导问题（矩形截面）分解为两个一维问题。基本思想是：</p>
 <ol>
-<li>先求解横向（厚度方向）的平板波导问题，得到 $n_{\text{eff}}$</li>
-<li>再将 $n_{\text{eff}}$ 作为&rdquo;等效核心折射率&rdquo;，求解宽度方向的限制问题</li>
+<li>先求解横向（厚度方向）的平板波导问题，得到 <span class="arithmatex">\(n_{\text{eff}}\)</span></li>
+<li>再将 <span class="arithmatex">\(n_{\text{eff}}\)</span> 作为&rdquo;等效核心折射率&rdquo;，求解宽度方向的限制问题</li>
 </ol>
-<p>这种方法的物理直觉是：光在厚度方向被限制后，可以看作在一个具有等效折射率 $n_{\text{eff}}$ 的&rdquo;有效平板&rdquo;中传播。</p>
+<p>这种方法的物理直觉是：光在厚度方向被限制后，可以看作在一个具有等效折射率 <span class="arithmatex">\(n_{\text{eff}}\)</span> 的&rdquo;有效平板&rdquo;中传播。</p>
 <p>对于 SOI 波导，典型参数为：<br />
-- 波导宽度 $w \approx 500$ nm<br />
-- 波导高度 $h \approx 220$ nm<br />
-- 工作波长 $\lambda_0 = 1550$ nm<br />
-- 有效折射率 $n_{\text{eff}} \approx 2.4$（基模 TE 偏振）</p>
+- 波导宽度 <span class="arithmatex">\(w \approx 500\)</span> nm<br />
+- 波导高度 <span class="arithmatex">\(h \approx 220\)</span> nm<br />
+- 工作波长 <span class="arithmatex">\(\lambda_0 = 1550\)</span> nm<br />
+- 有效折射率 <span class="arithmatex">\(n_{\text{eff}} \approx 2.4\)</span>（基模 TE 偏振）</p>
 <h3 id="314-v">3.1.4 单模与多模条件：V 参数<a class="headerlink" href="#314-v" title="Permanent link"></a></h3>
 <p>波导能支持多少个模式？这由<strong>归一化频率</strong>（normalized frequency），即 <strong>V 参数</strong>决定：</p>
-<p>$$<br />
-V = \frac{2\pi d}{\lambda_0} \sqrt{n_{\text{core}}^2 - n_{\text{clad}}^2} = \frac{2\pi d}{\lambda_0} \cdot \text{NA}<br />
-$$</p>
-<p>其中 NA $= \sqrt{n_{\text{core}}^2 - n_{\text{clad}}^2}$ 是<strong>数值孔径</strong>（numerical aperture），描述了波导收集光的能力。</p>
+<div class="arithmatex">\[
+V = \frac{2\pi d}{\lambda_0} \sqrt{n_{\text{core}}^2 - n_{\text{clad}}^2} = \frac{2\pi d}{\lambda_0} \cdot \text{NA}
+\]</div>
+<p>其中 NA <span class="arithmatex">\(= \sqrt{n_{\text{core}}^2 - n_{\text{clad}}^2}\)</span> 是<strong>数值孔径</strong>（numerical aperture），描述了波导收集光的能力。</p>
 <p>对于平板波导，模式截止条件为：<br />
-- $V &lt; \pi/2$：仅支持一个模式（单模，single-mode）<br />
-- $\pi/2 &lt; V &lt; \pi$：支持两个模式<br />
+- <span class="arithmatex">\(V &lt; \pi/2\)</span>：仅支持一个模式（单模，single-mode）<br />
+- <span class="arithmatex">\(\pi/2 &lt; V &lt; \pi\)</span>：支持两个模式<br />
 - 以此类推</p>
-<p><strong>物理图像</strong>：V 参数本质上是波导横向尺寸与光波长（在介质中）的比值。当波导太细（$V$ 太小）时，光无法被有效限制，会泄漏到包层中（截止）。当波导太粗（$V$ 太大）时，可以容纳多个&rdquo;横向驻波模式&rdquo;，类似于一个宽管中可以有多条水流路径。</p>
+<p><strong>物理图像</strong>：V 参数本质上是波导横向尺寸与光波长（在介质中）的比值。当波导太细（<span class="arithmatex">\(V\)</span> 太小）时，光无法被有效限制，会泄漏到包层中（截止）。当波导太粗（<span class="arithmatex">\(V\)</span> 太大）时，可以容纳多个&rdquo;横向驻波模式&rdquo;，类似于一个宽管中可以有多条水流路径。</p>
 <p>对于 PACE 使用的 SOI 波导：<br />
-- 在 $\lambda = 1550$ nm 处，$V \approx \frac{2\pi \times 220\text{nm}}{1550\text{nm}} \sqrt{3.48^2 - 1.44^2} \approx 2.6$</p>
+- 在 <span class="arithmatex">\(\lambda = 1550\)</span> nm 处，<span class="arithmatex">\(V \approx \frac{2\pi \times 220\text{nm}}{1550\text{nm}} \sqrt{3.48^2 - 1.44^2} \approx 2.6\)</span></p>
 <p>这个值处于单模边缘附近。通过精确设计波导尺寸，PACE 的波导在目标波长范围内保持单模工作，避免了模式色散（modal dispersion）和模式串扰（modal crosstalk）。</p>
 <h3 id="315">3.1.5 模式轮廓与限制因子<a class="headerlink" href="#315" title="Permanent link"></a></h3>
 <p><strong>模式轮廓</strong>（mode profile）描述了光场在波导横截面上的空间分布。对于基模（fundamental mode），光场在核心层中心最强，向包层呈指数衰减。</p>
-<p><strong>限制因子</strong>（confinement factor）$\Gamma$ 定义为光场能量在核心层中的占比：</p>
-<p>$$<br />
-\Gamma = \frac{\int_{\text{core}} |\mathcal{E}(y)|^2 \, dy}{\int_{-\infty}^{\infty} |\mathcal{E}(y)|^2 \, dy}<br />
-$$</p>
-<p>对于 SOI 波导，$\Gamma \approx 0.5 \sim 0.7$，意味着约一半到七成的光能量被限制在 220 nm 厚的硅层内。</p>
+<p><strong>限制因子</strong>（confinement factor）<span class="arithmatex">\(\Gamma\)</span> 定义为光场能量在核心层中的占比：</p>
+<div class="arithmatex">\[
+\Gamma = \frac{\int_{\text{core}} |\mathcal{E}(y)|^2 \, dy}{\int_{-\infty}^{\infty} |\mathcal{E}(y)|^2 \, dy}
+\]</div>
+<p>对于 SOI 波导，<span class="arithmatex">\(\Gamma \approx 0.5 \sim 0.7\)</span>，意味着约一半到七成的光能量被限制在 220 nm 厚的硅层内。</p>
 <p><strong>与光纤的类比</strong>：如果你熟悉单模光纤（single-mode fiber），SOI 波导的概念非常相似。光纤也是通过核心-包层折射率差实现光限制，也有 V 参数和单模条件。主要区别在于：<br />
 - 光纤是圆柱对称的，SOI 波导是矩形的<br />
-- 光纤的折射率差很小（$\Delta n \approx 0.01$），SOI 波导的折射率差很大（$\Delta n \approx 2$）<br />
+- 光纤的折射率差很小（<span class="arithmatex">\(\Delta n \approx 0.01\)</span>），SOI 波导的折射率差很大（<span class="arithmatex">\(\Delta n \approx 2\)</span>）<br />
 - 光纤模式场直径约 10 μm，SOI 波导模式场尺寸约 0.5 μm</p>
 <p>这种高折射率对比度（high-index contrast）使 SOI 波导可以急剧弯曲（弯曲半径可小至 5 μm），而光纤需要厘米级的弯曲半径。这正是 PIC 可以在几平方毫米内集成数千器件的关键。</p>
 <hr />
@@ -925,30 +935,30 @@ $$</p>
 </ol>
 <p><strong>光栅耦合器</strong>（grating coupler）提供了一种优雅的解决方案：它在芯片表面制作周期性结构，将垂直（或倾斜）入射的光&rdquo;折叠&rdquo;进波导平面内。</p>
 <h3 id="322">3.2.2 布拉格衍射的物理图像<a class="headerlink" href="#322" title="Permanent link"></a></h3>
-<p>光栅耦合器的核心物理是<strong>布拉格衍射</strong>（Bragg diffraction）。想象你在芯片表面刻蚀了一系列平行的凹槽，间距为 $\Lambda$（光栅周期）。当光以角度 $\theta$ 入射时，每个凹槽都散射一部分光。如果来自相邻凹槽的散射光相位相干叠加（constructive interference），就会形成强的衍射光束。</p>
-<p>对于波导中的导模，其传播常数为 $\beta = k_0 n_{\text{eff}}$。入射光在空气中的波矢为 $\mathbf{k}_i$，其在波导平面方向的投影为 $k_0 \sin\theta$（设入射面为 $x$-$z$ 平面，波导沿 $z$ 方向）。光栅提供额外的动量（准动量，quasimomentum）：</p>
-<p>$$<br />
-\beta = k_0 n_{\text{air}} \sin\theta + m \frac{2\pi}{\Lambda}<br />
-$$</p>
-<p>对于一阶衍射（$m = 1$）和空气折射率 $n_{\text{air}} \approx 1$，得到<strong>布拉格条件</strong>（Bragg condition）：</p>
-<p>$$<br />
-n_{\text{eff}} - \sin\theta = \frac{\lambda_0}{\Lambda}<br />
-$$</p>
+<p>光栅耦合器的核心物理是<strong>布拉格衍射</strong>（Bragg diffraction）。想象你在芯片表面刻蚀了一系列平行的凹槽，间距为 <span class="arithmatex">\(\Lambda\)</span>（光栅周期）。当光以角度 <span class="arithmatex">\(\theta\)</span> 入射时，每个凹槽都散射一部分光。如果来自相邻凹槽的散射光相位相干叠加（constructive interference），就会形成强的衍射光束。</p>
+<p>对于波导中的导模，其传播常数为 <span class="arithmatex">\(\beta = k_0 n_{\text{eff}}\)</span>。入射光在空气中的波矢为 <span class="arithmatex">\(\mathbf{k}_i\)</span>，其在波导平面方向的投影为 <span class="arithmatex">\(k_0 \sin\theta\)</span>（设入射面为 <span class="arithmatex">\(x\)</span>-<span class="arithmatex">\(z\)</span> 平面，波导沿 <span class="arithmatex">\(z\)</span> 方向）。光栅提供额外的动量（准动量，quasimomentum）：</p>
+<div class="arithmatex">\[
+\beta = k_0 n_{\text{air}} \sin\theta + m \frac{2\pi}{\Lambda}
+\]</div>
+<p>对于一阶衍射（<span class="arithmatex">\(m = 1\)</span>）和空气折射率 <span class="arithmatex">\(n_{\text{air}} \approx 1\)</span>，得到<strong>布拉格条件</strong>（Bragg condition）：</p>
+<div class="arithmatex">\[
+n_{\text{eff}} - \sin\theta = \frac{\lambda_0}{\Lambda}
+\]</div>
 <p>或等价地：</p>
-<p>$$<br />
-\Lambda = \frac{\lambda_0}{n_{\text{eff}} - \sin\theta}<br />
-$$</p>
-<p><strong>物理直觉</strong>：光栅就像一个&rdquo;动量转换器&rdquo;。自由空间光具有横向动量 $k_0 \sin\theta$，而波导导模需要纵向动量 $k_0 n_{\text{eff}}$。光栅的周期性提供了离散的动量增量 $2\pi/\Lambda$，使得动量守恒得以满足。</p>
-<p>对于垂直入射（$\theta = 0$），光栅周期为：</p>
-<p>$$<br />
-\Lambda = \frac{\lambda_0}{n_{\text{eff}}} \approx \frac{1550\text{nm}}{2.4} \approx 646\text{nm}<br />
-$$</p>
-<p>实际设计中，通常采用倾斜入射（$\theta \approx 8° \sim 10°$）以避免反射光直接返回光源。</p>
+<div class="arithmatex">\[
+\Lambda = \frac{\lambda_0}{n_{\text{eff}} - \sin\theta}
+\]</div>
+<p><strong>物理直觉</strong>：光栅就像一个&rdquo;动量转换器&rdquo;。自由空间光具有横向动量 <span class="arithmatex">\(k_0 \sin\theta\)</span>，而波导导模需要纵向动量 <span class="arithmatex">\(k_0 n_{\text{eff}}\)</span>。光栅的周期性提供了离散的动量增量 <span class="arithmatex">\(2\pi/\Lambda\)</span>，使得动量守恒得以满足。</p>
+<p>对于垂直入射（<span class="arithmatex">\(\theta = 0\)</span>），光栅周期为：</p>
+<div class="arithmatex">\[
+\Lambda = \frac{\lambda_0}{n_{\text{eff}}} \approx \frac{1550\text{nm}}{2.4} \approx 646\text{nm}
+\]</div>
+<p>实际设计中，通常采用倾斜入射（<span class="arithmatex">\(\theta \approx 8° \sim 10°\)</span>）以避免反射光直接返回光源。</p>
 <h3 id="323">3.2.3 耦合效率与重叠积分<a class="headerlink" href="#323" title="Permanent link"></a></h3>
-<p>耦合效率 $\eta$ 定义为进入波导的光功率与入射光功率之比。理论上，它取决于入射光场 $\psi_{\text{in}}$ 与波导模式 $\psi_{\text{wg}}$ 的<strong>重叠积分</strong>（overlap integral）：</p>
-<p>$$<br />
-\eta = \left| \int \psi_{\text{in}}^*(x) \, \psi_{\text{wg}}(x) \, dx \right|^2 \Big/ \left( \int |\psi_{\text{in}}|^2 dx \cdot \int |\psi_{\text{wg}}|^2 dx \right)<br />
-$$</p>
+<p>耦合效率 <span class="arithmatex">\(\eta\)</span> 定义为进入波导的光功率与入射光功率之比。理论上，它取决于入射光场 <span class="arithmatex">\(\psi_{\text{in}}\)</span> 与波导模式 <span class="arithmatex">\(\psi_{\text{wg}}\)</span> 的<strong>重叠积分</strong>（overlap integral）：</p>
+<div class="arithmatex">\[
+\eta = \left| \int \psi_{\text{in}}^*(x) \, \psi_{\text{wg}}(x) \, dx \right|^2 \Big/ \left( \int |\psi_{\text{in}}|^2 dx \cdot \int |\psi_{\text{wg}}|^2 dx \right)
+\]</div>
 <p><strong>为什么效率不能达到 100%？</strong> 几个因素限制了耦合效率：</p>
 <ol>
 <li><strong>模式失配</strong>：高斯光束（来自光纤）与指数衰减的波导模式形状不同</li>
@@ -956,85 +966,85 @@ $$</p>
 <li><strong>反射</strong>：界面处的菲涅尔反射损失</li>
 <li><strong>带宽</strong>：布拉格条件是波长敏感的</li>
 </ol>
-<p>通过优化光栅结构（如啁啾光栅 chirped grating、非均匀占空比 apodized duty cycle），可以实现方向性优化和模式匹配。先进的硅光栅耦合器可以达到 $3 \sim 5$ dB 的耦合损耗（即效率 $50\% \sim 70\%$）。</p>
+<p>通过优化光栅结构（如啁啾光栅 chirped grating、非均匀占空比 apodized duty cycle），可以实现方向性优化和模式匹配。先进的硅光栅耦合器可以达到 <span class="arithmatex">\(3 \sim 5\)</span> dB 的耦合损耗（即效率 <span class="arithmatex">\(50\% \sim 70\%\)</span>）。</p>
 <h3 id="324">3.2.4 带宽分析<a class="headerlink" href="#324" title="Permanent link"></a></h3>
 <p>光栅耦合器是<strong>色散器件</strong>——耦合效率强烈依赖于波长。对布拉格条件两边关于波长求导，得到带宽的近似表达式：</p>
-<p>$$<br />
-\Delta\lambda \approx \eta_{\text{BW}} \cdot \left| \frac{-n_c \cos\theta}{n_g - n_c \sin\theta} \right| \cdot \Lambda<br />
-$$</p>
-<p>其中 $n_g$ 是<strong>群折射率</strong>（group index），$n_c$ 是入射介质折射率（空气为 1），$\eta_{\text{BW}}$ 是一个与光栅设计相关的带宽系数。</p>
-<p>更直观的理解：光栅耦合器的带宽受限于光栅的&rdquo;频率选择性&rdquo;。光栅周期数 $N$ 越多，选择性越强（带宽越窄）。对于典型的光栅耦合器（$N \approx 20 \sim 50$ 个周期），3 dB 带宽约为 $30 \sim 60$ nm。</p>
+<div class="arithmatex">\[
+\Delta\lambda \approx \eta_{\text{BW}} \cdot \left| \frac{-n_c \cos\theta}{n_g - n_c \sin\theta} \right| \cdot \Lambda
+\]</div>
+<p>其中 <span class="arithmatex">\(n_g\)</span> 是<strong>群折射率</strong>（group index），<span class="arithmatex">\(n_c\)</span> 是入射介质折射率（空气为 1），<span class="arithmatex">\(\eta_{\text{BW}}\)</span> 是一个与光栅设计相关的带宽系数。</p>
+<p>更直观的理解：光栅耦合器的带宽受限于光栅的&rdquo;频率选择性&rdquo;。光栅周期数 <span class="arithmatex">\(N\)</span> 越多，选择性越强（带宽越窄）。对于典型的光栅耦合器（<span class="arithmatex">\(N \approx 20 \sim 50\)</span> 个周期），3 dB 带宽约为 <span class="arithmatex">\(30 \sim 60\)</span> nm。</p>
 <p><strong>PACE 数据</strong>：<br />
-- 耦合效率：约 $3 \sim 5$ dB/耦合面（即单程损耗 $50\% \sim 70\%$）<br />
-- 工作波长范围：C 波段（$1530 \sim 1565$ nm）或 O 波段（$1260 \sim 1360$ nm）<br />
+- 耦合效率：约 <span class="arithmatex">\(3 \sim 5\)</span> dB/耦合面（即单程损耗 <span class="arithmatex">\(50\% \sim 70\%\)</span>）<br />
+- 工作波长范围：C 波段（<span class="arithmatex">\(1530 \sim 1565\)</span> nm）或 O 波段（<span class="arithmatex">\(1260 \sim 1360\)</span> nm）<br />
 - 光栅耦合器带宽：足以覆盖所需波长范围</p>
 <hr />
 <h2 id="33-directional-coupler">3.3 定向耦合器（Directional Coupler）<a class="headerlink" href="#33-directional-coupler" title="Permanent link"></a></h2>
 <h3 id="331">3.3.1 片上&rdquo;分束器&rdquo;<a class="headerlink" href="#331" title="Permanent link"></a></h3>
 <p>在自由空间光学中，分束器（beam splitter）是干涉仪的核心元件——它将一束光分成两束（或合并两束光）。在片上光子学中，<strong>定向耦合器</strong>（directional coupler, DC）承担同样的角色。</p>
-<p>定向耦合器由两根平行放置的波导组成，间距为 $g$（通常 $200 \sim 400$ nm），平行长度为 $L$。当光从一根波导输入时，由于两根波导之间的倏逝场（evanescent field）重叠，光功率会逐渐耦合到另一根波导中。</p>
+<p>定向耦合器由两根平行放置的波导组成，间距为 <span class="arithmatex">\(g\)</span>（通常 <span class="arithmatex">\(200 \sim 400\)</span> nm），平行长度为 <span class="arithmatex">\(L\)</span>。当光从一根波导输入时，由于两根波导之间的倏逝场（evanescent field）重叠，光功率会逐渐耦合到另一根波导中。</p>
 <h3 id="332">3.3.2 耦合模理论推导<a class="headerlink" href="#332" title="Permanent link"></a></h3>
 <p>让我们用<strong>耦合模理论</strong>（Coupled Mode Theory, CMT）定量分析这一过程。</p>
-<p>设波导 1 和波导 2 中的模式振幅分别为 $a_1(z)$ 和 $a_2(z)$（满足 $|a_i|^2 = P_i$ 为功率）。在没有耦合时，各自独立传播：</p>
-<p>$$<br />
-\frac{da_1}{dz} = -i\beta_1 a_1, \quad \frac{da_2}{dz} = -i\beta_2 a_2<br />
-$$</p>
+<p>设波导 1 和波导 2 中的模式振幅分别为 <span class="arithmatex">\(a_1(z)\)</span> 和 <span class="arithmatex">\(a_2(z)\)</span>（满足 <span class="arithmatex">\(|a_i|^2 = P_i\)</span> 为功率）。在没有耦合时，各自独立传播：</p>
+<div class="arithmatex">\[
+\frac{da_1}{dz} = -i\beta_1 a_1, \quad \frac{da_2}{dz} = -i\beta_2 a_2
+\]</div>
 <p>当两根波导靠近时，波导 1 的倏逝场会&rdquo;感受到&rdquo;波导 2 的存在，反之亦然。这引入了一个耦合项：</p>
-<p>$$<br />
-\frac{da_1}{dz} = -i\beta_1 a_1 - i\kappa a_2<br />
-$$<br />
-$$<br />
-\frac{da_2}{dz} = -i\kappa a_1 - i\beta_2 a_2<br />
-$$</p>
-<p>其中 $\kappa$ 是<strong>耦合系数</strong>（coupling coefficient），它取决于：<br />
-- 两根波导的间距 $g$（$\kappa \propto e^{-\gamma g}$，指数衰减）<br />
+<div class="arithmatex">\[
+\frac{da_1}{dz} = -i\beta_1 a_1 - i\kappa a_2
+$$
+$$
+\frac{da_2}{dz} = -i\kappa a_1 - i\beta_2 a_2
+\]</div>
+<p>其中 <span class="arithmatex">\(\kappa\)</span> 是<strong>耦合系数</strong>（coupling coefficient），它取决于：<br />
+- 两根波导的间距 <span class="arithmatex">\(g\)</span>（<span class="arithmatex">\(\kappa \propto e^{-\gamma g}\)</span>，指数衰减）<br />
 - 模式重叠程度<br />
 - 工作波长</p>
-<p>对于对称定向耦合器（两根波导完全相同，$\beta_1 = \beta_2 = \beta$），方程组简化为：</p>
-<p>$$<br />
-i\frac{d}{dz}\begin{pmatrix} a_1 \ a_2 \end{pmatrix} = \begin{pmatrix} \beta &amp; \kappa \ \kappa &amp; \beta \end{pmatrix} \begin{pmatrix} a_1 \ a_2 \end{pmatrix}<br />
-$$</p>
+<p>对于对称定向耦合器（两根波导完全相同，<span class="arithmatex">\(\beta_1 = \beta_2 = \beta\)</span>），方程组简化为：</p>
+<div class="arithmatex">\[
+i\frac{d}{dz}\begin{pmatrix} a_1 \\ a_2 \end{pmatrix} = \begin{pmatrix} \beta &amp; \kappa \\ \kappa &amp; \beta \end{pmatrix} \begin{pmatrix} a_1 \\ a_2 \end{pmatrix}
+\]</div>
 <h3 id="333">3.3.3 功率转移的解析解<a class="headerlink" href="#333" title="Permanent link"></a></h3>
-<p>设初始条件为光从波导 1 输入：$a_1(0) = 1$，$a_2(0) = 0$。求解上述方程组，得到：</p>
-<p>$$<br />
-a_1(z) = \cos(\kappa z) \, e^{-i\beta z}<br />
-$$<br />
-$$<br />
-a_2(z) = -i\sin(\kappa z) \, e^{-i\beta z}<br />
-$$</p>
+<p>设初始条件为光从波导 1 输入：<span class="arithmatex">\(a_1(0) = 1\)</span>，<span class="arithmatex">\(a_2(0) = 0\)</span>。求解上述方程组，得到：</p>
+<div class="arithmatex">\[
+a_1(z) = \cos(\kappa z) \, e^{-i\beta z}
+$$
+$$
+a_2(z) = -i\sin(\kappa z) \, e^{-i\beta z}
+\]</div>
 <p>对应的功率为：</p>
-<p>$$<br />
-P_1(z) = |a_1(z)|^2 = \cos^2(\kappa z)<br />
-$$<br />
-$$<br />
-P_2(z) = |a_2(z)|^2 = \sin^2(\kappa z)<br />
-$$</p>
-<p><strong>物理图像</strong>：光功率在两根波导之间周期性&rdquo;来回跳动&rdquo;，就像两个耦合的摆锤交换能量。耦合系数 $\kappa$ 越大（波导越近），功率交换越快。</p>
+<div class="arithmatex">\[
+P_1(z) = |a_1(z)|^2 = \cos^2(\kappa z)
+$$
+$$
+P_2(z) = |a_2(z)|^2 = \sin^2(\kappa z)
+\]</div>
+<p><strong>物理图像</strong>：光功率在两根波导之间周期性&rdquo;来回跳动&rdquo;，就像两个耦合的摆锤交换能量。耦合系数 <span class="arithmatex">\(\kappa\)</span> 越大（波导越近），功率交换越快。</p>
 <h3 id="334-5050">3.3.4 50:50 分束条件与耦合长度<a class="headerlink" href="#334-5050" title="Permanent link"></a></h3>
 <p>当平行长度满足：</p>
-<p>$$<br />
-\kappa L_c = \frac{\pi}{4}<br />
-$$</p>
+<div class="arithmatex">\[
+\kappa L_c = \frac{\pi}{4}
+\]</div>
 <p>即：</p>
-<p>$$<br />
-L_c = \frac{\pi}{4\kappa}<br />
-$$</p>
-<p>时，有 $P_1 = P_2 = 0.5$，实现<strong>50:50 分束</strong>。更一般地，<strong>完全耦合长度</strong>（full coupling length）为：</p>
-<p>$$<br />
-L_{\pi} = \frac{\pi}{2\kappa}<br />
-$$</p>
+<div class="arithmatex">\[
+L_c = \frac{\pi}{4\kappa}
+\]</div>
+<p>时，有 <span class="arithmatex">\(P_1 = P_2 = 0.5\)</span>，实现<strong>50:50 分束</strong>。更一般地，<strong>完全耦合长度</strong>（full coupling length）为：</p>
+<div class="arithmatex">\[
+L_{\pi} = \frac{\pi}{2\kappa}
+\]</div>
 <p>此时所有功率从波导 1 转移到波导 2。</p>
-<p>对于 SOI 波导定向耦合器，典型的耦合长度在 $10 \sim 50$ μm 范围内，取决于波导间距。</p>
+<p>对于 SOI 波导定向耦合器，典型的耦合长度在 <span class="arithmatex">\(10 \sim 50\)</span> μm 范围内，取决于波导间距。</p>
 <h3 id="335">3.3.5 传输矩阵<a class="headerlink" href="#335" title="Permanent link"></a></h3>
-<p>定向耦合器可以用一个 $2 \times 2$ 传输矩阵描述。对于 50:50 耦合器：</p>
-<p>$$<br />
-\begin{pmatrix} E_{3} \ E_{4} \end{pmatrix} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \ i &amp; 1 \end{pmatrix} \begin{pmatrix} E_{1} \ E_{2} \end{pmatrix}<br />
-$$</p>
-<p>其中因子 $i$ 表示 $\pi/2$ 的相位变化——这是能量守恒的要求（$|1|^2 + |i|^2 = 2$，归一化后满足分束器关系）。</p>
+<p>定向耦合器可以用一个 <span class="arithmatex">\(2 \times 2\)</span> 传输矩阵描述。对于 50:50 耦合器：</p>
+<div class="arithmatex">\[
+\begin{pmatrix} E_{3} \\ E_{4} \end{pmatrix} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \\ i &amp; 1 \end{pmatrix} \begin{pmatrix} E_{1} \\ E_{2} \end{pmatrix}
+\]</div>
+<p>其中因子 <span class="arithmatex">\(i\)</span> 表示 <span class="arithmatex">\(\pi/2\)</span> 的相位变化——这是能量守恒的要求（<span class="arithmatex">\(|1|^2 + |i|^2 = 2\)</span>，归一化后满足分束器关系）。</p>
 <p><strong>与自由空间分束器的联系</strong>：如果你熟悉自由空间中的 50:50 分束器，其琼斯矩阵为：</p>
-<p>$$<br />
-\mathbf{B} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \ i &amp; 1 \end{pmatrix}<br />
-$$</p>
+<div class="arithmatex">\[
+\mathbf{B} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \\ i &amp; 1 \end{pmatrix}
+\]</div>
 <p>定向耦合器的矩阵形式完全相同！这体现了不同物理实现背后相同的数学结构。</p>
 <hr />
 <h2 id="34-mzi">3.4 MZI 调制器——片上版干涉仪<a class="headerlink" href="#34-mzi" title="Permanent link"></a></h2>
@@ -1065,62 +1075,62 @@ $$</p>
 
 <p>光从输入端口进入，被第一个定向耦合器分成两束，分别通过上下两臂，在第二个定向耦合器处重新合并，从输出端口射出。</p>
 <h3 id="342">3.4.2 传输函数的推导<a class="headerlink" href="#342" title="Permanent link"></a></h3>
-<p>设输入光场为 $E_{\text{in}}$，两臂引入的相位差为 $\Delta\phi = \phi_1 - \phi_2$。</p>
+<p>设输入光场为 <span class="arithmatex">\(E_{\text{in}}\)</span>，两臂引入的相位差为 <span class="arithmatex">\(\Delta\phi = \phi_1 - \phi_2\)</span>。</p>
 <p>第一个定向耦合器（50:50）：</p>
-<p>$$<br />
-\begin{pmatrix} E_{a1} \ E_{a2} \end{pmatrix} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \ i &amp; 1 \end{pmatrix} \begin{pmatrix} E_{\text{in}} \ 0 \end{pmatrix} = \frac{E_{\text{in}}}{\sqrt{2}} \begin{pmatrix} 1 \ i \end{pmatrix}<br />
-$$</p>
+<div class="arithmatex">\[
+\begin{pmatrix} E_{a1} \\ E_{a2} \end{pmatrix} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \\ i &amp; 1 \end{pmatrix} \begin{pmatrix} E_{\text{in}} \\ 0 \end{pmatrix} = \frac{E_{\text{in}}}{\sqrt{2}} \begin{pmatrix} 1 \\ i \end{pmatrix}
+\]</div>
 <p>两臂传播引入相位：</p>
-<p>$$<br />
-E_{b1} = E_{a1} e^{i\phi_1} = \frac{E_{\text{in}}}{\sqrt{2}} e^{i\phi_1}<br />
-$$<br />
-$$<br />
-E_{b2} = E_{a2} e^{i\phi_2} = \frac{i E_{\text{in}}}{\sqrt{2}} e^{i\phi_2}<br />
-$$</p>
+<div class="arithmatex">\[
+E_{b1} = E_{a1} e^{i\phi_1} = \frac{E_{\text{in}}}{\sqrt{2}} e^{i\phi_1}
+$$
+$$
+E_{b2} = E_{a2} e^{i\phi_2} = \frac{i E_{\text{in}}}{\sqrt{2}} e^{i\phi_2}
+\]</div>
 <p>第二个定向耦合器：</p>
-<p>$$<br />
-\begin{pmatrix} E_{\text{out},1} \ E_{\text{out},2} \end{pmatrix} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \ i &amp; 1 \end{pmatrix} \begin{pmatrix} E_{b1} \ E_{b2} \end{pmatrix}<br />
-$$</p>
+<div class="arithmatex">\[
+\begin{pmatrix} E_{\text{out},1} \\ E_{\text{out},2} \end{pmatrix} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 &amp; i \\ i &amp; 1 \end{pmatrix} \begin{pmatrix} E_{b1} \\ E_{b2} \end{pmatrix}
+\]</div>
 <p>计算输出端口 1（上输出）：</p>
-<p>$$<br />
-E_{\text{out},1} = \frac{1}{\sqrt{2}}(E_{b1} + i E_{b2}) = \frac{E_{\text{in}}}{2}\left(e^{i\phi_1} + i \cdot i \cdot e^{i\phi_2}\right) = \frac{E_{\text{in}}}{2}\left(e^{i\phi_1} - e^{i\phi_2}\right)<br />
-$$</p>
+<div class="arithmatex">\[
+E_{\text{out},1} = \frac{1}{\sqrt{2}}(E_{b1} + i E_{b2}) = \frac{E_{\text{in}}}{2}\left(e^{i\phi_1} + i \cdot i \cdot e^{i\phi_2}\right) = \frac{E_{\text{in}}}{2}\left(e^{i\phi_1} - e^{i\phi_2}\right)
+\]</div>
 <p>输出光强：</p>
-<p>$$<br />
-P_{\text{out},1} = |E_{\text{out},1}|^2 = \frac{P_{\text{in}}}{4} \left|e^{i\phi_1} - e^{i\phi_2}\right|^2<br />
-$$</p>
+<div class="arithmatex">\[
+P_{\text{out},1} = |E_{\text{out},1}|^2 = \frac{P_{\text{in}}}{4} \left|e^{i\phi_1} - e^{i\phi_2}\right|^2
+\]</div>
 <p>展开：</p>
-<p>$$<br />
-\left|e^{i\phi_1} - e^{i\phi_2}\right|^2 = \left(e^{i\phi_1} - e^{i\phi_2}\right)\left(e^{-i\phi_1} - e^{-i\phi_2}\right) = 2 - e^{i(\phi_1-\phi_2)} - e^{-i(\phi_1-\phi_2)} = 2 - 2\cos(\Delta\phi)<br />
-$$</p>
+<div class="arithmatex">\[
+\left|e^{i\phi_1} - e^{i\phi_2}\right|^2 = \left(e^{i\phi_1} - e^{i\phi_2}\right)\left(e^{-i\phi_1} - e^{-i\phi_2}\right) = 2 - e^{i(\phi_1-\phi_2)} - e^{-i(\phi_1-\phi_2)} = 2 - 2\cos(\Delta\phi)
+\]</div>
 <p>因此：</p>
-<p>$$<br />
-P_{\text{out},1} = \frac{P_{\text{in}}}{2} \left(1 - \cos(\Delta\phi)\right) = P_{\text{in}} \sin^2\left(\frac{\Delta\phi}{2}\right)<br />
-$$</p>
+<div class="arithmatex">\[
+P_{\text{out},1} = \frac{P_{\text{in}}}{2} \left(1 - \cos(\Delta\phi)\right) = P_{\text{in}} \sin^2\left(\frac{\Delta\phi}{2}\right)
+\]</div>
 <p>同理，输出端口 2：</p>
-<p>$$<br />
-P_{\text{out},2} = P_{\text{in}} \cos^2\left(\frac{\Delta\phi}{2}\right)<br />
-$$</p>
-<p><strong>这就是 MZI 的传输函数</strong>——与自由空间 MZI 完全相同！当两臂相位差 $\Delta\phi = 0$ 时，所有光从端口 2 输出；当 $\Delta\phi = \pi$ 时，所有光从端口 1 输出。</p>
+<div class="arithmatex">\[
+P_{\text{out},2} = P_{\text{in}} \cos^2\left(\frac{\Delta\phi}{2}\right)
+\]</div>
+<p><strong>这就是 MZI 的传输函数</strong>——与自由空间 MZI 完全相同！当两臂相位差 <span class="arithmatex">\(\Delta\phi = 0\)</span> 时，所有光从端口 2 输出；当 <span class="arithmatex">\(\Delta\phi = \pi\)</span> 时，所有光从端口 1 输出。</p>
 <h3 id="343">3.4.3 相位调制的物理机制<a class="headerlink" href="#343" title="Permanent link"></a></h3>
 <p>如何在片上实现相位调制？主要有两种机制：</p>
 <h4 id="thermo-optic-effect">热光效应（Thermo-Optic Effect）<a class="headerlink" href="#thermo-optic-effect" title="Permanent link"></a></h4>
 <p>硅的折射率随温度变化：</p>
-<p>$$<br />
-n(T) = n_0 + \frac{dn}{dT} \cdot \Delta T<br />
-$$</p>
-<p>其中热光系数 $dn/dT \approx 1.86 \times 10^{-4}$ K$^{-1}$（对于硅在 300 K 附近）。</p>
+<div class="arithmatex">\[
+n(T) = n_0 + \frac{dn}{dT} \cdot \Delta T
+\]</div>
+<p>其中热光系数 <span class="arithmatex">\(dn/dT \approx 1.86 \times 10^{-4}\)</span> K<span class="arithmatex">\(^{-1}\)</span>（对于硅在 300 K 附近）。</p>
 <p>在波导臂上方制作微型加热器（micro-heater），通过电流加热改变局部温度，从而改变折射率和光程：</p>
-<p>$$<br />
-\Delta\phi = \frac{2\pi}{\lambda_0} \Delta n \cdot L = \frac{2\pi}{\lambda_0} \frac{dn}{dT} \Delta T \cdot L<br />
-$$</p>
-<p>对于 $\pi$ 相移（实现从&rdquo;全透&rdquo;到&rdquo;全阻&rdquo;的切换），所需温度变化约为 $10 \sim 20$ K，功耗约 $10 \sim 50$ mW。</p>
+<div class="arithmatex">\[
+\Delta\phi = \frac{2\pi}{\lambda_0} \Delta n \cdot L = \frac{2\pi}{\lambda_0} \frac{dn}{dT} \Delta T \cdot L
+\]</div>
+<p>对于 <span class="arithmatex">\(\pi\)</span> 相移（实现从&rdquo;全透&rdquo;到&rdquo;全阻&rdquo;的切换），所需温度变化约为 <span class="arithmatex">\(10 \sim 20\)</span> K，功耗约 <span class="arithmatex">\(10 \sim 50\)</span> mW。</p>
 <h4 id="pockels-effect">泡克尔斯效应（Pockels Effect，电光效应）<a class="headerlink" href="#pockels-effect" title="Permanent link"></a></h4>
 <p>某些非中心对称材料（如 LiNbO₃、InP、有机聚合物）的折射率随外加电场线性变化：</p>
-<p>$$<br />
-\Delta n = -\frac{1}{2} n^3 r_{\text{eff}} E<br />
-$$</p>
-<p>其中 $r_{\text{eff}}$ 是有效电光系数。</p>
+<div class="arithmatex">\[
+\Delta n = -\frac{1}{2} n^3 r_{\text{eff}} E
+\]</div>
+<p>其中 <span class="arithmatex">\(r_{\text{eff}}\)</span> 是有效电光系数。</p>
 <p>泡克尔斯效应的响应速度极快（可达 GHz 以上），且功耗低。但硅是中心对称晶体，本身没有线性电光效应。要在硅中实现电光调制，需要：<br />
 - 引入应变打破对称性<br />
 - 使用等离子色散效应（plasma dispersion effect，载流子浓度改变折射率）<br />
@@ -1136,24 +1146,24 @@ $$</p>
 <h3 id="345">3.4.5 调制带宽限制<a class="headerlink" href="#345" title="Permanent link"></a></h3>
 <p>热光调制器的带宽受限于热动力学：</p>
 <ol>
-<li><strong>RC 时间常数</strong>：加热器本身的电阻 $R$ 和寄生电容 $C$ 决定了电学响应速度，$\tau_{RC} = RC$</li>
-<li><strong>热扩散时间</strong>：热量从加热器扩散到波导核心需要的时间，$\tau_{\text{thermal}} \sim d^2/\alpha$，其中 $d$ 是加热器到波导的距离，$\alpha$ 是热扩散系数</li>
+<li><strong>RC 时间常数</strong>：加热器本身的电阻 <span class="arithmatex">\(R\)</span> 和寄生电容 <span class="arithmatex">\(C\)</span> 决定了电学响应速度，<span class="arithmatex">\(\tau_{RC} = RC\)</span></li>
+<li><strong>热扩散时间</strong>：热量从加热器扩散到波导核心需要的时间，<span class="arithmatex">\(\tau_{\text{thermal}} \sim d^2/\alpha\)</span>，其中 <span class="arithmatex">\(d\)</span> 是加热器到波导的距离，<span class="arithmatex">\(\alpha\)</span> 是热扩散系数</li>
 </ol>
 <p>对于典型的硅光子热光调制器：<br />
-- 3 dB 带宽：约 $10 \sim 100$ kHz<br />
-- 上升/下降时间：约 $1 \sim 10$ μs</p>
+- 3 dB 带宽：约 <span class="arithmatex">\(10 \sim 100\)</span> kHz<br />
+- 上升/下降时间：约 <span class="arithmatex">\(1 \sim 10\)</span> μs</p>
 <p><strong>PACE 数据</strong>：<br />
-- 消光比（extinction ratio）：$&gt; 20$ dB（即通态与断态功率比 $&gt; 100:1$）<br />
+- 消光比（extinction ratio）：<span class="arithmatex">\(&gt; 20\)</span> dB（即通态与断态功率比 <span class="arithmatex">\(&gt; 100:1\)</span>）<br />
 - 调制带宽：足以支持 1 GHz 时钟下的权重更新（因为权重在每个周期开始时预加载，不需要在周期内连续调制）<br />
-- 驱动电压：$1 \sim 3$ V（CMOS 兼容）</p>
+- 驱动电压：<span class="arithmatex">\(1 \sim 3\)</span> V（CMOS 兼容）</p>
 <hr />
 <h2 id="35-mac">3.5 非相干光 MAC 的核心机制<a class="headerlink" href="#35-mac" title="Permanent link"></a></h2>
 <h3 id="351-pace">3.5.1 PACE 不是相干干涉矩阵<a class="headerlink" href="#351-pace" title="Permanent link"></a></h3>
 <p>这里需要澄清一个常见的误解。许多光子神经网络加速器（如 Lightmatter 的 Passage、MIT 的 Shen 等人的工作）采用<strong>相干 MZI 网格</strong>（coherent MZI mesh）架构。在这种架构中：</p>
 <ul>
 <li>光保持相干，通过级联的 MZI 实现酉矩阵（unitary matrix）变换</li>
-<li>数学上：$\mathbf{E}<em _text_in="\text{in">{\text{out}} = \mathbf{U} \cdot \mathbf{E}</em>$ 是酉矩阵}}$，其中 $\mathbf{U</li>
-<li>每个 MZI 实现一个 $2 \times 2$ 的旋转操作，级联后实现任意酉变换</li>
+<li>数学上：<span class="arithmatex">\(\mathbf{E}_{\text{out}} = \mathbf{U} \cdot \mathbf{E}_{\text{in}}\)</span>，其中 <span class="arithmatex">\(\mathbf{U}\)</span> 是酉矩阵</li>
+<li>每个 MZI 实现一个 <span class="arithmatex">\(2 \times 2\)</span> 的旋转操作，级联后实现任意酉变换</li>
 </ul>
 <p><strong>PACE 完全不同</strong>。PACE 采用的是<strong>非相干（incoherent）强度编码</strong>架构。</p>
 <h3 id="352-pace-mac">3.5.2 PACE 的 MAC 原理：强度编码<a class="headerlink" href="#352-pace-mac" title="Permanent link"></a></h3>
@@ -1180,22 +1190,22 @@ $$</p>
 <li>对温度漂移、振动等环境因素不敏感</li>
 </ul>
 <p>数学上，单个输出端口的检测强度为：</p>
-<p>$$<br />
-I_{\text{det},i} = \sum_{j=1}^{N} W_{ij} \cdot x_j<br />
-$$</p>
+<div class="arithmatex">\[
+I_{\text{det},i} = \sum_{j=1}^{N} W_{ij} \cdot x_j
+\]</div>
 <p>其中：<br />
-- $x_j$ 是第 $j$ 个输入光的强度（编码输入向量元素）<br />
-- $W_{ij}$ 是第 $(i,j)$ 个 MZI 调制器的透射率（编码矩阵元素），$W_{ij} = \cos^2(\Delta\phi_{ij}/2)$，取值范围 $[0, 1]$<br />
-- $I_{\text{det},i}$ 是第 $i$ 个输出端口的检测强度</p>
+- <span class="arithmatex">\(x_j\)</span> 是第 <span class="arithmatex">\(j\)</span> 个输入光的强度（编码输入向量元素）<br />
+- <span class="arithmatex">\(W_{ij}\)</span> 是第 <span class="arithmatex">\((i,j)\)</span> 个 MZI 调制器的透射率（编码矩阵元素），<span class="arithmatex">\(W_{ij} = \cos^2(\Delta\phi_{ij}/2)\)</span>，取值范围 <span class="arithmatex">\([0, 1]\)</span><br />
+- <span class="arithmatex">\(I_{\text{det},i}\)</span> 是第 <span class="arithmatex">\(i\)</span> 个输出端口的检测强度</p>
 <p><strong>为什么这实现了矩阵-向量乘法？</strong></p>
-<p>考虑一个 $M \times N$ 矩阵 $\mathbf{W}$ 和一个 $N$ 维向量 $\mathbf{x}$ 的乘法：</p>
-<p>$$<br />
-y_i = \sum_{j=1}^{N} W_{ij} x_j<br />
-$$</p>
+<p>考虑一个 <span class="arithmatex">\(M \times N\)</span> 矩阵 <span class="arithmatex">\(\mathbf{W}\)</span> 和一个 <span class="arithmatex">\(N\)</span> 维向量 <span class="arithmatex">\(\mathbf{x}\)</span> 的乘法：</p>
+<div class="arithmatex">\[
+y_i = \sum_{j=1}^{N} W_{ij} x_j
+\]</div>
 <p>PACE 的光学实现正是这个公式：<br />
-- 用 $N$ 个光强表示向量元素 $x_j$<br />
-- 用 $M \times N$ 个 MZI 的透射率表示矩阵元素 $W_{ij}$<br />
-- 用 $M$ 个探测器的输出表示结果 $y_i$</p>
+- 用 <span class="arithmatex">\(N\)</span> 个光强表示向量元素 <span class="arithmatex">\(x_j\)</span><br />
+- 用 <span class="arithmatex">\(M \times N\)</span> 个 MZI 的透射率表示矩阵元素 <span class="arithmatex">\(W_{ij}\)</span><br />
+- 用 <span class="arithmatex">\(M\)</span> 个探测器的输出表示结果 <span class="arithmatex">\(y_i\)</span></p>
 <h3 id="353-mzi">3.5.3 与相干 MZI 网格的对比<a class="headerlink" href="#353-mzi" title="Permanent link"></a></h3>
 <table>
 <thead>
@@ -1223,7 +1233,7 @@ $$</p>
 </tr>
 <tr>
 <td>矩阵类型</td>
-<td>非负实数矩阵（$W_{ij} \in [0,1]$）</td>
+<td>非负实数矩阵（<span class="arithmatex">\(W_{ij} \in [0,1]\)</span>）</td>
 <td>酉矩阵（复数）</td>
 </tr>
 <tr>
@@ -1250,19 +1260,19 @@ $$</p>
 </table>
 <p><strong>PACE 的权衡</strong>：非相干架构牺牲了复数运算能力和部分能效，但换来了极高的可扩展性和鲁棒性。对于许多机器学习推理任务（权重和激活通常为非负或可通过偏置处理），非负实数矩阵乘法已经足够。</p>
 <h3 id="354">3.5.4 权重编码的细节<a class="headerlink" href="#354" title="Permanent link"></a></h3>
-<p>由于 MZI 的透射率 $T = \cos^2(\Delta\phi/2)$ 天然在 $[0, 1]$ 范围内，而神经网络权重可能为负或大于 1，PACE 采用以下策略：</p>
+<p>由于 MZI 的透射率 <span class="arithmatex">\(T = \cos^2(\Delta\phi/2)\)</span> 天然在 <span class="arithmatex">\([0, 1]\)</span> 范围内，而神经网络权重可能为负或大于 1，PACE 采用以下策略：</p>
 <ol>
 <li><strong>差分编码</strong>：用一对 MZI 表示一个带符号权重</li>
-<li>$W_{ij}^+ = \max(W_{ij}, 0)$（正权重部分）</li>
-<li>$W_{ij}^- = \max(-W_{ij}, 0)$（负权重部分）</li>
+<li><span class="arithmatex">\(W_{ij}^+ = \max(W_{ij}, 0)\)</span>（正权重部分）</li>
+<li><span class="arithmatex">\(W_{ij}^- = \max(-W_{ij}, 0)\)</span>（负权重部分）</li>
 <li>
-<p>实际权重：$W_{ij} = W_{ij}^+ - W_{ij}^-$</p>
+<p>实际权重：<span class="arithmatex">\(W_{ij} = W_{ij}^+ - W_{ij}^-\)</span></p>
 </li>
 <li>
 <p><strong>偏置（bias）处理</strong>：通过调整输入光的基准强度或探测器的参考电平，实现权重值域的平移</p>
 </li>
 <li>
-<p><strong>归一化</strong>：在部署前将权重归一化到 $[0, 1]$ 或 $[-1, 1]$ 范围</p>
+<p><strong>归一化</strong>：在部署前将权重归一化到 <span class="arithmatex">\([0, 1]\)</span> 或 <span class="arithmatex">\([-1, 1]\)</span> 范围</p>
 </li>
 </ol>
 <hr />
@@ -1272,42 +1282,42 @@ $$</p>
 <h2 id="41-ge">4.1 Ge（锗）光电探测器<a class="headerlink" href="#41-ge" title="Permanent link"></a></h2>
 <h3 id="411">4.1.1 为什么不用硅做探测器？<a class="headerlink" href="#411" title="Permanent link"></a></h3>
 <p>一个自然的问题是：既然 PACE 的波导是硅做的，为什么探测器不用硅？</p>
-<p>答案在于<strong>带隙</strong>（bandgap）。硅的带隙为 $E_g^{\text{Si}} = 1.12$ eV，对应的光吸收截止波长为：</p>
-<p>$$<br />
-\lambda_c^{\text{Si}} = \frac{hc}{E_g} = \frac{1.24 \text{ eV·μm}}{1.12 \text{ eV}} \approx 1.11 \text{ μm}<br />
-$$</p>
+<p>答案在于<strong>带隙</strong>（bandgap）。硅的带隙为 <span class="arithmatex">\(E_g^{\text{Si}} = 1.12\)</span> eV，对应的光吸收截止波长为：</p>
+<div class="arithmatex">\[
+\lambda_c^{\text{Si}} = \frac{hc}{E_g} = \frac{1.24 \text{ eV·μm}}{1.12 \text{ eV}} \approx 1.11 \text{ μm}
+\]</div>
 <p>这意味着硅对波长大于 1.11 μm 的光几乎是透明的。而光通信的标准波长为：<br />
-- O 波段：$1260 \sim 1360$ nm<br />
-- E 波段：$1360 \sim 1460$ nm<br />
-- S 波段：$1460 \sim 1530$ nm<br />
-- C 波段：$1530 \sim 1565$ nm<br />
-- L 波段：$1565 \sim 1625$ nm</p>
+- O 波段：<span class="arithmatex">\(1260 \sim 1360\)</span> nm<br />
+- E 波段：<span class="arithmatex">\(1360 \sim 1460\)</span> nm<br />
+- S 波段：<span class="arithmatex">\(1460 \sim 1530\)</span> nm<br />
+- C 波段：<span class="arithmatex">\(1530 \sim 1565\)</span> nm<br />
+- L 波段：<span class="arithmatex">\(1565 \sim 1625\)</span> nm</p>
 <p>在这些波段，硅无法有效吸收光子，因此不能用作探测器材料。</p>
 <h3 id="412">4.1.2 锗的优势<a class="headerlink" href="#412" title="Permanent link"></a></h3>
-<p>锗（Germanium, Ge）的带隙为 $E_g^{\text{Ge}} = 0.67$ eV，对应的截止波长为：</p>
-<p>$$<br />
-\lambda_c^{\text{Ge}} = \frac{1.24}{0.67} \approx 1.85 \text{ μm}<br />
-$$</p>
-<p>这完全覆盖了光通信的所有波段。在 1550 nm 处，锗的吸收系数约为 $\alpha_{\text{Ge}} \approx 10^4 \text{ cm}^{-1}$，意味着光在锗中传播约 1 μm 就会被显著吸收。</p>
-<p><strong>物理图像</strong>：当能量 $h\nu &gt; E_g$ 的光子入射到锗中时，它可以将价带（valence band）中的电子激发到导带（conduction band），产生一个电子-空穴对（electron-hole pair）。在外加电场的作用下，电子和空穴分别向相反方向漂移，形成光电流。</p>
+<p>锗（Germanium, Ge）的带隙为 <span class="arithmatex">\(E_g^{\text{Ge}} = 0.67\)</span> eV，对应的截止波长为：</p>
+<div class="arithmatex">\[
+\lambda_c^{\text{Ge}} = \frac{1.24}{0.67} \approx 1.85 \text{ μm}
+\]</div>
+<p>这完全覆盖了光通信的所有波段。在 1550 nm 处，锗的吸收系数约为 <span class="arithmatex">\(\alpha_{\text{Ge}} \approx 10^4 \text{ cm}^{-1}\)</span>，意味着光在锗中传播约 1 μm 就会被显著吸收。</p>
+<p><strong>物理图像</strong>：当能量 <span class="arithmatex">\(h\nu &gt; E_g\)</span> 的光子入射到锗中时，它可以将价带（valence band）中的电子激发到导带（conduction band），产生一个电子-空穴对（electron-hole pair）。在外加电场的作用下，电子和空穴分别向相反方向漂移，形成光电流。</p>
 <h3 id="413">4.1.3 响应度公式<a class="headerlink" href="#413" title="Permanent link"></a></h3>
-<p><strong>响应度</strong>（Responsivity, $R$）定义为每单位入射光功率产生的光电流：</p>
-<p>$$<br />
-R = \frac{I_{\text{ph}}}{P_{\text{in}}} \quad \text{[A/W]}<br />
-$$</p>
-<p>从量子效率（quantum efficiency, $\eta$）出发推导。量子效率定义为被收集的载流子数与入射光子数之比：</p>
-<p>$$<br />
-\eta = \frac{\text{电子数}/\text{秒}}{\text{光子数}/\text{秒}} = \frac{I_{\text{ph}}/q}{P_{\text{in}}/(h\nu)}<br />
-$$</p>
+<p><strong>响应度</strong>（Responsivity, <span class="arithmatex">\(R\)</span>）定义为每单位入射光功率产生的光电流：</p>
+<div class="arithmatex">\[
+R = \frac{I_{\text{ph}}}{P_{\text{in}}} \quad \text{[A/W]}
+\]</div>
+<p>从量子效率（quantum efficiency, <span class="arithmatex">\(\eta\)</span>）出发推导。量子效率定义为被收集的载流子数与入射光子数之比：</p>
+<div class="arithmatex">\[
+\eta = \frac{\text{电子数}/\text{秒}}{\text{光子数}/\text{秒}} = \frac{I_{\text{ph}}/q}{P_{\text{in}}/(h\nu)}
+\]</div>
 <p>因此：</p>
-<p>$$<br />
-R = \frac{I_{\text{ph}}}{P_{\text{in}}} = \eta \frac{q}{h\nu} = \eta \frac{q\lambda}{hc}<br />
-$$</p>
+<div class="arithmatex">\[
+R = \frac{I_{\text{ph}}}{P_{\text{in}}} = \eta \frac{q}{h\nu} = \eta \frac{q\lambda}{hc}
+\]</div>
 <p>代入常数：</p>
-<p>$$<br />
-R \approx \eta \cdot \frac{\lambda(\mu\text{m})}{1.24} \quad \text{[A/W]}<br />
-$$</p>
-<p>在 $\lambda = 1550$ nm 处，理想量子效率 $\eta = 1$ 时，$R \approx 1.25$ A/W。实际 Ge 探测器由于反射损失、不完全吸收等因素，$\eta \approx 0.7 \sim 0.9$，响应度约为 $0.8 \sim 1.0$ A/W。</p>
+<div class="arithmatex">\[
+R \approx \eta \cdot \frac{\lambda(\mu\text{m})}{1.24} \quad \text{[A/W]}
+\]</div>
+<p>在 <span class="arithmatex">\(\lambda = 1550\)</span> nm 处，理想量子效率 <span class="arithmatex">\(\eta = 1\)</span> 时，<span class="arithmatex">\(R \approx 1.25\)</span> A/W。实际 Ge 探测器由于反射损失、不完全吸收等因素，<span class="arithmatex">\(\eta \approx 0.7 \sim 0.9\)</span>，响应度约为 <span class="arithmatex">\(0.8 \sim 1.0\)</span> A/W。</p>
 <h3 id="414-pin">4.1.4 PIN 结构<a class="headerlink" href="#414-pin" title="Permanent link"></a></h3>
 <p>Ge 探测器通常采用 <strong>PIN 结构</strong>（P-Intrinsic-N）：</p>
 <div class="highlight"><pre><span></span><code>  金属电极
@@ -1334,18 +1344,18 @@ $$</p>
 <li>I 区的高电阻使得大部分电压降落在 I 区，形成均匀强电场</li>
 </ul>
 <p><strong>PACE 数据</strong>：<br />
-- 响应度：$\approx 1.0$ A/W @ 1550 nm<br />
-- 暗电流（dark current）：$&lt; 100$ nA（决定噪声底线）<br />
-- 带宽：$&gt; 10$ GHz（受载流子渡越时间和 RC 限制）<br />
-- 接收功率范围：$0.1 \sim 10$ mW（线性工作区）</p>
+- 响应度：<span class="arithmatex">\(\approx 1.0\)</span> A/W @ 1550 nm<br />
+- 暗电流（dark current）：<span class="arithmatex">\(&lt; 100\)</span> nA（决定噪声底线）<br />
+- 带宽：<span class="arithmatex">\(&gt; 10\)</span> GHz（受载流子渡越时间和 RC 限制）<br />
+- 接收功率范围：<span class="arithmatex">\(0.1 \sim 10\)</span> mW（线性工作区）</p>
 <hr />
 <h2 id="42-tia">4.2 TIA（跨阻放大器）<a class="headerlink" href="#42-tia" title="Permanent link"></a></h2>
 <h3 id="421-tia">4.2.1 为什么需要 TIA？<a class="headerlink" href="#421-tia" title="Permanent link"></a></h3>
 <p>光电探测器输出的是电流信号。典型值：<br />
-- 输入光功率：$1$ mW<br />
-- 响应度：$1$ A/W<br />
-- 光电流：$I_{\text{ph}} = 1$ mA</p>
-<p>但在 PACE 中，由于分束、调制损耗、耦合损耗等，到达单个探测器的光功率可能只有 $1 \sim 10$ μW，对应光电流仅 $1 \sim 10$ nA。</p>
+- 输入光功率：<span class="arithmatex">\(1\)</span> mW<br />
+- 响应度：<span class="arithmatex">\(1\)</span> A/W<br />
+- 光电流：<span class="arithmatex">\(I_{\text{ph}} = 1\)</span> mA</p>
+<p>但在 PACE 中，由于分束、调制损耗、耦合损耗等，到达单个探测器的光功率可能只有 <span class="arithmatex">\(1 \sim 10\)</span> μW，对应光电流仅 <span class="arithmatex">\(1 \sim 10\)</span> nA。</p>
 <p>这么微弱的电流无法直接驱动后续电路。需要将其转换为电压信号并放大。这就是<strong>跨阻放大器</strong>（Transimpedance Amplifier, TIA）的作用。</p>
 <h3 id="422">4.2.2 基本电路与跨阻增益<a class="headerlink" href="#422" title="Permanent link"></a></h3>
 <p>最简单的 TIA 基于运算放大器（op-amp）的反向放大配置：</p>
@@ -1361,41 +1371,41 @@ I_ph ─┤-        │
 
 <p>理想运放的虚短（virtual short）和虚断（virtual open）特性意味着：<br />
 - 反相输入端电压 = 同相输入端电压 = 0 V（虚地）<br />
-- 所有光电流都流过反馈电阻 $R_f$</p>
+- 所有光电流都流过反馈电阻 <span class="arithmatex">\(R_f\)</span></p>
 <p>因此：</p>
-<p>$$<br />
-V_{\text{out}} = -I_{\text{ph}} \cdot R_f<br />
-$$</p>
+<div class="arithmatex">\[
+V_{\text{out}} = -I_{\text{ph}} \cdot R_f
+\]</div>
 <p><strong>跨阻增益</strong>（transimpedance gain）为：</p>
-<p>$$<br />
-Z_T = \left|\frac{V_{\text{out}}}{I_{\text{ph}}}\right| = R_f<br />
-$$</p>
-<p>典型值：$R_f = 10 \text{ k}\Omega \sim 1 \text{ M}\Omega$。</p>
-<p>对于 $I_{\text{ph}} = 10$ nA 和 $R_f = 100$ k$\Omega$：</p>
-<p>$$<br />
-V_{\text{out}} = 10 \times 10^{-9} \times 100 \times 10^3 = 1 \text{ mV}<br />
-$$</p>
+<div class="arithmatex">\[
+Z_T = \left|\frac{V_{\text{out}}}{I_{\text{ph}}}\right| = R_f
+\]</div>
+<p>典型值：<span class="arithmatex">\(R_f = 10 \text{ k}\Omega \sim 1 \text{ M}\Omega\)</span>。</p>
+<p>对于 <span class="arithmatex">\(I_{\text{ph}} = 10\)</span> nA 和 <span class="arithmatex">\(R_f = 100\)</span> k<span class="arithmatex">\(\Omega\)</span>：</p>
+<div class="arithmatex">\[
+V_{\text{out}} = 10 \times 10^{-9} \times 100 \times 10^3 = 1 \text{ mV}
+\]</div>
 <p>这个电压水平可以被后续的模数转换器（ADC）或比较器处理。</p>
 <h3 id="423">4.2.3 噪声分析<a class="headerlink" href="#423" title="Permanent link"></a></h3>
 <p>TIA 的噪声性能直接决定了 PACE 的计算精度。主要噪声源：</p>
 <h4 id="shot-noise">散粒噪声（Shot Noise）<a class="headerlink" href="#shot-noise" title="Permanent link"></a></h4>
 <p>光电流本身具有量子涨落。散粒噪声电流的均方值为：</p>
-<p>$$<br />
-\langle i_{\text{shot}}^2 \rangle = 2qI_{\text{ph}}B<br />
-$$</p>
-<p>其中 $B$ 是系统带宽。散粒噪声是光电流的固有属性，无法消除，只能通过增大信号功率来压制。</p>
+<div class="arithmatex">\[
+\langle i_{\text{shot}}^2 \rangle = 2qI_{\text{ph}}B
+\]</div>
+<p>其中 <span class="arithmatex">\(B\)</span> 是系统带宽。散粒噪声是光电流的固有属性，无法消除，只能通过增大信号功率来压制。</p>
 <h4 id="thermal-noise-">热噪声（Thermal Noise，约翰逊-奈奎斯特噪声）<a class="headerlink" href="#thermal-noise-" title="Permanent link"></a></h4>
-<p>反馈电阻 $R_f$ 中的电子热运动产生噪声电压：</p>
-<p>$$<br />
-\langle v_{\text{thermal}}^2 \rangle = 4kTR_f B<br />
-$$</p>
+<p>反馈电阻 <span class="arithmatex">\(R_f\)</span> 中的电子热运动产生噪声电压：</p>
+<div class="arithmatex">\[
+\langle v_{\text{thermal}}^2 \rangle = 4kTR_f B
+\]</div>
 <p>对应的等效输入噪声电流：</p>
-<p>$$<br />
-\langle i_{\text{thermal}}^2 \rangle = \frac{4kTB}{R_f}<br />
-$$</p>
-<p><strong>关键权衡</strong>：增大 $R_f$ 可以提高跨阻增益（信号更大），但也会增大热噪声电压。同时，大电阻意味着大的 RC 时间常数，限制带宽。</p>
+<div class="arithmatex">\[
+\langle i_{\text{thermal}}^2 \rangle = \frac{4kTB}{R_f}
+\]</div>
+<p><strong>关键权衡</strong>：增大 <span class="arithmatex">\(R_f\)</span> 可以提高跨阻增益（信号更大），但也会增大热噪声电压。同时，大电阻意味着大的 RC 时间常数，限制带宽。</p>
 <h4 id="_28">运放噪声<a class="headerlink" href="#_28" title="Permanent link"></a></h4>
-<p>实际运放还有输入参考噪声电压 $e_n$ 和噪声电流 $i_n$。在低源阻抗时，电压噪声占主导；在高源阻抗时，电流噪声占主导。</p>
+<p>实际运放还有输入参考噪声电压 <span class="arithmatex">\(e_n\)</span> 和噪声电流 <span class="arithmatex">\(i_n\)</span>。在低源阻抗时，电压噪声占主导；在高源阻抗时，电流噪声占主导。</p>
 <hr />
 <h2 id="43-snr">4.3 SNR（信噪比）——模拟计算的命脉<a class="headerlink" href="#43-snr" title="Permanent link"></a></h2>
 <h3 id="431">4.3.1 为什么模拟计算的精度有限？<a class="headerlink" href="#431" title="Permanent link"></a></h3>
@@ -1403,112 +1413,112 @@ $$</p>
 <p>模拟计算则不同。光强、电流、电压都是连续变量，任何噪声都会直接叠加在信号上，无法区分。因此，<strong>模拟计算的精度 fundamentally 受限于信噪比</strong>（Signal-to-Noise Ratio, SNR）。</p>
 <h3 id="432-snr">4.3.2 SNR 公式推导<a class="headerlink" href="#432-snr" title="Permanent link"></a></h3>
 <p>定义 SNR 为信号功率与噪声功率之比：</p>
-<p>$$<br />
-\text{SNR} = \frac{P_{\text{signal}}}{P_{\text{noise}}}<br />
-$$</p>
+<div class="arithmatex">\[
+\text{SNR} = \frac{P_{\text{signal}}}{P_{\text{noise}}}
+\]</div>
 <p>对于 PACE 的一个 MAC 单元：</p>
 <p><strong>信号功率</strong>：</p>
-<p>探测器接收的光功率为 $P_{\text{sig}}$，光电流 $I_{\text{ph}} = R \cdot P_{\text{sig}}$，TIA 输出电压 $V_{\text{sig}} = I_{\text{ph}} R_f = R R_f P_{\text{sig}}$。</p>
+<p>探测器接收的光功率为 <span class="arithmatex">\(P_{\text{sig}}\)</span>，光电流 <span class="arithmatex">\(I_{\text{ph}} = R \cdot P_{\text{sig}}\)</span>，TIA 输出电压 <span class="arithmatex">\(V_{\text{sig}} = I_{\text{ph}} R_f = R R_f P_{\text{sig}}\)</span>。</p>
 <p>信号功率（电压平方意义）：</p>
-<p>$$<br />
-P_{\text{signal}} = V_{\text{sig}}^2 = (R R_f P_{\text{sig}})^2<br />
-$$</p>
+<div class="arithmatex">\[
+P_{\text{signal}} = V_{\text{sig}}^2 = (R R_f P_{\text{sig}})^2
+\]</div>
 <p><strong>噪声功率</strong>：</p>
 <p>总噪声是散粒噪声和热噪声的叠加（假设不相关）：</p>
-<p>$$<br />
-\langle V_{\text{noise}}^2 \rangle = (2qI_{\text{ph}}B) R_f^2 + 4kTR_f B<br />
-$$</p>
+<div class="arithmatex">\[
+\langle V_{\text{noise}}^2 \rangle = (2qI_{\text{ph}}B) R_f^2 + 4kTR_f B
+\]</div>
 <p>因此：</p>
-<p>$$<br />
-\text{SNR} = \frac{(R R_f P_{\text{sig}})^2}{(2q R P_{\text{sig}} B) R_f^2 + 4kT R_f B} = \frac{R^2 R_f^2 P_{\text{sig}}^2}{2q R P_{\text{sig}} R_f^2 B + 4kT R_f B}<br />
-$$</p>
+<div class="arithmatex">\[
+\text{SNR} = \frac{(R R_f P_{\text{sig}})^2}{(2q R P_{\text{sig}} B) R_f^2 + 4kT R_f B} = \frac{R^2 R_f^2 P_{\text{sig}}^2}{2q R P_{\text{sig}} R_f^2 B + 4kT R_f B}
+\]</div>
 <p>简化：</p>
-<p>$$<br />
-\text{SNR} = \frac{R^2 R_f^2 P_{\text{sig}}^2}{2q R P_{\text{sig}} R_f^2 B + 4kT R_f B}<br />
-$$</p>
+<div class="arithmatex">\[
+\text{SNR} = \frac{R^2 R_f^2 P_{\text{sig}}^2}{2q R P_{\text{sig}} R_f^2 B + 4kT R_f B}
+\]</div>
 <p><strong>两种极限情况</strong>：</p>
 <ol>
-<li><strong>散粒噪声主导</strong>（大信号）：$2q R P_{\text{sig}} R_f^2 \gg 4kT R_f$，即 $P_{\text{sig}} \gg 2kT/(qR_f)$</li>
+<li><strong>散粒噪声主导</strong>（大信号）：<span class="arithmatex">\(2q R P_{\text{sig}} R_f^2 \gg 4kT R_f\)</span>，即 <span class="arithmatex">\(P_{\text{sig}} \gg 2kT/(qR_f)\)</span></li>
 </ol>
-<p>$$<br />
-\text{SNR} \approx \frac{R P_{\text{sig}}}{2qB}<br />
-$$</p>
+<div class="arithmatex">\[
+\text{SNR} \approx \frac{R P_{\text{sig}}}{2qB}
+\]</div>
 <p>SNR 与光功率成正比。</p>
 <ol>
-<li><strong>热噪声主导</strong>（小信号）：$P_{\text{sig}}$ 很小</li>
+<li><strong>热噪声主导</strong>（小信号）：<span class="arithmatex">\(P_{\text{sig}}\)</span> 很小</li>
 </ol>
-<p>$$<br />
-\text{SNR} \approx \frac{R^2 R_f P_{\text{sig}}^2}{4kTB}<br />
-$$</p>
+<div class="arithmatex">\[
+\text{SNR} \approx \frac{R^2 R_f P_{\text{sig}}^2}{4kTB}
+\]</div>
 <p>SNR 与光功率的平方成正比。</p>
 <h3 id="433-snr">4.3.3 SNR 与矩阵尺寸的关系<a class="headerlink" href="#433-snr" title="Permanent link"></a></h3>
 <p>这是 PACE 设计中最关键的考量之一。</p>
-<p>对于一个 $N \times N$ 的矩阵-向量乘法，每个输出是 $N$ 个输入的加权和：</p>
-<p>$$<br />
-y_i = \sum_{j=1}^{N} W_{ij} x_j<br />
-$$</p>
-<p>假设输入光功率被均分为 $N$ 路，每路功率为 $P_0/N$。经过调制（透射率 $W_{ij}$）后，到达探测器的信号功率为：</p>
-<p>$$<br />
-P_{\text{sig},ij} = \frac{P_0}{N} W_{ij}<br />
-$$</p>
-<p>对于单个探测器，总信号是所有 $N$ 路光的叠加：</p>
-<p>$$<br />
-P_{\text{sig},i} = \sum_{j=1}^{N} P_{\text{sig},ij} = \frac{P_0}{N} \sum_{j=1}^{N} W_{ij}<br />
-$$</p>
-<p>假设权重平均值为 $\langle W \rangle$，则：</p>
-<p>$$<br />
-P_{\text{sig},i} \approx P_0 \langle W \rangle<br />
-$$</p>
-<p>有趣的是，总信号功率与 $N$ 无关（因为分束损失和路数增加恰好抵消）！</p>
-<p>但噪声呢？如果各路光的噪声不相关，总噪声功率是各路噪声之和。每路的噪声与 $P_{\text{sig},ij}$ 相关，总噪声：</p>
-<p>$$<br />
-P_{\text{noise},i} \propto \sum_{j=1}^{N} P_{\text{sig},ij} \propto P_0 \langle W \rangle<br />
-$$</p>
+<p>对于一个 <span class="arithmatex">\(N \times N\)</span> 的矩阵-向量乘法，每个输出是 <span class="arithmatex">\(N\)</span> 个输入的加权和：</p>
+<div class="arithmatex">\[
+y_i = \sum_{j=1}^{N} W_{ij} x_j
+\]</div>
+<p>假设输入光功率被均分为 <span class="arithmatex">\(N\)</span> 路，每路功率为 <span class="arithmatex">\(P_0/N\)</span>。经过调制（透射率 <span class="arithmatex">\(W_{ij}\)</span>）后，到达探测器的信号功率为：</p>
+<div class="arithmatex">\[
+P_{\text{sig},ij} = \frac{P_0}{N} W_{ij}
+\]</div>
+<p>对于单个探测器，总信号是所有 <span class="arithmatex">\(N\)</span> 路光的叠加：</p>
+<div class="arithmatex">\[
+P_{\text{sig},i} = \sum_{j=1}^{N} P_{\text{sig},ij} = \frac{P_0}{N} \sum_{j=1}^{N} W_{ij}
+\]</div>
+<p>假设权重平均值为 <span class="arithmatex">\(\langle W \rangle\)</span>，则：</p>
+<div class="arithmatex">\[
+P_{\text{sig},i} \approx P_0 \langle W \rangle
+\]</div>
+<p>有趣的是，总信号功率与 <span class="arithmatex">\(N\)</span> 无关（因为分束损失和路数增加恰好抵消）！</p>
+<p>但噪声呢？如果各路光的噪声不相关，总噪声功率是各路噪声之和。每路的噪声与 <span class="arithmatex">\(P_{\text{sig},ij}\)</span> 相关，总噪声：</p>
+<div class="arithmatex">\[
+P_{\text{noise},i} \propto \sum_{j=1}^{N} P_{\text{sig},ij} \propto P_0 \langle W \rangle
+\]</div>
 <p>因此 SNR：</p>
-<p>$$<br />
-\text{SNR} \propto \frac{P_0 \langle W \rangle}{P_0 \langle W \rangle} \sim \text{const} \quad \text{（对于散粒噪声极限）}<br />
-$$</p>
-<p>等等，这似乎意味着 SNR 与 $N$ 无关？实际上，更精确的分析需要考虑：</p>
+<div class="arithmatex">\[
+\text{SNR} \propto \frac{P_0 \langle W \rangle}{P_0 \langle W \rangle} \sim \text{const} \quad \text{（对于散粒噪声极限）}
+\]</div>
+<p>等等，这似乎意味着 SNR 与 <span class="arithmatex">\(N\)</span> 无关？实际上，更精确的分析需要考虑：</p>
 <ol>
-<li><strong>每路光的噪声是独立的</strong>，总噪声是 $N$ 个独立噪声源的叠加</li>
-<li><strong>信号也是 $N$ 个分量的和</strong>，但信号分量是相干的（同相叠加），噪声是非相干的（功率叠加）</li>
+<li><strong>每路光的噪声是独立的</strong>，总噪声是 <span class="arithmatex">\(N\)</span> 个独立噪声源的叠加</li>
+<li><strong>信号也是 <span class="arithmatex">\(N\)</span> 个分量的和</strong>，但信号分量是相干的（同相叠加），噪声是非相干的（功率叠加）</li>
 <li>实际上，对于强度叠加（非相干），信号和噪声都以功率形式叠加</li>
 </ol>
-<p>更准确的分析表明，在散粒噪声极限下，SNR 确实与 $N$ 关系不大，但实际的限制来自：<br />
-- <strong>动态范围</strong>：需要区分 $N$ 个输入的精细组合，要求 $N \cdot \text{ENOB}$ 的有效精度<br />
-- <strong>串扰</strong>：$N$ 路光之间的非理想隔离<br />
+<p>更准确的分析表明，在散粒噪声极限下，SNR 确实与 <span class="arithmatex">\(N\)</span> 关系不大，但实际的限制来自：<br />
+- <strong>动态范围</strong>：需要区分 <span class="arithmatex">\(N\)</span> 个输入的精细组合，要求 <span class="arithmatex">\(N \cdot \text{ENOB}\)</span> 的有效精度<br />
+- <strong>串扰</strong>：<span class="arithmatex">\(N\)</span> 路光之间的非理想隔离<br />
 - <strong>权重精度</strong>：DAC 分辨率限制</p>
 <h3 id="434-pace-snr">4.3.4 PACE 的 SNR 设计优化<a class="headerlink" href="#434-pace-snr" title="Permanent link"></a></h3>
 <p>PACE 相对于&rdquo;传统设计&rdquo;的 SNR 改进主要来自：</p>
 <ol>
-<li><strong>高功率光源</strong>：使用高功率激光器（$&gt; 100$ mW），补偿分束损失</li>
+<li><strong>高功率光源</strong>：使用高功率激光器（<span class="arithmatex">\(&gt; 100\)</span> mW），补偿分束损失</li>
 <li><strong>低噪声 TIA</strong>：优化反馈电阻和运放选择</li>
 <li><strong>差分探测</strong>：使用平衡探测（balanced detection）抑制共模噪声</li>
 <li><strong>时间复用</strong>：通过时分复用减少同时工作的通道数，降低串扰</li>
 </ol>
 <h3 id="435-enob">4.3.5 有效位数（ENOB）<a class="headerlink" href="#435-enob" title="Permanent link"></a></h3>
 <p><strong>有效位数</strong>（Effective Number of Bits）是从 SNR 导出的等效数字精度：</p>
-<p>对于理想 $n$ 位 ADC，量化噪声功率为：</p>
-<p>$$<br />
-P_{\text{quant}} = \frac{\Delta^2}{12} = \frac{(V_{\text{FS}}/2^n)^2}{12}<br />
-$$</p>
-<p>其中 $V_{\text{FS}}$ 是满量程电压，$\Delta = V_{\text{FS}}/2^n$ 是量化步长。</p>
+<p>对于理想 <span class="arithmatex">\(n\)</span> 位 ADC，量化噪声功率为：</p>
+<div class="arithmatex">\[
+P_{\text{quant}} = \frac{\Delta^2}{12} = \frac{(V_{\text{FS}}/2^n)^2}{12}
+\]</div>
+<p>其中 <span class="arithmatex">\(V_{\text{FS}}\)</span> 是满量程电压，<span class="arithmatex">\(\Delta = V_{\text{FS}}/2^n\)</span> 是量化步长。</p>
 <p>信号功率（满量程正弦波）：</p>
-<p>$$<br />
-P_{\text{sig}} = \frac{V_{\text{FS}}^2}{8}<br />
-$$</p>
+<div class="arithmatex">\[
+P_{\text{sig}} = \frac{V_{\text{FS}}^2}{8}
+\]</div>
 <p>理想 SNR：</p>
-<p>$$<br />
-\text{SNR}<em _text_sig="\text{sig">{\text{ideal}} = \frac{P</em>}}}{P_{\text{quant}}} = \frac{V_{\text{FS}}^2/8}{V_{\text{FS}}^2/(12 \cdot 4^n)} = \frac{3}{2} \cdot 4^n = 1.76 \text{ dB} + 6.02n \text{ dB<br />
-$$</p>
-<p>反解 $n$：</p>
-<p>$$<br />
-n = \frac{\text{SNR(dB)} - 1.76}{6.02}<br />
-$$</p>
+<div class="arithmatex">\[
+\text{SNR}_{\text{ideal}} = \frac{P_{\text{sig}}}{P_{\text{quant}}} = \frac{V_{\text{FS}}^2/8}{V_{\text{FS}}^2/(12 \cdot 4^n)} = \frac{3}{2} \cdot 4^n = 1.76 \text{ dB} + 6.02n \text{ dB}
+\]</div>
+<p>反解 <span class="arithmatex">\(n\)</span>：</p>
+<div class="arithmatex">\[
+n = \frac{\text{SNR(dB)} - 1.76}{6.02}
+\]</div>
 <p>对于 PACE：<br />
-- 典型 SNR：$40 \sim 50$ dB<br />
-- 对应 ENOB：$(40 - 1.76)/6.02 \approx 6.4$ 位 到 $(50 - 1.76)/6.02 \approx 8.0$ 位</p>
-<p>这意味着 PACE 的模拟计算精度约为 $6 \sim 8$ 位。对于神经网络推理，这通常已经足够（研究表明，$4 \sim 8$ 位量化对大多数模型影响很小）。</p>
+- 典型 SNR：<span class="arithmatex">\(40 \sim 50\)</span> dB<br />
+- 对应 ENOB：<span class="arithmatex">\((40 - 1.76)/6.02 \approx 6.4\)</span> 位 到 <span class="arithmatex">\((50 - 1.76)/6.02 \approx 8.0\)</span> 位</p>
+<p>这意味着 PACE 的模拟计算精度约为 <span class="arithmatex">\(6 \sim 8\)</span> 位。对于神经网络推理，这通常已经足够（研究表明，<span class="arithmatex">\(4 \sim 8\)</span> 位量化对大多数模型影响很小）。</p>
 <hr />
 <h1 id="eic">第五章 电子控制芯片（EIC）与封装——光的&rdquo;大脑&rdquo;<a class="headerlink" href="#eic" title="Permanent link"></a></h1>
 <p>光子擅长线性运算（传播、干涉、叠加），但它有一个致命的弱点：<strong>光没有记忆</strong>。光信号无法被&rdquo;冻结&rdquo;或&rdquo;存储&rdquo;，也无法直接实现非线性函数（如 ReLU、sigmoid）。这些任务必须由电子电路完成。</p>
@@ -1565,12 +1575,12 @@ $$</p>
 </tbody>
 </table>
 <h3 id="513">5.1.3 比较器：片上非线性的实现<a class="headerlink" href="#513" title="Permanent link"></a></h3>
-<p>神经网络的激活函数（如 ReLU：$y = \max(0, x)$）需要非线性。PACE 使用<strong>比较器</strong>实现阈值功能：</p>
-<p>$$<br />
-V_{\text{out}} = \begin{cases} V_{\text{high}} &amp; \text{if } V_{\text{in}} &gt; V_{\text{th}} \ V_{\text{low}} &amp; \text{if } V_{\text{in}} \leq V_{\text{th}} \end{cases}<br />
-$$</p>
+<p>神经网络的激活函数（如 ReLU：<span class="arithmatex">\(y = \max(0, x)\)</span>）需要非线性。PACE 使用<strong>比较器</strong>实现阈值功能：</p>
+<div class="arithmatex">\[
+V_{\text{out}} = \begin{cases} V_{\text{high}} &amp; \text{if } V_{\text{in}} &gt; V_{\text{th}} \\ V_{\text{low}} &amp; \text{if } V_{\text{in}} \leq V_{\text{th}} \end{cases}
+\]</div>
 <p>这正是一个单比特的量化（sign 函数），或配合 DAC 实现多电平阈值。</p>
-<p><strong>伊辛模型（Ising Model）应用</strong>：比较器是实现伊辛模型（二元自旋 $s_i \in {-1, +1}$）的核心。在组合优化问题中，比较器的阈值输出直接对应自旋状态。</p>
+<p><strong>伊辛模型（Ising Model）应用</strong>：比较器是实现伊辛模型（二元自旋 <span class="arithmatex">\(s_i \in \{-1, +1\}\)</span>）的核心。在组合优化问题中，比较器的阈值输出直接对应自旋状态。</p>
 <hr />
 <h2 id="52-dac">5.2 DAC（数模转换器）<a class="headerlink" href="#52-dac" title="Permanent link"></a></h2>
 <h3 id="521-dac">5.2.1 DAC 的角色<a class="headerlink" href="#521-dac" title="Permanent link"></a></h3>
@@ -1590,39 +1600,39 @@ $$</p>
 [MZI 透射率] → T = cos²(Δφ/2)
 </code></pre></div>
 
-<p>DAC 的分辨率直接决定了权重的精度。一个 $N$ 位 DAC 可以将权重量化为 $2^N$ 个等级。</p>
+<p>DAC 的分辨率直接决定了权重的精度。一个 <span class="arithmatex">\(N\)</span> 位 DAC 可以将权重量化为 <span class="arithmatex">\(2^N\)</span> 个等级。</p>
 <h3 id="522-dac">5.2.2 DAC 分辨率与系统精度<a class="headerlink" href="#522-dac" title="Permanent link"></a></h3>
-<p>假设 DAC 分辨率为 $n$ 位，则权重误差为：</p>
-<p>$$<br />
-\delta W \sim \frac{1}{2^n}<br />
-$$</p>
-<p>对于矩阵-向量乘法 $y = Wx$，输出误差：</p>
-<p>$$<br />
-\delta y \sim N \cdot \delta W \cdot x_{\text{max}}<br />
-$$</p>
-<p>对于 $N = 64$ 的矩阵：<br />
-- 6 位 DAC：$\delta W \approx 1.6\%$，$\delta y \sim 64 \times 0.016 \approx 1.0$（相对满量程）<br />
-- 8 位 DAC：$\delta W \approx 0.4\%$，$\delta y \sim 64 \times 0.004 \approx 0.26$</p>
+<p>假设 DAC 分辨率为 <span class="arithmatex">\(n\)</span> 位，则权重误差为：</p>
+<div class="arithmatex">\[
+\delta W \sim \frac{1}{2^n}
+\]</div>
+<p>对于矩阵-向量乘法 <span class="arithmatex">\(y = Wx\)</span>，输出误差：</p>
+<div class="arithmatex">\[
+\delta y \sim N \cdot \delta W \cdot x_{\text{max}}
+\]</div>
+<p>对于 <span class="arithmatex">\(N = 64\)</span> 的矩阵：<br />
+- 6 位 DAC：<span class="arithmatex">\(\delta W \approx 1.6\%\)</span>，<span class="arithmatex">\(\delta y \sim 64 \times 0.016 \approx 1.0\)</span>（相对满量程）<br />
+- 8 位 DAC：<span class="arithmatex">\(\delta W \approx 0.4\%\)</span>，<span class="arithmatex">\(\delta y \sim 64 \times 0.004 \approx 0.26\)</span></p>
 <p>实际中，由于误差统计平均，有效误差小于最坏情况估计。但 DAC 分辨率确实是系统精度的关键瓶颈之一。</p>
 <h3 id="523-dac">5.2.3 DAC 架构类型<a class="headerlink" href="#523-dac" title="Permanent link"></a></h3>
 <h4 id="dacthermometer-dac">温度计码 DAC（Thermometer DAC）<a class="headerlink" href="#dacthermometer-dac" title="Permanent link"></a></h4>
-<p>将 $n$ 位二进制码转换为 $2^n - 1$ 个单位电流源的控制信号。例如，3 位输入 &ldquo;101&rdquo;（5）控制 5 个单位电流源导通。</p>
+<p>将 <span class="arithmatex">\(n\)</span> 位二进制码转换为 <span class="arithmatex">\(2^n - 1\)</span> 个单位电流源的控制信号。例如，3 位输入 &ldquo;101&rdquo;（5）控制 5 个单位电流源导通。</p>
 <p><strong>优点</strong>：固有的单调性（monotonicity），无毛刺（glitch）<br />
-<strong>缺点</strong>：需要 $2^n - 1$ 个开关，面积随位数指数增长</p>
+<strong>缺点</strong>：需要 <span class="arithmatex">\(2^n - 1\)</span> 个开关，面积随位数指数增长</p>
 <h4 id="dacbinary-weighted-dac">二进制加权 DAC（Binary-Weighted DAC）<a class="headerlink" href="#dacbinary-weighted-dac" title="Permanent link"></a></h4>
-<p>使用按 $1:2:4:8:\ldots$ 比例加权的电流源。</p>
-<p><strong>优点</strong>：仅需 $n$ 个开关，面积小<br />
+<p>使用按 <span class="arithmatex">\(1:2:4:8:\ldots\)</span> 比例加权的电流源。</p>
+<p><strong>优点</strong>：仅需 <span class="arithmatex">\(n\)</span> 个开关，面积小<br />
 <strong>缺点</strong>：开关时序不匹配会导致毛刺（如从 0111 到 1000，所有位都翻转）</p>
 <h4 id="dacsegmented-dac">分段式 DAC（Segmented DAC）<a class="headerlink" href="#dacsegmented-dac" title="Permanent link"></a></h4>
-<p>高 $m$ 位使用温度计码，低 $n-m$ 位使用二进制加权。兼顾线性和面积。</p>
-<p><strong>PACE 的选择</strong>：考虑到面积和功耗约束，PACE 可能采用中等分段比的 DAC（如 6+2 分段），在 28 nm CMOS 中实现 $6 \sim 8$ 位有效分辨率。</p>
+<p>高 <span class="arithmatex">\(m\)</span> 位使用温度计码，低 <span class="arithmatex">\(n-m\)</span> 位使用二进制加权。兼顾线性和面积。</p>
+<p><strong>PACE 的选择</strong>：考虑到面积和功耗约束，PACE 可能采用中等分段比的 DAC（如 6+2 分段），在 28 nm CMOS 中实现 <span class="arithmatex">\(6 \sim 8\)</span> 位有效分辨率。</p>
 <h3 id="524-inl-dnl">5.2.4 INL 与 DNL<a class="headerlink" href="#524-inl-dnl" title="Permanent link"></a></h3>
 <p><strong>积分非线性</strong>（Integral Nonlinearity, INL）：实际转换特性与理想直线的最大偏差。</p>
 <p><strong>微分非线性</strong>（Differential Nonlinearity, DNL）：实际步长与理想步长（1 LSB）的偏差。</p>
 <p>对于 PACE：<br />
 - INL 影响权重的绝对精度<br />
 - DNL 影响相邻权重等级的区分度</p>
-<p>典型要求：INL $&lt; \pm 0.5$ LSB，DNL $&lt; \pm 1$ LSB（保证无丢码）。</p>
+<p>典型要求：INL <span class="arithmatex">\(&lt; \pm 0.5\)</span> LSB，DNL <span class="arithmatex">\(&lt; \pm 1\)</span> LSB（保证无丢码）。</p>
 <hr />
 <h2 id="53-25d">5.3 2.5D 混合封装<a class="headerlink" href="#53-25d" title="Permanent link"></a></h2>
 <h3 id="531-25d">5.3.1 什么是 2.5D 封装？<a class="headerlink" href="#531-25d" title="Permanent link"></a></h3>
@@ -1708,31 +1718,31 @@ $$</p>
 <p><strong>为什么 PIC 在上、EIC 在下？</strong></p>
 <ol>
 <li><strong>光路访问</strong>：光栅耦合器需要在芯片上表面接收光纤输入，PIC 必须在上方</li>
-<li><strong>散热</strong>：EIC 功耗较大（$&gt; 1$ W），靠近基板有利于散热</li>
+<li><strong>散热</strong>：EIC 功耗较大（<span class="arithmatex">\(&gt; 1\)</span> W），靠近基板有利于散热</li>
 <li><strong>电气连接</strong>：EIC 通过基板与外部 PCB 连接</li>
 </ol>
 <h3 id="533-micro-bump">5.3.3 微凸点（Micro-bump）与间距<a class="headerlink" href="#533-micro-bump" title="Permanent link"></a></h3>
 <p>微凸点是 PIC 和 EIC 之间的电气连接点。PACE 的创新之一是将凸点间距缩小到 <strong>100 μm 级别</strong>。</p>
 <p><strong>为什么间距很重要？</strong></p>
-<p>对于 $64 \times 64$ 的矩阵，共有 4096 个权重需要独立控制。加上输入/输出信号、电源、地线，总连接数超过 10,000。如果凸点间距为 100 μm，则这些连接可以在约 $1 \times 1$ cm² 的面积内实现。</p>
+<p>对于 <span class="arithmatex">\(64 \times 64\)</span> 的矩阵，共有 4096 个权重需要独立控制。加上输入/输出信号、电源、地线，总连接数超过 10,000。如果凸点间距为 100 μm，则这些连接可以在约 <span class="arithmatex">\(1 \times 1\)</span> cm² 的面积内实现。</p>
 <p><strong>寄生参数</strong>：</p>
 <p>每个微凸点引入寄生电容：</p>
-<p>$$<br />
-C_{\text{bump}} \approx \frac{\varepsilon_0 \varepsilon_r A}{d}<br />
-$$</p>
-<p>其中 $A$ 是凸点面积，$d$ 是间距。对于 100 μm 间距的焊球，$C_{\text{bump}} \approx 40 \sim 60$ fF。</p>
+<div class="arithmatex">\[
+C_{\text{bump}} \approx \frac{\varepsilon_0 \varepsilon_r A}{d}
+\]</div>
+<p>其中 <span class="arithmatex">\(A\)</span> 是凸点面积，<span class="arithmatex">\(d\)</span> 是间距。对于 100 μm 间距的焊球，<span class="arithmatex">\(C_{\text{bump}} \approx 40 \sim 60\)</span> fF。</p>
 <p>这个电容的影响：<br />
-- <strong>信号完整性</strong>：高频信号（$&gt; 1$ GHz）下，容抗 $X_C = 1/(2\pi f C) \approx 2.6 \text{ k}\Omega$ @ 1 GHz，可能导致信号衰减<br />
-- <strong>功耗</strong>：充放电电容消耗动态功耗 $P = C V^2 f$<br />
-- <strong>RC 延迟</strong>：$\tau = RC$，限制信号带宽</p>
+- <strong>信号完整性</strong>：高频信号（<span class="arithmatex">\(&gt; 1\)</span> GHz）下，容抗 <span class="arithmatex">\(X_C = 1/(2\pi f C) \approx 2.6 \text{ k}\Omega\)</span> @ 1 GHz，可能导致信号衰减<br />
+- <strong>功耗</strong>：充放电电容消耗动态功耗 <span class="arithmatex">\(P = C V^2 f\)</span><br />
+- <strong>RC 延迟</strong>：<span class="arithmatex">\(\tau = RC\)</span>，限制信号带宽</p>
 <p>PACE 通过优化驱动电路和信号时序，将这些寄生效应控制在可接受范围内。</p>
 <h3 id="534">5.3.4 为什么封装对光子计算至关重要？<a class="headerlink" href="#534" title="Permanent link"></a></h3>
 <p>光子计算的封装挑战比传统电子芯片更严峻：</p>
 <ol>
 <li><strong>光-电接口</strong>：需要同时处理光信号（光纤对准）和电信号（高密度互连）</li>
 <li><strong>热管理</strong>：热光调制器对温度敏感，需要稳定的温度环境</li>
-<li><strong>机械稳定性</strong>：光纤对准精度需 $&lt; 1$ μm，对振动和热膨胀敏感</li>
-<li><strong>成本控制</strong>：光子封装通常占系统总成本的 $50\%$ 以上</li>
+<li><strong>机械稳定性</strong>：光纤对准精度需 <span class="arithmatex">\(&lt; 1\)</span> μm，对振动和热膨胀敏感</li>
+<li><strong>成本控制</strong>：光子封装通常占系统总成本的 <span class="arithmatex">\(50\%\)</span> 以上</li>
 </ol>
 <p>PACE 的 2.5D 封装方案通过将 PIC 和 EIC 紧密集成，最小化了电互连长度，同时保持了光路的可访问性。</p>
 <hr />
@@ -1828,7 +1838,7 @@ t = 10 ns: 反馈/输出
 </tr>
 </tbody>
 </table>
-<p><strong>关键洞察</strong>：3 ns 的延迟指的是<strong>在权重已加载完成后的计算延迟</strong>。权重的热光调制需要 $1 \sim 10$ μs 的建立时间，但这属于&rdquo;配置时间&rdquo;而非&rdquo;计算时间&rdquo;。PACE 采用<strong>权重预加载</strong>策略：在计算开始前，所有权重已经通过热光调制器设置好。随后的 MAC 运算以 1 GHz 的速率流水线执行。</p>
+<p><strong>关键洞察</strong>：3 ns 的延迟指的是<strong>在权重已加载完成后的计算延迟</strong>。权重的热光调制需要 <span class="arithmatex">\(1 \sim 10\)</span> μs 的建立时间，但这属于&rdquo;配置时间&rdquo;而非&rdquo;计算时间&rdquo;。PACE 采用<strong>权重预加载</strong>策略：在计算开始前，所有权重已经通过热光调制器设置好。随后的 MAC 运算以 1 GHz 的速率流水线执行。</p>
 <h3 id="543">5.4.3 系统架构总结<a class="headerlink" href="#543" title="Permanent link"></a></h3>
 <div class="highlight"><pre><span></span><code>┌─────────────────────────────────────────────────────────────┐
 │                         PACE 系统                            │
@@ -1872,108 +1882,108 @@ t = 10 ns: 反馈/输出
 <h3 id="61-ising">6.1 什么是 Ising 模型？<a class="headerlink" href="#61-ising" title="Permanent link"></a></h3>
 <h4 id="611">6.1.1 从磁性系统到抽象数学模型<a class="headerlink" href="#611" title="Permanent link"></a></h4>
 <p>Ising 模型的故事始于 1920 年代，德国物理学家 Wilhelm Lenz 将一个问题交给他的学生 Ernst Ising：一维磁性链中，相邻原子磁矩的相互作用能否解释铁磁相变？Ising 证明了一维情况下不存在有限温度下的相变，但二维情况后来被 Lars Onsager 在 1944 年精确求解——这是统计物理学的里程碑之一。</p>
-<p>对于熟悉量子多体物理的读者，Ising 模型是一个绝佳的切入点。想象一块晶体中的磁性原子，每个原子携带一个自旋（spin），可以向上（$\sigma_i = +1$）或向下（$\sigma_i = -1$）。相邻自旋之间存在交换相互作用（exchange interaction）：如果它们平行排列，系统能量降低；反平行排列，能量升高。这正是海森堡模型（Heisenberg model）的伊辛极限——忽略自旋的 $x$ 和 $y$ 分量，只保留 $z$ 分量。</p>
+<p>对于熟悉量子多体物理的读者，Ising 模型是一个绝佳的切入点。想象一块晶体中的磁性原子，每个原子携带一个自旋（spin），可以向上（<span class="arithmatex">\(\sigma_i = +1\)</span>）或向下（<span class="arithmatex">\(\sigma_i = -1\)</span>）。相邻自旋之间存在交换相互作用（exchange interaction）：如果它们平行排列，系统能量降低；反平行排列，能量升高。这正是海森堡模型（Heisenberg model）的伊辛极限——忽略自旋的 <span class="arithmatex">\(x\)</span> 和 <span class="arithmatex">\(y\)</span> 分量，只保留 <span class="arithmatex">\(z\)</span> 分量。</p>
 <p>系统的哈密顿量（Hamiltonian）写作：</p>
-<p>$$<br />
-H = -\frac{1}{2} \sum_{i,j} J_{ij} \sigma_i \sigma_j - \sum_i h_i \sigma_i<br />
-$$</p>
+<div class="arithmatex">\[
+H = -\frac{1}{2} \sum_{i,j} J_{ij} \sigma_i \sigma_j - \sum_i h_i \sigma_i
+\]</div>
 <p>让我们逐项拆解这个表达式：</p>
-<p><strong>第一项</strong> $-\frac{1}{2} \sum_{i,j} J_{ij} \sigma_i \sigma_j$ 描述自旋之间的两体相互作用：<br />
-- $\sigma_i \in {+1, -1}$ 是第 $i$ 个格点上的自旋变量，取值离散且二元<br />
-- $J_{ij}$ 是耦合系数（coupling coefficient），表示自旋 $i$ 和 $j$ 之间的相互作用强度<br />
-- 负号 $-1/2$ 是约定：当 $J_{ij} &gt; 0$（铁磁耦合，ferromagnetic coupling）时，平行自旋（$\sigma_i = \sigma_j$）使能量降低；反铁磁耦合（antiferromagnetic coupling，$J_{ij} &lt; 0$）则相反<br />
-- 求和包含所有 $i, j$ 对，$1/2$ 因子避免每对自旋被重复计数</p>
-<p><strong>第二项</strong> $-\sum_i h_i \sigma_i$ 描述外场作用：<br />
-- $h_i$ 是施加在第 $i$ 个自旋上的外磁场（external field）<br />
-- 当 $h_i &gt; 0$ 时，自旋倾向于取 $+1$ 以最小化能量</p>
-<p>在 PACE 的语境中，我们通常关注<strong>无外场</strong>（$h_i = 0$）的 Ising 模型，因为组合优化问题大多可以归约到这种形式。</p>
+<p><strong>第一项</strong> <span class="arithmatex">\(-\frac{1}{2} \sum_{i,j} J_{ij} \sigma_i \sigma_j\)</span> 描述自旋之间的两体相互作用：<br />
+- <span class="arithmatex">\(\sigma_i \in \{+1, -1\}\)</span> 是第 <span class="arithmatex">\(i\)</span> 个格点上的自旋变量，取值离散且二元<br />
+- <span class="arithmatex">\(J_{ij}\)</span> 是耦合系数（coupling coefficient），表示自旋 <span class="arithmatex">\(i\)</span> 和 <span class="arithmatex">\(j\)</span> 之间的相互作用强度<br />
+- 负号 <span class="arithmatex">\(-1/2\)</span> 是约定：当 <span class="arithmatex">\(J_{ij} &gt; 0\)</span>（铁磁耦合，ferromagnetic coupling）时，平行自旋（<span class="arithmatex">\(\sigma_i = \sigma_j\)</span>）使能量降低；反铁磁耦合（antiferromagnetic coupling，<span class="arithmatex">\(J_{ij} &lt; 0\)</span>）则相反<br />
+- 求和包含所有 <span class="arithmatex">\(i, j\)</span> 对，<span class="arithmatex">\(1/2\)</span> 因子避免每对自旋被重复计数</p>
+<p><strong>第二项</strong> <span class="arithmatex">\(-\sum_i h_i \sigma_i\)</span> 描述外场作用：<br />
+- <span class="arithmatex">\(h_i\)</span> 是施加在第 <span class="arithmatex">\(i\)</span> 个自旋上的外磁场（external field）<br />
+- 当 <span class="arithmatex">\(h_i &gt; 0\)</span> 时，自旋倾向于取 <span class="arithmatex">\(+1\)</span> 以最小化能量</p>
+<p>在 PACE 的语境中，我们通常关注<strong>无外场</strong>（<span class="arithmatex">\(h_i = 0\)</span>）的 Ising 模型，因为组合优化问题大多可以归约到这种形式。</p>
 <h4 id="612">6.1.2 能量景观与基态<a class="headerlink" href="#612" title="Permanent link"></a></h4>
-<p>Ising 模型的核心问题是：<strong>给定一组耦合系数 ${J_{ij}}$，找到使哈密顿量 $H$ 最小的自旋构型 ${\sigma_i}$。</strong> 这个最小能量构型称为<strong>基态</strong>（ground state），类比于量子力学中系统的最低能量本征态。</p>
-<p>对于 $N$ 个自旋，共有 $2^N$ 种可能的构型。当 $N = 64$（PACE 的矩阵维度）时，$2^{64} \approx 1.8 \times 10^{19}$，穷举所有构型是不可能的。这正是组合优化的困难所在。</p>
-<p>我们可以将能量 $H$ 视为定义在 $N$ 维超立方体（hypercube）顶点上的<strong>能量景观</strong>（energy landscape）。每个顶点对应一个自旋构型，边连接仅有一个自旋不同的构型（Hamming 距离为 1）。基态就是这座景观的&rdquo;最低点&rdquo;。</p>
-<p>这里有一个深刻的类比：量子多体系统中的基态搜索与 Ising 模型的基态搜索在数学上是同构的。在量子系统中，基态由哈密顿量的最小本征值决定；在 Ising 模型中，基态由经典能量函数的极小值决定。两者的区别仅在于：量子系统的状态空间是希尔伯特空间中的连续向量，而 Ising 模型的状态空间是离散的 $N$ 维超立方体顶点。</p>
-<p>当耦合系数 $J_{ij}$ 全部同号时（例如全为正），能量景观是&rdquo;凸&rdquo;的——只有一个全局最小值，所有自旋平行排列。但当 $J_{ij}$ 有正有负时（<strong>阻挫系统</strong>，frustrated system），景观变得崎岖不平，存在大量局部极小值（local minima）。这类似于量子自旋玻璃（quantum spin glass）中的复杂基态结构。</p>
-<p><strong>阻挫</strong>（frustration）的概念值得展开：考虑三个自旋构成的三角形，边耦合为 $J_{12} = J_{23} = J_{31} = +1$（全铁磁）。此时 $\sigma_1 = \sigma_2 = \sigma_3 = +1$ 是完美基态，能量 $H = -3$。但如果 $J_{12} = J_{23} = +1$ 而 $J_{31} = -1$，则无论怎么排列，总有一条边不满足能量最低条件——这就是阻挫。在阻挫系统中，寻找基态变得异常困难。</p>
+<p>Ising 模型的核心问题是：<strong>给定一组耦合系数 <span class="arithmatex">\(\{J_{ij}\}\)</span>，找到使哈密顿量 <span class="arithmatex">\(H\)</span> 最小的自旋构型 <span class="arithmatex">\(\{\sigma_i\}\)</span>。</strong> 这个最小能量构型称为<strong>基态</strong>（ground state），类比于量子力学中系统的最低能量本征态。</p>
+<p>对于 <span class="arithmatex">\(N\)</span> 个自旋，共有 <span class="arithmatex">\(2^N\)</span> 种可能的构型。当 <span class="arithmatex">\(N = 64\)</span>（PACE 的矩阵维度）时，<span class="arithmatex">\(2^{64} \approx 1.8 \times 10^{19}\)</span>，穷举所有构型是不可能的。这正是组合优化的困难所在。</p>
+<p>我们可以将能量 <span class="arithmatex">\(H\)</span> 视为定义在 <span class="arithmatex">\(N\)</span> 维超立方体（hypercube）顶点上的<strong>能量景观</strong>（energy landscape）。每个顶点对应一个自旋构型，边连接仅有一个自旋不同的构型（Hamming 距离为 1）。基态就是这座景观的&rdquo;最低点&rdquo;。</p>
+<p>这里有一个深刻的类比：量子多体系统中的基态搜索与 Ising 模型的基态搜索在数学上是同构的。在量子系统中，基态由哈密顿量的最小本征值决定；在 Ising 模型中，基态由经典能量函数的极小值决定。两者的区别仅在于：量子系统的状态空间是希尔伯特空间中的连续向量，而 Ising 模型的状态空间是离散的 <span class="arithmatex">\(N\)</span> 维超立方体顶点。</p>
+<p>当耦合系数 <span class="arithmatex">\(J_{ij}\)</span> 全部同号时（例如全为正），能量景观是&rdquo;凸&rdquo;的——只有一个全局最小值，所有自旋平行排列。但当 <span class="arithmatex">\(J_{ij}\)</span> 有正有负时（<strong>阻挫系统</strong>，frustrated system），景观变得崎岖不平，存在大量局部极小值（local minima）。这类似于量子自旋玻璃（quantum spin glass）中的复杂基态结构。</p>
+<p><strong>阻挫</strong>（frustration）的概念值得展开：考虑三个自旋构成的三角形，边耦合为 <span class="arithmatex">\(J_{12} = J_{23} = J_{31} = +1\)</span>（全铁磁）。此时 <span class="arithmatex">\(\sigma_1 = \sigma_2 = \sigma_3 = +1\)</span> 是完美基态，能量 <span class="arithmatex">\(H = -3\)</span>。但如果 <span class="arithmatex">\(J_{12} = J_{23} = +1\)</span> 而 <span class="arithmatex">\(J_{31} = -1\)</span>，则无论怎么排列，总有一条边不满足能量最低条件——这就是阻挫。在阻挫系统中，寻找基态变得异常困难。</p>
 <h4 id="613">6.1.3 与平均场理论的连接<a class="headerlink" href="#613" title="Permanent link"></a></h4>
 <p>熟悉量子多体物理的读者一定了解平均场理论（mean-field theory）。Ising 模型提供了一个理解平均场近似的绝佳框架。</p>
-<p>在无限维或全连接（fully connected）的 Ising 模型中，每个自旋与所有其他自旋耦合，$J_{ij} = J/N$。此时我们可以引入<strong>磁化强度</strong>（magnetization）$m = \frac{1}{N}\sum_i \sigma_i$，将哈密顿量近似为：</p>
-<p>$$<br />
-H \approx -\frac{J}{2N} \left(\sum_i \sigma_i\right)^2 = -\frac{JN}{2} m^2<br />
-$$</p>
-<p>在热力学极限下，自由能密度由磁化强度 $m$ 决定。通过变分法求自由能极小值，我们得到著名的<strong>自洽方程</strong>：</p>
-<p>$$<br />
-m = \tanh\left(\frac{Jm}{k_B T}\right)<br />
-$$</p>
-<p>这个方程在 $T &lt; T_c = J/k_B$ 时有非零解，对应铁磁相变。临界温度 $T_c$ 以下，系统自发对称性破缺，出现宏观磁化。</p>
-<p>对于 PACE 的求解算法，平均场思想至关重要。递归更新规则 $S_{t+1} = \text{sign}(W \cdot S_t)$ 本质上就是一种<strong>零温平均场动力学</strong>（zero-temperature mean-field dynamics）：每个自旋根据其他自旋的&rdquo;平均场&rdquo;作用来决定自己的取向。我们将在 6.4 节详细分析这一点。</p>
+<p>在无限维或全连接（fully connected）的 Ising 模型中，每个自旋与所有其他自旋耦合，<span class="arithmatex">\(J_{ij} = J/N\)</span>。此时我们可以引入<strong>磁化强度</strong>（magnetization）<span class="arithmatex">\(m = \frac{1}{N}\sum_i \sigma_i\)</span>，将哈密顿量近似为：</p>
+<div class="arithmatex">\[
+H \approx -\frac{J}{2N} \left(\sum_i \sigma_i\right)^2 = -\frac{JN}{2} m^2
+\]</div>
+<p>在热力学极限下，自由能密度由磁化强度 <span class="arithmatex">\(m\)</span> 决定。通过变分法求自由能极小值，我们得到著名的<strong>自洽方程</strong>：</p>
+<div class="arithmatex">\[
+m = \tanh\left(\frac{Jm}{k_B T}\right)
+\]</div>
+<p>这个方程在 <span class="arithmatex">\(T &lt; T_c = J/k_B\)</span> 时有非零解，对应铁磁相变。临界温度 <span class="arithmatex">\(T_c\)</span> 以下，系统自发对称性破缺，出现宏观磁化。</p>
+<p>对于 PACE 的求解算法，平均场思想至关重要。递归更新规则 <span class="arithmatex">\(S_{t+1} = \text{sign}(W \cdot S_t)\)</span> 本质上就是一种<strong>零温平均场动力学</strong>（zero-temperature mean-field dynamics）：每个自旋根据其他自旋的&rdquo;平均场&rdquo;作用来决定自己的取向。我们将在 6.4 节详细分析这一点。</p>
 <hr />
 <h3 id="62-ising">6.2 为什么 Ising 模型重要？<a class="headerlink" href="#62-ising" title="Permanent link"></a></h3>
 <h4 id="621-np-hard">6.2.1 NP-hard 问题的统一框架<a class="headerlink" href="#621-np-hard" title="Permanent link"></a></h4>
 <p>Ising 模型的重要性远超统计物理学的范畴。1980 年代以来，理论计算机科学家发现：<strong>大量 NP-hard 组合优化问题可以多项式时间归约到 Ising 基态搜索问题</strong>。这意味着，如果你能高效求解 Ising 模型，你就能高效求解所有这些 NP-hard 问题。</p>
 <p>这一发现的核心在于：Ising 哈密顿量是一个<strong>二次伪布尔函数</strong>（quadratic pseudo-Boolean function），而许多组合优化问题的目标函数恰好可以表示为这种形式。让我们详细考察几个经典映射。</p>
 <h4 id="622-max-cut">6.2.2 Max-Cut 问题的直接映射<a class="headerlink" href="#622-max-cut" title="Permanent link"></a></h4>
-<p><strong>Max-Cut</strong>（最大割）是最直观的例子。给定一个无向图 $G = (V, E)$，每条边 $(i,j) \in E$ 有权重 $w_{ij} &gt; 0$。Max-Cut 要求将顶点集 $V$ 划分为两个子集 $S$ 和 $\bar{S}$，使得跨越割的边权之和最大：</p>
-<p>$$<br />
-\text{Max-Cut}(G) = \max_{S \subseteq V} \sum_{(i,j) \in E, i \in S, j \in \bar{S}} w_{ij}<br />
-$$</p>
+<p><strong>Max-Cut</strong>（最大割）是最直观的例子。给定一个无向图 <span class="arithmatex">\(G = (V, E)\)</span>，每条边 <span class="arithmatex">\((i,j) \in E\)</span> 有权重 <span class="arithmatex">\(w_{ij} &gt; 0\)</span>。Max-Cut 要求将顶点集 <span class="arithmatex">\(V\)</span> 划分为两个子集 <span class="arithmatex">\(S\)</span> 和 <span class="arithmatex">\(\bar{S}\)</span>，使得跨越割的边权之和最大：</p>
+<div class="arithmatex">\[
+\text{Max-Cut}(G) = \max_{S \subseteq V} \sum_{(i,j) \in E, i \in S, j \in \bar{S}} w_{ij}
+\]</div>
 <p>Max-Cut 是 Karp 的 21 个 NP-complete 问题之一。它如何映射到 Ising 模型？</p>
-<p>将每个顶点 $i$ 分配一个自旋变量 $\sigma_i \in {+1, -1}$，其中 $\sigma_i = +1$ 表示 $i \in S$，$\sigma_i = -1$ 表示 $i \in \bar{S}$。那么：</p>
-<p>$$<br />
-\sigma_i \sigma_j = \begin{cases} +1 &amp; \text{if } i,j \text{ 在同一侧} \ -1 &amp; \text{if } i,j \text{ 在两侧} \end{cases}<br />
-$$</p>
+<p>将每个顶点 <span class="arithmatex">\(i\)</span> 分配一个自旋变量 <span class="arithmatex">\(\sigma_i \in \{+1, -1\}\)</span>，其中 <span class="arithmatex">\(\sigma_i = +1\)</span> 表示 <span class="arithmatex">\(i \in S\)</span>，<span class="arithmatex">\(\sigma_i = -1\)</span> 表示 <span class="arithmatex">\(i \in \bar{S}\)</span>。那么：</p>
+<div class="arithmatex">\[
+\sigma_i \sigma_j = \begin{cases} +1 &amp; \text{if } i,j \text{ 在同一侧} \\ -1 &amp; \text{if } i,j \text{ 在两侧} \end{cases}
+\]</div>
 <p>考虑 Ising 哈密顿量：</p>
-<p>$$<br />
-H = -\frac{1}{2} \sum_{(i,j) \in E} w_{ij} \sigma_i \sigma_j<br />
-$$</p>
-<p>当 $\sigma_i$ 和 $\sigma_j$ 异号（跨越割）时，$\sigma_i \sigma_j = -1$，该项对 $H$ 的贡献为 $+w_{ij}/2$；同号时贡献 $-w_{ij}/2$。因此：</p>
-<p>$$<br />
-H = \frac{1}{2}\sum_{(i,j)\in E} w_{ij} - \sum_{(i,j)\in E, \sigma_i \neq \sigma_j} w_{ij}<br />
-$$</p>
-<p>第一项是常数，所以<strong>最小化 $H$ 等价于最大化跨越割的边权和</strong>。耦合系数直接对应图边权重：$J_{ij} = w_{ij}$（对于 $(i,j) \in E$），$J_{ij} = 0$（否则）。</p>
+<div class="arithmatex">\[
+H = -\frac{1}{2} \sum_{(i,j) \in E} w_{ij} \sigma_i \sigma_j
+\]</div>
+<p>当 <span class="arithmatex">\(\sigma_i\)</span> 和 <span class="arithmatex">\(\sigma_j\)</span> 异号（跨越割）时，<span class="arithmatex">\(\sigma_i \sigma_j = -1\)</span>，该项对 <span class="arithmatex">\(H\)</span> 的贡献为 <span class="arithmatex">\(+w_{ij}/2\)</span>；同号时贡献 <span class="arithmatex">\(-w_{ij}/2\)</span>。因此：</p>
+<div class="arithmatex">\[
+H = \frac{1}{2}\sum_{(i,j)\in E} w_{ij} - \sum_{(i,j)\in E, \sigma_i \neq \sigma_j} w_{ij}
+\]</div>
+<p>第一项是常数，所以<strong>最小化 <span class="arithmatex">\(H\)</span> 等价于最大化跨越割的边权和</strong>。耦合系数直接对应图边权重：<span class="arithmatex">\(J_{ij} = w_{ij}\)</span>（对于 <span class="arithmatex">\((i,j) \in E\)</span>），<span class="arithmatex">\(J_{ij} = 0\)</span>（否则）。</p>
 <p>这个映射是<strong>一一对应</strong>的：Ising 基态给出 Max-Cut 最优解，反之亦然。Max-Cut 在电路设计、图像分割、聚类分析中有广泛应用。</p>
 <h4 id="623-tsp">6.2.3 旅行商问题（TSP）的映射<a class="headerlink" href="#623-tsp" title="Permanent link"></a></h4>
-<p><strong>旅行商问题</strong>（Traveling Salesman Problem, TSP）要求找到访问 $N$ 个城市各一次并返回起点的最短路径。TSP 是最著名的 NP-hard 问题之一。</p>
-<p>将 TSP 映射到 Ising 模型需要更精巧的编码。我们使用<strong>二元变量</strong> $x_{v,t} \in {0,1}$，表示城市 $v$ 是否在路径的第 $t$ 个位置被访问。TSP 的约束条件为：</p>
+<p><strong>旅行商问题</strong>（Traveling Salesman Problem, TSP）要求找到访问 <span class="arithmatex">\(N\)</span> 个城市各一次并返回起点的最短路径。TSP 是最著名的 NP-hard 问题之一。</p>
+<p>将 TSP 映射到 Ising 模型需要更精巧的编码。我们使用<strong>二元变量</strong> <span class="arithmatex">\(x_{v,t} \in \{0,1\}\)</span>，表示城市 <span class="arithmatex">\(v\)</span> 是否在路径的第 <span class="arithmatex">\(t\)</span> 个位置被访问。TSP 的约束条件为：</p>
 <ol>
-<li><strong>每个城市恰好访问一次</strong>：$\sum_t x_{v,t} = 1$ 对所有 $v$</li>
-<li><strong>每个位置恰好一个城市</strong>：$\sum_v x_{v,t} = 1$ 对所有 $t$</li>
-<li><strong>最小化总路径长度</strong>：$\sum_{u,v,t} d_{uv} x_{u,t} x_{v,t+1}$</li>
+<li><strong>每个城市恰好访问一次</strong>：<span class="arithmatex">\(\sum_t x_{v,t} = 1\)</span> 对所有 <span class="arithmatex">\(v\)</span></li>
+<li><strong>每个位置恰好一个城市</strong>：<span class="arithmatex">\(\sum_v x_{v,t} = 1\)</span> 对所有 <span class="arithmatex">\(t\)</span></li>
+<li><strong>最小化总路径长度</strong>：<span class="arithmatex">\(\sum_{u,v,t} d_{uv} x_{u,t} x_{v,t+1}\)</span></li>
 </ol>
-<p>为了将二元变量 $x_{v,t} \in {0,1}$ 转换为 Ising 自旋 $\sigma_{v,t} \in {-1,+1}$，使用变换：</p>
-<p>$$<br />
-x_{v,t} = \frac{1 + \sigma_{v,t}}{2}<br />
-$$</p>
-<p>目标函数和约束条件都变为关于 $\sigma_{v,t}$ 的二次函数。约束条件通过<strong>惩罚项</strong>（penalty terms）引入哈密顿量：</p>
-<p>$$<br />
-H = \underbrace{\sum_{u,v,t} d_{uv} \frac{1+\sigma_{u,t}}{2} \frac{1+\sigma_{v,t+1}}{2}}<em v_t="v,t">{\text{路径长度}} + \underbrace{\lambda \sum_v \left(\sum_t \frac{1+\sigma</em>}}{2} - 1\right)^2<em v_t="v,t">{\text{城市访问约束}} + \underbrace{\lambda \sum_t \left(\sum_v \frac{1+\sigma</em>}}{2} - 1\right)^2}_{\text{位置约束}<br />
-$$</p>
-<p>其中 $\lambda$ 是足够大的惩罚系数，确保约束违反的能量代价远高于路径长度的优化。展开后，这确实是一个二次 Ising 哈密顿量。</p>
-<p>TSP 在物流规划、电路板钻孔、DNA 测序中有直接应用。一个包含 50 个城市的 TSP 有 $49!/2 \approx 3 \times 10^{62}$ 条可能路径——Ising 映射将其转化为在 $50^2 = 2500$ 个自旋上的能量最小化问题。</p>
+<p>为了将二元变量 <span class="arithmatex">\(x_{v,t} \in \{0,1\}\)</span> 转换为 Ising 自旋 <span class="arithmatex">\(\sigma_{v,t} \in \{-1,+1\}\)</span>，使用变换：</p>
+<div class="arithmatex">\[
+x_{v,t} = \frac{1 + \sigma_{v,t}}{2}
+\]</div>
+<p>目标函数和约束条件都变为关于 <span class="arithmatex">\(\sigma_{v,t}\)</span> 的二次函数。约束条件通过<strong>惩罚项</strong>（penalty terms）引入哈密顿量：</p>
+<div class="arithmatex">\[
+H = \underbrace{\sum_{u,v,t} d_{uv} \frac{1+\sigma_{u,t}}{2} \frac{1+\sigma_{v,t+1}}{2}}_{\text{路径长度}} + \underbrace{\lambda \sum_v \left(\sum_t \frac{1+\sigma_{v,t}}{2} - 1\right)^2}_{\text{城市访问约束}} + \underbrace{\lambda \sum_t \left(\sum_v \frac{1+\sigma_{v,t}}{2} - 1\right)^2}_{\text{位置约束}}
+\]</div>
+<p>其中 <span class="arithmatex">\(\lambda\)</span> 是足够大的惩罚系数，确保约束违反的能量代价远高于路径长度的优化。展开后，这确实是一个二次 Ising 哈密顿量。</p>
+<p>TSP 在物流规划、电路板钻孔、DNA 测序中有直接应用。一个包含 50 个城市的 TSP 有 <span class="arithmatex">\(49!/2 \approx 3 \times 10^{62}\)</span> 条可能路径——Ising 映射将其转化为在 <span class="arithmatex">\(50^2 = 2500\)</span> 个自旋上的能量最小化问题。</p>
 <h4 id="624-graph-coloring">6.2.4 图着色（Graph Coloring）<a class="headerlink" href="#624-graph-coloring" title="Permanent link"></a></h4>
-<p><strong>图着色问题</strong>要求用 $K$ 种颜色给图的顶点着色，使得相邻顶点颜色不同。这是调度和资源分配问题的抽象。</p>
-<p>使用<strong>独热编码</strong>（one-hot encoding）：对每个顶点 $v$ 和每种颜色 $k$，定义二元变量 $x_{v,k} \in {0,1}$，表示顶点 $v$ 是否使用颜色 $k$。约束条件为：</p>
+<p><strong>图着色问题</strong>要求用 <span class="arithmatex">\(K\)</span> 种颜色给图的顶点着色，使得相邻顶点颜色不同。这是调度和资源分配问题的抽象。</p>
+<p>使用<strong>独热编码</strong>（one-hot encoding）：对每个顶点 <span class="arithmatex">\(v\)</span> 和每种颜色 <span class="arithmatex">\(k\)</span>，定义二元变量 <span class="arithmatex">\(x_{v,k} \in \{0,1\}\)</span>，表示顶点 <span class="arithmatex">\(v\)</span> 是否使用颜色 <span class="arithmatex">\(k\)</span>。约束条件为：</p>
 <ol>
-<li><strong>每个顶点恰好一种颜色</strong>：$\sum_k x_{v,k} = 1$</li>
-<li><strong>相邻顶点不同色</strong>：$x_{u,k} + x_{v,k} \leq 1$ 对 $(u,v) \in E$ 和每种 $k$</li>
+<li><strong>每个顶点恰好一种颜色</strong>：<span class="arithmatex">\(\sum_k x_{v,k} = 1\)</span></li>
+<li><strong>相邻顶点不同色</strong>：<span class="arithmatex">\(x_{u,k} + x_{v,k} \leq 1\)</span> 对 <span class="arithmatex">\((u,v) \in E\)</span> 和每种 <span class="arithmatex">\(k\)</span></li>
 </ol>
 <p>同样转换为 Ising 变量并引入惩罚项。独热编码的约束确保解空间被正确限制。</p>
 <h4 id="625-sat">6.2.5 布尔可满足性问题（SAT）<a class="headerlink" href="#625-sat" title="Permanent link"></a></h4>
 <p><strong>SAT</strong>（Boolean Satisfiability）是 NP-complete 问题的&rdquo;鼻祖&rdquo;——Cook-Levin 定理证明所有 NP 问题都可以多项式归约到 SAT。</p>
 <p>给定一个布尔公式（合取范式，CNF）：</p>
-<p>$$<br />
-\Phi = C_1 \land C_2 \land \cdots \land C_m<br />
-$$</p>
-<p>其中每个子句 $C_j$ 是若干文字的析取，例如 $C_j = x_1 \lor \bar{x}_3 \lor x_5$。SAT 问：是否存在变量赋值使 $\Phi$ 为真？</p>
-<p>将布尔变量 $x_i \in {\text{True}, \text{False}}$ 映射到 Ising 自旋：$x_i = \text{True} \Leftrightarrow \sigma_i = +1$，$x_i = \text{False} \Leftrightarrow \sigma_i = -1$。</p>
-<p>每个子句 $C_j$ 定义一个能量惩罚：如果 $C_j$ 不满足，增加能量代价。例如对于 $C_j = x_1 \lor \bar{x}_3$，不满足的情况是 $x_1 = \text{False}$ 且 $x_3 = \text{True}$，即 $\sigma_1 = -1$ 且 $\sigma_3 = +1$。对应的惩罚项可以设计为：</p>
-<p>$$<br />
-E_j = \frac{(1-\sigma_1)(1+\sigma_3)}{4}<br />
-$$</p>
-<p>当 $\sigma_1 = -1, \sigma_3 = +1$ 时 $E_j = 1$（惩罚），否则 $E_j = 0$。总哈密顿量为所有子句惩罚之和：</p>
-<p>$$<br />
-H = \sum_{j=1}^m E_j<br />
-$$</p>
-<p>$H = 0$ 当且仅当所有子句满足，即公式可满足。</p>
+<div class="arithmatex">\[
+\Phi = C_1 \land C_2 \land \cdots \land C_m
+\]</div>
+<p>其中每个子句 <span class="arithmatex">\(C_j\)</span> 是若干文字的析取，例如 <span class="arithmatex">\(C_j = x_1 \lor \bar{x}_3 \lor x_5\)</span>。SAT 问：是否存在变量赋值使 <span class="arithmatex">\(\Phi\)</span> 为真？</p>
+<p>将布尔变量 <span class="arithmatex">\(x_i \in \{\text{True}, \text{False}\}\)</span> 映射到 Ising 自旋：<span class="arithmatex">\(x_i = \text{True} \Leftrightarrow \sigma_i = +1\)</span>，<span class="arithmatex">\(x_i = \text{False} \Leftrightarrow \sigma_i = -1\)</span>。</p>
+<p>每个子句 <span class="arithmatex">\(C_j\)</span> 定义一个能量惩罚：如果 <span class="arithmatex">\(C_j\)</span> 不满足，增加能量代价。例如对于 <span class="arithmatex">\(C_j = x_1 \lor \bar{x}_3\)</span>，不满足的情况是 <span class="arithmatex">\(x_1 = \text{False}\)</span> 且 <span class="arithmatex">\(x_3 = \text{True}\)</span>，即 <span class="arithmatex">\(\sigma_1 = -1\)</span> 且 <span class="arithmatex">\(\sigma_3 = +1\)</span>。对应的惩罚项可以设计为：</p>
+<div class="arithmatex">\[
+E_j = \frac{(1-\sigma_1)(1+\sigma_3)}{4}
+\]</div>
+<p>当 <span class="arithmatex">\(\sigma_1 = -1, \sigma_3 = +1\)</span> 时 <span class="arithmatex">\(E_j = 1\)</span>（惩罚），否则 <span class="arithmatex">\(E_j = 0\)</span>。总哈密顿量为所有子句惩罚之和：</p>
+<div class="arithmatex">\[
+H = \sum_{j=1}^m E_j
+\]</div>
+<p><span class="arithmatex">\(H = 0\)</span> 当且仅当所有子句满足，即公式可满足。</p>
 <h4 id="626-karp-21-ising">6.2.6 Karp 的 21 个问题与 Ising 归约<a class="headerlink" href="#626-karp-21-ising" title="Permanent link"></a></h4>
 <p>1972 年，Richard Karp 证明了 21 个经典组合问题之间的 NP-completeness 归约链。今天我们知道，这些问题（以及数千个其他问题）都可以多项式时间归约到 Ising 基态搜索：</p>
 <table>
@@ -1988,27 +1998,27 @@ $$</p>
 <tr>
 <td>图论</td>
 <td>Max-Cut, Max-Clique, Vertex Cover</td>
-<td>$O(N^2)$ 变量</td>
+<td><span class="arithmatex">\(O(N^2)\)</span> 变量</td>
 </tr>
 <tr>
 <td>调度</td>
 <td>Job Shop, TSP</td>
-<td>$O(N^2)$ 变量</td>
+<td><span class="arithmatex">\(O(N^2)\)</span> 变量</td>
 </tr>
 <tr>
 <td>逻辑</td>
 <td>SAT, 3-SAT</td>
-<td>$O(NM)$ 变量</td>
+<td><span class="arithmatex">\(O(NM)\)</span> 变量</td>
 </tr>
 <tr>
 <td>组合</td>
 <td>Knapsack, Partition</td>
-<td>$O(N)$ 变量</td>
+<td><span class="arithmatex">\(O(N)\)</span> 变量</td>
 </tr>
 <tr>
 <td>网络</td>
 <td>Max-Flow（变体）</td>
-<td>$O(N^2)$ 变量</td>
+<td><span class="arithmatex">\(O(N^2)\)</span> 变量</td>
 </tr>
 </tbody>
 </table>
@@ -2021,67 +2031,67 @@ $$</p>
 <p>算法核心思想：在能量景观中引入&rdquo;热噪声&rdquo;，允许系统偶尔跃迁到能量更高的状态，从而逃离局部极小值。随着&rdquo;温度&rdquo;降低，系统逐渐&rdquo;冷却&rdquo;到基态。</p>
 <p><strong>算法步骤</strong>：</p>
 <ol>
-<li>初始化：随机选择自旋构型 ${\sigma_i^{(0)}}$，设定初始温度 $T_0$</li>
-<li>对于每次迭代 $t = 1, 2, \ldots, T_{\max}$：<br />
-   a. 随机选择一个自旋 $i$<br />
-   b. 计算翻转该自旋的能量变化：$\Delta E = E(\text{新构型}) - E(\text{旧构型})$<br />
-   c. 如果 $\Delta E &lt; 0$（能量降低），接受翻转<br />
-   d. 如果 $\Delta E \geq 0$，以概率 $P(\text{accept}) = \exp(-\Delta E / k_B T)$ 接受翻转<br />
-   e. 更新温度：$T(t) = T(t-1) \cdot \alpha$ 或按其他 schedule</li>
+<li>初始化：随机选择自旋构型 <span class="arithmatex">\(\{\sigma_i^{(0)}\}\)</span>，设定初始温度 <span class="arithmatex">\(T_0\)</span></li>
+<li>对于每次迭代 <span class="arithmatex">\(t = 1, 2, \ldots, T_{\max}\)</span>：<br />
+   a. 随机选择一个自旋 <span class="arithmatex">\(i\)</span><br />
+   b. 计算翻转该自旋的能量变化：<span class="arithmatex">\(\Delta E = E(\text{新构型}) - E(\text{旧构型})\)</span><br />
+   c. 如果 <span class="arithmatex">\(\Delta E &lt; 0\)</span>（能量降低），接受翻转<br />
+   d. 如果 <span class="arithmatex">\(\Delta E \geq 0\)</span>，以概率 <span class="arithmatex">\(P(\text{accept}) = \exp(-\Delta E / k_B T)\)</span> 接受翻转<br />
+   e. 更新温度：<span class="arithmatex">\(T(t) = T(t-1) \cdot \alpha\)</span> 或按其他 schedule</li>
 <li>输出最终构型</li>
 </ol>
 <p><strong>Metropolis 准则</strong>（Metropolis criterion）是算法的灵魂。接受概率：</p>
-<p>$$<br />
-P(\text{accept } \Delta E) = \min\left(1, \exp\left(-\frac{\Delta E}{k_B T}\right)\right)<br />
-$$</p>
+<div class="arithmatex">\[
+P(\text{accept } \Delta E) = \min\left(1, \exp\left(-\frac{\Delta E}{k_B T}\right)\right)
+\]</div>
 <p>让我们分析这个公式的物理直觉：<br />
-- 当 $T \to \infty$ 时，$\exp(-\Delta E / k_B T) \to 1$，所有翻转都被接受——系统在构型空间中随机游走<br />
-- 当 $T \to 0$ 时，只有 $\Delta E &lt; 0$ 的翻转被接受——系统贪婪地爬向最近的局部极小值<br />
+- 当 <span class="arithmatex">\(T \to \infty\)</span> 时，<span class="arithmatex">\(\exp(-\Delta E / k_B T) \to 1\)</span>，所有翻转都被接受——系统在构型空间中随机游走<br />
+- 当 <span class="arithmatex">\(T \to 0\)</span> 时，只有 <span class="arithmatex">\(\Delta E &lt; 0\)</span> 的翻转被接受——系统贪婪地爬向最近的局部极小值<br />
 - 在 intermediate 温度，系统以玻尔兹曼概率接受&rdquo; uphill &ldquo;跃迁，这恰好是<strong>细致平衡</strong>（detailed balance）条件，保证稳态分布为吉布斯分布（Gibbs distribution）：</p>
-<p>$$<br />
-P({\sigma_i}) = \frac{1}{Z} \exp\left(-\frac{H({\sigma_i})}{k_B T}\right)<br />
-$$</p>
-<p>其中 $Z = \sum_{{\sigma_i}} \exp(-H/k_B T)$ 是配分函数（partition function）。</p>
+<div class="arithmatex">\[
+P(\{\sigma_i\}) = \frac{1}{Z} \exp\left(-\frac{H(\{\sigma_i\})}{k_B T}\right)
+\]</div>
+<p>其中 <span class="arithmatex">\(Z = \sum_{\{\sigma_i\}} \exp(-H/k_B T)\)</span> 是配分函数（partition function）。</p>
 <p><strong>温度 schedule</strong> 的选择至关重要。理论分析表明，为保证收敛到全局最优，温度应按对数衰减：</p>
-<p>$$<br />
-T(t) = \frac{T_0}{\log(1+t)}<br />
-$$</p>
+<div class="arithmatex">\[
+T(t) = \frac{T_0}{\log(1+t)}
+\]</div>
 <p>但这导致收敛极慢。实践中常用指数衰减：</p>
-<p>$$<br />
-T(t) = T_0 \cdot \alpha^t, \quad \alpha \in [0.95, 0.999]<br />
-$$</p>
+<div class="arithmatex">\[
+T(t) = T_0 \cdot \alpha^t, \quad \alpha \in [0.95, 0.999]
+\]</div>
 <p>或更复杂的自适应 schedule。</p>
-<p><strong>收敛性分析</strong>：Hajek (1988) 证明，模拟退火收敛到全局最优的充要条件是温度下降足够慢，使得系统能够穿越能量景观中的任何&rdquo;山脊&rdquo;。具体地，如果 $d^<em>$ 是能量景观中最深的局部极小值与相邻更低极小值之间的能量壁垒高度，则需要 $T(t) \geq d^</em> / \log t$。</p>
+<p><strong>收敛性分析</strong>：Hajek (1988) 证明，模拟退火收敛到全局最优的充要条件是温度下降足够慢，使得系统能够穿越能量景观中的任何&rdquo;山脊&rdquo;。具体地，如果 <span class="arithmatex">\(d^*\)</span> 是能量景观中最深的局部极小值与相邻更低极小值之间的能量壁垒高度，则需要 <span class="arithmatex">\(T(t) \geq d^* / \log t\)</span>。</p>
 <p>对于熟悉量子隧穿（quantum tunneling）的读者，这里有一个深刻类比：模拟退火中的热涨落帮助系统&rdquo;翻越&rdquo;能量壁垒，而量子退火（quantum annealing）中的量子隧穿帮助系统&rdquo;穿透&rdquo;能量壁垒。D-Wave 量子退火机就是利用这一原理。PACE 的光子退火则走了一条不同的路——利用光子计算的极短延迟，在单位时间内执行更多迭代，实现更彻底的能量景观探索。</p>
 <h4 id="632">6.3.2 光子启发式算法<a class="headerlink" href="#632" title="Permanent link"></a></h4>
 <p>PACE 不执行严格的模拟退火，而是采用一种<strong>零温递归启发式算法</strong>（zero-temperature recursive heuristic），其效率来自硬件的极致速度而非算法的理论保证。</p>
-<p>核心映射：Ising 耦合矩阵 $J$ 直接对应 PACE 的光子权重矩阵 $W$：</p>
-<p>$$<br />
-W_{ij} = J_{ij}<br />
-$$</p>
+<p>核心映射：Ising 耦合矩阵 <span class="arithmatex">\(J\)</span> 直接对应 PACE 的光子权重矩阵 <span class="arithmatex">\(W\)</span>：</p>
+<div class="arithmatex">\[
+W_{ij} = J_{ij}
+\]</div>
 <p>（在 PACE 的 oMAC 架构中，权重被编码为光衰减器的透射率。）</p>
 <p>算法迭代规则：</p>
-<p>$$<br />
-S_i^{(t+1)} = \text{sign}\left(\sum_j W_{ij} S_j^{(t)} + \xi_i^{(t)}\right)<br />
-$$</p>
+<div class="arithmatex">\[
+S_i^{(t+1)} = \text{sign}\left(\sum_j W_{ij} S_j^{(t)} + \xi_i^{(t)}\right)
+\]</div>
 <p>其中：<br />
-- $S_i^{(t)} \in {-1, +1}$ 是第 $t$ 次迭代时第 $i$ 个自旋的状态<br />
-- $\sum_j W_{ij} S_j^{(t)}$ 是矩阵-向量乘法（MAC），由 PACE 的光学核心执行<br />
-- $\xi_i^{(t)}$ 是人工注入的噪声项<br />
-- $\text{sign}(x)$ 是符号函数：$+1$ 如果 $x \geq 0$，$-1$ 如果 $x &lt; 0$</p>
-<p>让我们与平均场理论对比。在平均场近似下，自旋 $i$ 感受到的有效场为：</p>
-<p>$$<br />
-h_i^{\text{eff}} = \sum_j J_{ij} \langle \sigma_j \rangle<br />
-$$</p>
-<p>在零温下，$\langle \sigma_i \rangle = \text{sign}(h_i^{\text{eff}})$。PACE 的更新规则正是这个方程的<strong>离散时间动力学实现</strong>，只不过用瞬时状态 $S_j^{(t)}$ 代替热平均值 $\langle \sigma_j \rangle$。</p>
-<p><strong>噪声的作用</strong>至关重要。没有噪声时，系统会快速收敛到最近的局部极小值并被卡住——这是<strong>梯度下降</strong>（gradient descent）的宿命。注入噪声 $\xi_i^{(t)}$ 后，更新规则变为：</p>
-<p>$$<br />
-S_i^{(t+1)} = \text{sign}\left(\sum_j W_{ij} S_j^{(t)} + \xi_i^{(t)}\right)<br />
-$$</p>
+- <span class="arithmatex">\(S_i^{(t)} \in \{-1, +1\}\)</span> 是第 <span class="arithmatex">\(t\)</span> 次迭代时第 <span class="arithmatex">\(i\)</span> 个自旋的状态<br />
+- <span class="arithmatex">\(\sum_j W_{ij} S_j^{(t)}\)</span> 是矩阵-向量乘法（MAC），由 PACE 的光学核心执行<br />
+- <span class="arithmatex">\(\xi_i^{(t)}\)</span> 是人工注入的噪声项<br />
+- <span class="arithmatex">\(\text{sign}(x)\)</span> 是符号函数：<span class="arithmatex">\(+1\)</span> 如果 <span class="arithmatex">\(x \geq 0\)</span>，<span class="arithmatex">\(-1\)</span> 如果 <span class="arithmatex">\(x &lt; 0\)</span></p>
+<p>让我们与平均场理论对比。在平均场近似下，自旋 <span class="arithmatex">\(i\)</span> 感受到的有效场为：</p>
+<div class="arithmatex">\[
+h_i^{\text{eff}} = \sum_j J_{ij} \langle \sigma_j \rangle
+\]</div>
+<p>在零温下，<span class="arithmatex">\(\langle \sigma_i \rangle = \text{sign}(h_i^{\text{eff}})\)</span>。PACE 的更新规则正是这个方程的<strong>离散时间动力学实现</strong>，只不过用瞬时状态 <span class="arithmatex">\(S_j^{(t)}\)</span> 代替热平均值 <span class="arithmatex">\(\langle \sigma_j \rangle\)</span>。</p>
+<p><strong>噪声的作用</strong>至关重要。没有噪声时，系统会快速收敛到最近的局部极小值并被卡住——这是<strong>梯度下降</strong>（gradient descent）的宿命。注入噪声 <span class="arithmatex">\(\xi_i^{(t)}\)</span> 后，更新规则变为：</p>
+<div class="arithmatex">\[
+S_i^{(t+1)} = \text{sign}\left(\sum_j W_{ij} S_j^{(t)} + \xi_i^{(t)}\right)
+\]</div>
 <p>噪声可以&rdquo;推动&rdquo;系统越过能量壁垒。物理直觉：噪声模拟了有限温度下的热涨落，但不同于模拟退火中逐渐降低温度，PACE 的噪声可以是<strong>时变</strong>的或<strong>自适应</strong>的。</p>
 <p>噪声的实现方式有多种：<br />
-- <strong>高斯噪声</strong>：$\xi_i^{(t)} \sim \mathcal{N}(0, \sigma^2(t))$，方差 $\sigma^2(t)$ 随时间衰减<br />
-- <strong>均匀噪声</strong>：$\xi_i^{(t)} \sim \text{Uniform}[-\eta(t), +\eta(t)]$<br />
+- <strong>高斯噪声</strong>：<span class="arithmatex">\(\xi_i^{(t)} \sim \mathcal{N}(0, \sigma^2(t))\)</span>，方差 <span class="arithmatex">\(\sigma^2(t)\)</span> 随时间衰减<br />
+- <strong>均匀噪声</strong>：<span class="arithmatex">\(\xi_i^{(t)} \sim \text{Uniform}[-\eta(t), +\eta(t)]\)</span><br />
 - <strong>伯努利噪声</strong>：以一定概率随机翻转某些自旋</p>
 <p>噪声 schedule 的设计是算法调优的关键。一种有效策略是&rdquo;噪声退火&rdquo;（noise annealing）：初始阶段使用大噪声进行全局探索，逐渐减小噪声进行局部精化（refinement）。</p>
 <h4 id="633">6.3.3 与模拟退火的对比<a class="headerlink" href="#633" title="Permanent link"></a></h4>
@@ -2111,8 +2121,8 @@ $$</p>
 </tr>
 <tr>
 <td>每次迭代时间</td>
-<td>$O(N^2)$（电子计算）</td>
-<td>$O(1)$（光学延迟，~3-5 ns）</td>
+<td><span class="arithmatex">\(O(N^2)\)</span>（电子计算）</td>
+<td><span class="arithmatex">\(O(1)\)</span>（光学延迟，~3-5 ns）</td>
 </tr>
 <tr>
 <td>理论保证</td>
@@ -2130,9 +2140,9 @@ $$</p>
 <hr />
 <h3 id="64-pace">6.4 PACE 的递归算法详解<a class="headerlink" href="#64-pace" title="Permanent link"></a></h3>
 <h4 id="641">6.4.1 算法形式化<a class="headerlink" href="#641" title="Permanent link"></a></h4>
-<p>让我们将 PACE 的求解算法形式化描述。给定 Ising 耦合矩阵 $J \in \mathbb{R}^{N \times N}$（对称，对角元为零），求解过程为：</p>
-<p><strong>输入</strong>：权重矩阵 $W = J$，初始自旋向量 $S^{(0)} \in {-1,+1}^N$，最大迭代次数 $T_{\max}$，噪声 schedule ${\sigma_t}<em _max="\max">{t=0}^{T</em>$}-1</p>
-<p><strong>输出</strong>：近似基态 $S^*$</p>
+<p>让我们将 PACE 的求解算法形式化描述。给定 Ising 耦合矩阵 <span class="arithmatex">\(J \in \mathbb{R}^{N \times N}\)</span>（对称，对角元为零），求解过程为：</p>
+<p><strong>输入</strong>：权重矩阵 <span class="arithmatex">\(W = J\)</span>，初始自旋向量 <span class="arithmatex">\(S^{(0)} \in \{-1,+1\}^N\)</span>，最大迭代次数 <span class="arithmatex">\(T_{\max}\)</span>，噪声 schedule <span class="arithmatex">\(\{\sigma_t\}_{t=0}^{T_{\max}-1}\)</span></p>
+<p><strong>输出</strong>：近似基态 <span class="arithmatex">\(S^*\)</span></p>
 <div class="highlight"><pre><span></span><code>for t = 0 to T_max - 1:
     // 光学 MAC 运算（PACE 核心）
     h^{(t)} = W · S^{(t)}        // 矩阵-向量乘法，~3 ns
@@ -2152,14 +2162,14 @@ $$</p>
 </code></pre></div>
 
 <p><strong>关键参数</strong>：<br />
-- $N = 64$（当前 PACE 的矩阵维度）<br />
+- <span class="arithmatex">\(N = 64\)</span>（当前 PACE 的矩阵维度）<br />
 - 每次 MAC 运算：~3 ns（纯矩阵乘法）或 ~5 ns（Ising 求解含噪声注入和符号判决）<br />
 - 时钟频率：1 GHz</p>
 <h4 id="642">6.4.2 硬件实现细节<a class="headerlink" href="#642" title="Permanent link"></a></h4>
 <p>PACE 的递归算法在硬件上的实现涉及光电混合信号链：</p>
 <ol>
 <li><strong>权重加载阶段</strong>：</li>
-<li>耦合矩阵 $J$ 的数字表示通过 DAC（数模转换器）转换为模拟电压</li>
+<li>耦合矩阵 <span class="arithmatex">\(J\)</span> 的数字表示通过 DAC（数模转换器）转换为模拟电压</li>
 <li>电压驱动光衰减器阵列（MZI 或 MRR），将权重编码为光透射率</li>
 <li>
 <p>这一步在问题切换时执行，不是每次迭代都需重复</p>
@@ -2167,8 +2177,8 @@ $$</p>
 <li>
 <p><strong>光学 MAC 阶段</strong>（~3 ns）：</p>
 </li>
-<li>自旋状态 $S^{(t)}$ 调制输入光强：$S_i = +1$ 对应高光强，$S_i = -1$ 对应低光强</li>
-<li>光通过权重矩阵（光互连网络），在输出端产生光强分布 $I_i \propto \sum_j W_{ij} S_j$</li>
+<li>自旋状态 <span class="arithmatex">\(S^{(t)}\)</span> 调制输入光强：<span class="arithmatex">\(S_i = +1\)</span> 对应高光强，<span class="arithmatex">\(S_i = -1\)</span> 对应低光强</li>
+<li>光通过权重矩阵（光互连网络），在输出端产生光强分布 <span class="arithmatex">\(I_i \propto \sum_j W_{ij} S_j\)</span></li>
 <li>
 <p>这是<strong>非相干光学求和</strong>（incoherent optical summation），光强直接相加</p>
 </li>
@@ -2179,12 +2189,12 @@ $$</p>
 <li>比较器（comparator）将模拟信号与阈值比较，输出数字逻辑电平</li>
 <li>噪声注入：通过调节比较器阈值或添加模拟噪声电压实现</li>
 <li>
-<p>输出即为 $S^{(t+1)}$</p>
+<p>输出即为 <span class="arithmatex">\(S^{(t+1)}\)</span></p>
 </li>
 <li>
 <p><strong>数字反馈阶段</strong>（纳秒级）：</p>
 </li>
-<li>$S^{(t+1)}$ 写入 SRAM（静态随机存取存储器）</li>
+<li><span class="arithmatex">\(S^{(t+1)}\)</span> 写入 SRAM（静态随机存取存储器）</li>
 <li>从 SRAM 读出驱动下一轮的激光调制器</li>
 <li>形成闭环反馈</li>
 </ol>
@@ -2196,65 +2206,65 @@ $$</p>
 <p>PACE 论文报告的关键性能指标：<br />
 - <strong>收敛率</strong>：92.72%（在 5 ns 迭代周期下）<br />
 - <strong>平均求解迭代次数</strong>：537 次<br />
-- <strong>平均求解时间</strong>：$537 \times 5\text{ ns} \approx 2.69\ \mu\text{s}$</p>
+- <strong>平均求解时间</strong>：<span class="arithmatex">\(537 \times 5\text{ ns} \approx 2.69\ \mu\text{s}\)</span></p>
 <p>让我们分析这些数字的含义。</p>
 <p><strong>收敛率 92.72%</strong> 表示：对于测试的 Ising 实例（通常是随机生成的 Max-Cut 或 SK 模型实例），算法在预设的最大迭代次数内找到基态（或接近基态的解）的比例。这不是理论保证，而是经验统计。</p>
 <p><strong>537 次迭代</strong>是一个统计平均值。实际迭代次数服从某种分布：简单实例可能几十次就收敛，困难实例可能需要数千次。分布的具体形状（是否重尾）对实际应用很重要。</p>
 <p><strong>为什么低延迟如此重要？</strong> 考虑一个需要 1000 次迭代才能收敛的困难实例：<br />
-- PACE：$1000 \times 5\text{ ns} = 5\ \mu\text{s}$<br />
-- 电子 TPU（假设每次迭代 1 ms）：$1000 \times 1\text{ ms} = 1\text{ s}$</p>
+- PACE：<span class="arithmatex">\(1000 \times 5\text{ ns} = 5\ \mu\text{s}\)</span><br />
+- 电子 TPU（假设每次迭代 1 ms）：<span class="arithmatex">\(1000 \times 1\text{ ms} = 1\text{ s}\)</span></p>
 <p>这就是 <strong>5 个数量级</strong> 的差距。即使电子硬件每次迭代更快（例如 GPU 上的并行模拟退火），光学的固有并行性和极短延迟仍然带来压倒性优势。</p>
 <p><strong>收敛的物理图像</strong>：将递归动力学视为在能量景观中的&rdquo;弹道&rdquo;运动。没有噪声时，系统沿能量梯度快速下滑到最近的吸引子（局部极小值）。噪声使系统偶尔&rdquo;跳跃&rdquo;到邻近盆地。迭代次数足够多时，系统有较高概率找到全局或接近全局的极小值。</p>
 <p>这与<strong>随机梯度下降</strong>（Stochastic Gradient Descent, SGD）有相似之处：噪声帮助逃离鞍点和浅层局部极小值。在深度学习中，SGD 的噪声来自小批量梯度估计；在 PACE 中，噪声是人为注入的。</p>
 <h4 id="644">6.4.4 能量计算的验证<a class="headerlink" href="#644" title="Permanent link"></a></h4>
 <p>如何验证 PACE 找到的解的质量？需要计算 Ising 能量：</p>
-<p>$$<br />
-E = -\frac{1}{2} \sum_{i,j} J_{ij} S_i S_j = -\frac{1}{2} S^T J S<br />
-$$</p>
-<p>这恰好是另一个二次型，可以用 PACE 的同一套 oMAC 硬件计算。事实上，$S^T J S$ 就是 $S$ 作为输入向量通过权重矩阵 $J$ 后的&rdquo;自相关&rdquo;。</p>
-<p>在数字域验证时，直接计算 $S^T J S$ 的复杂度为 $O(N^2)$。对于 $N = 64$，这微不足道。但对于更大的系统，能量验证本身可能成为瓶颈。</p>
+<div class="arithmatex">\[
+E = -\frac{1}{2} \sum_{i,j} J_{ij} S_i S_j = -\frac{1}{2} S^T J S
+\]</div>
+<p>这恰好是另一个二次型，可以用 PACE 的同一套 oMAC 硬件计算。事实上，<span class="arithmatex">\(S^T J S\)</span> 就是 <span class="arithmatex">\(S\)</span> 作为输入向量通过权重矩阵 <span class="arithmatex">\(J\)</span> 后的&rdquo;自相关&rdquo;。</p>
+<p>在数字域验证时，直接计算 <span class="arithmatex">\(S^T J S\)</span> 的复杂度为 <span class="arithmatex">\(O(N^2)\)</span>。对于 <span class="arithmatex">\(N = 64\)</span>，这微不足道。但对于更大的系统，能量验证本身可能成为瓶颈。</p>
 <hr />
 <h2 id="_30">第七章：为什么是现在？——光计算的商业化路径<a class="headerlink" href="#_30" title="Permanent link"></a></h2>
 <h3 id="71-tpu">7.1 与电子 TPU 的延迟对比<a class="headerlink" href="#71-tpu" title="Permanent link"></a></h3>
 <h4 id="711">7.1.1 电子计算的延迟瓶颈<a class="headerlink" href="#711" title="Permanent link"></a></h4>
 <p>要理解 PACE 的价值，我们必须先理解电子计算在矩阵运算中的根本瓶颈。<strong>延迟</strong>（latency）——从输入数据到达至输出结果可用的时间——是光计算相对于电子计算最具优势的维度。</p>
-<p>考虑一个 $N \times N$ 矩阵与 $N$ 维向量的乘法：$y = W x$。在电子硬件中，这通常通过<strong>脉动阵列</strong>（systolic array）或<strong>乘法累加单元阵列</strong>（MAC array）实现。</p>
+<p>考虑一个 <span class="arithmatex">\(N \times N\)</span> 矩阵与 <span class="arithmatex">\(N\)</span> 维向量的乘法：<span class="arithmatex">\(y = W x\)</span>。在电子硬件中，这通常通过<strong>脉动阵列</strong>（systolic array）或<strong>乘法累加单元阵列</strong>（MAC array）实现。</p>
 <p><strong>电子脉动阵列的时序分析</strong>：</p>
-<p>一个典型的 $N \times N$ 脉动阵列由 $N^2$ 个处理单元（PE）组成，每个 PE 执行一次乘法和一次累加。数据以&rdquo;脉动&rdquo;方式流经阵列：</p>
+<p>一个典型的 <span class="arithmatex">\(N \times N\)</span> 脉动阵列由 <span class="arithmatex">\(N^2\)</span> 个处理单元（PE）组成，每个 PE 执行一次乘法和一次累加。数据以&rdquo;脉动&rdquo;方式流经阵列：</p>
 <ol>
 <li>
-<p><strong>权重加载</strong>：将 $W$ 的 $N^2$ 个元素分发到 PE 阵列。对于片外存储器（DRAM），这需要 $O(N^2)$ 次内存访问，每次访问延迟约 10-100 ns。即使使用 HBM（高带宽内存），加载 64×64 矩阵也需要微秒级时间。</p>
+<p><strong>权重加载</strong>：将 <span class="arithmatex">\(W\)</span> 的 <span class="arithmatex">\(N^2\)</span> 个元素分发到 PE 阵列。对于片外存储器（DRAM），这需要 <span class="arithmatex">\(O(N^2)\)</span> 次内存访问，每次访问延迟约 10-100 ns。即使使用 HBM（高带宽内存），加载 64×64 矩阵也需要微秒级时间。</p>
 </li>
 <li>
-<p><strong>计算阶段</strong>：输入向量 $x$ 的元素从阵列左侧流入，权重 $W$ 从顶部流入，部分和从底部流出。对于 $N \times N$ 矩阵，需要 $2N-1$ 个时钟周期完成全部计算。</p>
+<p><strong>计算阶段</strong>：输入向量 <span class="arithmatex">\(x\)</span> 的元素从阵列左侧流入，权重 <span class="arithmatex">\(W\)</span> 从顶部流入，部分和从底部流出。对于 <span class="arithmatex">\(N \times N\)</span> 矩阵，需要 <span class="arithmatex">\(2N-1\)</span> 个时钟周期完成全部计算。</p>
 </li>
 <li>
-<p><strong>结果输出</strong>：$N$ 个输出元素依次流出，需要 $N$ 个周期。</p>
+<p><strong>结果输出</strong>：<span class="arithmatex">\(N\)</span> 个输出元素依次流出，需要 <span class="arithmatex">\(N\)</span> 个周期。</p>
 </li>
 </ol>
 <p>总延迟（仅计算阶段）：</p>
-<p>$$<br />
-T_{\text{elec}} \approx (3N) \times T_{\text{clk}} + T_{\text{memory}}<br />
-$$</p>
-<p>其中 $T_{\text{clk}}$ 是时钟周期（现代 TPU/GPU 约 0.5-1 ns，即 1-2 GHz），$T_{\text{memory}}$ 是内存访问延迟。</p>
-<p>对于 $N = 64$：<br />
-- 计算延迟：$\sim 200 \times 1\text{ ns} = 200\text{ ns}$<br />
-- 内存延迟（权重从 HBM 加载）：$\sim 1\ \mu\text{s}$<br />
+<div class="arithmatex">\[
+T_{\text{elec}} \approx (3N) \times T_{\text{clk}} + T_{\text{memory}}
+\]</div>
+<p>其中 <span class="arithmatex">\(T_{\text{clk}}\)</span> 是时钟周期（现代 TPU/GPU 约 0.5-1 ns，即 1-2 GHz），<span class="arithmatex">\(T_{\text{memory}}\)</span> 是内存访问延迟。</p>
+<p>对于 <span class="arithmatex">\(N = 64\)</span>：<br />
+- 计算延迟：<span class="arithmatex">\(\sim 200 \times 1\text{ ns} = 200\text{ ns}\)</span><br />
+- 内存延迟（权重从 HBM 加载）：<span class="arithmatex">\(\sim 1\ \mu\text{s}\)</span><br />
 - 总延迟：<strong>微秒级</strong></p>
 <p>但这只是单次 MAC 运算。Ising 求解需要数百次迭代，每次迭代都需要一次 MAC 和一次反馈：</p>
-<p>$$<br />
-T_{\text{Ising, elec}} \approx 537 \times (T_{\text{MAC}} + T_{\text{feedback}}) \approx 537 \times 1\ \mu\text{s} \approx 0.5\text{ ms}<br />
-$$</p>
+<div class="arithmatex">\[
+T_{\text{Ising, elec}} \approx 537 \times (T_{\text{MAC}} + T_{\text{feedback}}) \approx 537 \times 1\ \mu\text{s} \approx 0.5\text{ ms}
+\]</div>
 <h4 id="712">7.1.2 光计算的延迟优势<a class="headerlink" href="#712" title="Permanent link"></a></h4>
 <p>PACE 的光学 MAC 从根本上改变了延迟方程。</p>
 <p><strong>光学延迟的来源</strong>：光在介质中的传播延迟。对于 PACE 的芯片级光互连：</p>
-<p>$$<br />
-T_{\text{opt}} = \frac{L \cdot n}{c}<br />
-$$</p>
-<p>其中 $L$ 是光程长度，$n$ 是折射率（硅波导约 3.5），$c$ 是真空光速。对于厘米级芯片（$L \sim 1\text{ cm}$）：</p>
-<p>$$<br />
-T_{\text{opt}} \approx \frac{10^{-2} \times 3.5}{3 \times 10^8} \approx 100\text{ ps}<br />
-$$</p>
+<div class="arithmatex">\[
+T_{\text{opt}} = \frac{L \cdot n}{c}
+\]</div>
+<p>其中 <span class="arithmatex">\(L\)</span> 是光程长度，<span class="arithmatex">\(n\)</span> 是折射率（硅波导约 3.5），<span class="arithmatex">\(c\)</span> 是真空光速。对于厘米级芯片（<span class="arithmatex">\(L \sim 1\text{ cm}\)</span>）：</p>
+<div class="arithmatex">\[
+T_{\text{opt}} \approx \frac{10^{-2} \times 3.5}{3 \times 10^8} \approx 100\text{ ps}
+\]</div>
 <p>这仅仅是光传播时间。实际系统中还有：<br />
 - 激光器响应时间：~100 ps<br />
 - 调制器响应时间：~10-100 ps（硅光调制器）<br />
@@ -2262,11 +2272,11 @@ $$</p>
 - 电子电路（比较器、SRAM）延迟：~1-2 ns</p>
 <p>PACE 报告的 3 ns 延迟（纯 MAC）和 5 ns 延迟（完整 Ising 迭代）与这些估算一致。关键洞察是：</p>
 <blockquote>
-<p><strong>光计算的延迟与矩阵维度 $N$ 基本无关（对于固定芯片面积），而电子计算的延迟随 $N$ 增长。</strong></p>
+<p><strong>光计算的延迟与矩阵维度 <span class="arithmatex">\(N\)</span> 基本无关（对于固定芯片面积），而电子计算的延迟随 <span class="arithmatex">\(N\)</span> 增长。</strong></p>
 </blockquote>
-<p>这是因为光在自由空间或波导中可以&rdquo;天然并行&rdquo;传播——一束光同时携带所有 $N$ 个输入信息，通过衍射或干涉在空间中完成求和。电子信号则需要通过导线顺序传播或复杂的互连网络。</p>
+<p>这是因为光在自由空间或波导中可以&rdquo;天然并行&rdquo;传播——一束光同时携带所有 <span class="arithmatex">\(N\)</span> 个输入信息，通过衍射或干涉在空间中完成求和。电子信号则需要通过导线顺序传播或复杂的互连网络。</p>
 <h4 id="713">7.1.3 数量级对比<a class="headerlink" href="#713" title="Permanent link"></a></h4>
-<p>让我们做一个直接的对比表（$N = 64$，Ising 求解 537 次迭代）：</p>
+<p>让我们做一个直接的对比表（<span class="arithmatex">\(N = 64\)</span>，Ising 求解 537 次迭代）：</p>
 <table>
 <thead>
 <tr>
@@ -2321,11 +2331,11 @@ $$</p>
 <h3 id="72">7.2 精度与规模的权衡<a class="headerlink" href="#72" title="Permanent link"></a></h3>
 <h4 id="721-pace">7.2.1 PACE 的精度分析<a class="headerlink" href="#721-pace" title="Permanent link"></a></h4>
 <p>光计算的一个固有挑战是<strong>精度</strong>。电子数字计算使用二进制表示，可以实现任意精度（32-bit float、64-bit double）。光计算使用模拟量（光强、相位），精度受限于光学元件的物理噪声和制造偏差。</p>
-<p>PACE 使用<strong>非相干光强编码</strong>（incoherent intensity encoding）：权重 $W_{ij}$ 编码为光衰减器的透射率，输入 $S_j$ 编码为光强。输出光强为：</p>
-<p>$$<br />
-I_i = \sum_j T_{ij} \cdot I_j^{\text{in}}<br />
-$$</p>
-<p>其中 $T_{ij}$ 是透射率（$0 \leq T_{ij} \leq 1$）。</p>
+<p>PACE 使用<strong>非相干光强编码</strong>（incoherent intensity encoding）：权重 <span class="arithmatex">\(W_{ij}\)</span> 编码为光衰减器的透射率，输入 <span class="arithmatex">\(S_j\)</span> 编码为光强。输出光强为：</p>
+<div class="arithmatex">\[
+I_i = \sum_j T_{ij} \cdot I_j^{\text{in}}
+\]</div>
+<p>其中 <span class="arithmatex">\(T_{ij}\)</span> 是透射率（<span class="arithmatex">\(0 \leq T_{ij} \leq 1\)</span>）。</p>
 <p>精度限制来源：</p>
 <ol>
 <li>
@@ -2357,8 +2367,8 @@ $$</p>
 <p>神经网络对低精度的鲁棒性已被广泛验证：</p>
 <ul>
 <li><strong>量化神经网络</strong>（Quantized Neural Networks）：8-bit 甚至 4-bit 权重和激活函数在许多任务上几乎不损失精度</li>
-<li><strong>二值神经网络</strong>（Binary Neural Networks）：权重和激活限制为 ${-1, +1}$，在 ImageNet 上仍能达到可接受的 Top-5 精度</li>
-<li><strong>Ising 求解</strong>：自旋本身就是 1-bit 变量（$\pm 1$），耦合系数 $J_{ij}$ 的精度要求相对宽松——只要符号正确，小幅幅度误差通常不影响基态的定性特征</li>
+<li><strong>二值神经网络</strong>（Binary Neural Networks）：权重和激活限制为 <span class="arithmatex">\(\{-1, +1\}\)</span>，在 ImageNet 上仍能达到可接受的 Top-5 精度</li>
+<li><strong>Ising 求解</strong>：自旋本身就是 1-bit 变量（<span class="arithmatex">\(\pm 1\)</span>），耦合系数 <span class="arithmatex">\(J_{ij}\)</span> 的精度要求相对宽松——只要符号正确，小幅幅度误差通常不影响基态的定性特征</li>
 </ul>
 <p>对于组合优化，精度要求更低：<br />
 - Max-Cut 只关心割的权重相对大小，不关心绝对精度<br />
@@ -2367,12 +2377,12 @@ $$</p>
 <p><strong>量化感知训练</strong>（Quantization-Aware Training, QAT）是深度学习中的标准技术：在训练过程中模拟低精度运算，使网络学会适应量化误差。类似地，对于 Ising 求解，可以在数字仿真中使用低精度权重训练/验证算法，确保硬件实现的有效性。</p>
 <h4 id="723-">7.2.3 精度-规模-速度的三角权衡<a class="headerlink" href="#723-" title="Permanent link"></a></h4>
 <p>光计算面临一个基本的物理权衡：</p>
-<p>$$<br />
-\text{精度} \times \text{规模} \times \text{速度} \leq \text{常数（由物理限制决定）}<br />
-$$</p>
+<div class="arithmatex">\[
+\text{精度} \times \text{规模} \times \text{速度} \leq \text{常数（由物理限制决定）}
+\]</div>
 <ul>
 <li>要提高精度：需要更高的光功率（降低相对噪声）或更慢的积分时间（降低带宽）</li>
-<li>要扩大规模（更大的 $N$）：需要更大的芯片面积，光损耗增加，信噪比下降</li>
+<li>要扩大规模（更大的 <span class="arithmatex">\(N\)</span>）：需要更大的芯片面积，光损耗增加，信噪比下降</li>
 <li>要提高速度：需要更高带宽，噪声增加</li>
 </ul>
 <p>PACE 选择了<strong>中等规模（64×64）、低精度（4-6 bit）、极高速度（ns 级）</strong>的甜点。这不是通用计算的方案，而是特定工作负载（Ising 求解、低精度 AI 推理）的专用加速器。</p>
@@ -2381,10 +2391,10 @@ $$</p>
 <h4 id="731-omac">7.3.1 oMAC 的通用性<a class="headerlink" href="#731-omac" title="Permanent link"></a></h4>
 <p>PACE 的核心是 <strong>oMAC</strong>（optical Matrix-Vector Multiplication，光学矩阵-向量乘法）。oMAC 本身是一个通用原语：任何可以表示为矩阵-向量乘法的计算都可以映射到 PACE 的硬件上。</p>
 <p><strong>Transformer 注意力机制</strong>（Attention）是一个直接的应用：</p>
-<p>$$<br />
-\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V<br />
-$$</p>
-<p>其中 $QK^T$ 和最后的矩阵乘法都是 MAC 运算。PACE 可以加速这些计算，但有几个挑战：</p>
+<div class="arithmatex">\[
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\]</div>
+<p>其中 <span class="arithmatex">\(QK^T\)</span> 和最后的矩阵乘法都是 MAC 运算。PACE 可以加速这些计算，但有几个挑战：</p>
 <ol>
 <li><strong>softmax 非线性</strong>：光学硬件难以直接实现指数和归一化，需要数字辅助</li>
 <li><strong>精度要求</strong>：注意力分数需要一定精度以避免数值不稳定</li>
@@ -2486,8 +2496,8 @@ $$</p>
 <p><strong>MODE 求解器</strong></p>
 <p>MODE 用于计算波导的本征模式（eigenmode）和有效折射率（effective index）。这是理解热光调谐（thermo-optic tuning）和群速度色散（group velocity dispersion）的基础。</p>
 <ul>
-<li><strong>典型任务</strong>：计算 SOI（Silicon on Insulator）波导的有效折射率 $n_{\text{eff}}$ 随宽度的变化；分析弯曲波导的辐射损耗；提取 FDTD 仿真所需的模式源（mode source）轮廓。</li>
-<li><strong>关键参数</strong>：对于 PACE 使用的 220 nm 顶层硅厚度、500 nm 宽度的标准单模波导，TE 偏振的 $n_{\text{eff}} \approx 2.4$（1550 nm 波长）。</li>
+<li><strong>典型任务</strong>：计算 SOI（Silicon on Insulator）波导的有效折射率 <span class="arithmatex">\(n_{\text{eff}}\)</span> 随宽度的变化；分析弯曲波导的辐射损耗；提取 FDTD 仿真所需的模式源（mode source）轮廓。</li>
+<li><strong>关键参数</strong>：对于 PACE 使用的 220 nm 顶层硅厚度、500 nm 宽度的标准单模波导，TE 偏振的 <span class="arithmatex">\(n_{\text{eff}} \approx 2.4\)</span>（1550 nm 波长）。</li>
 </ul>
 <p><strong>INTERCONNECT</strong></p>
 <p>INTERCONNECT 是系统级仿真工具，将 FDTD 提取的紧凑模型（compact model）连接成电路，进行端到端仿真。PACE 论文中的 64×64 MAC 阵列、SNR 分析、系统误码率（BER）估算，理论上都可以用 INTERCONNECT 建模。</p>
@@ -2495,7 +2505,7 @@ $$</p>
 <li><strong>工作流</strong>：FDTD 仿真单个器件 → 提取 S 参数或紧凑模型 → 在 INTERCONNECT 中搭建系统 → 运行瞬态或频域仿真。</li>
 <li><strong>与 PACE 的关联</strong>：论文 Fig. 2 中的器件级表征数据（插入损耗、串扰、消光比）可以直接作为 INTERCONNECT 模型的输入参数。</li>
 </ul>
-<p><strong>成本与获取</strong>：Lumerical 是商业软件，单模块年费约 $10,000-$20,000。高校通常有校园许可。如果你的机构没有许可，可以考虑以下替代方案。</p>
+<p><strong>成本与获取</strong>：Lumerical 是商业软件，单模块年费约 <span class="arithmatex">\(10,000-\)</span>20,000。高校通常有校园许可。如果你的机构没有许可，可以考虑以下替代方案。</p>
 <h4 id="812-ipkiss-luceda">8.1.2 IPKISS / Luceda —— 硅光子设计流程<a class="headerlink" href="#812-ipkiss-luceda" title="Permanent link"></a></h4>
 <p><strong>IPKISS</strong> 是 Luceda Photonics 开发的 Python 框架，专注于硅光子版图设计（layout design）和链路仿真。它与代工厂 PDK（Process Design Kit）深度集成，是流片（tape-out）前的标准工具。</p>
 <ul>
@@ -2566,8 +2576,8 @@ $$</p>
 <p>PACE 论文的核心贡献不仅是硬件，还包括算法层面的映射策略（Ising 问题到光子 MAC 的映射）和性能分析（SNR、精度、能效）。这些都需要强大的数据分析能力。</p>
 <h4 id="821-python">8.2.1 Python 生态系统<a class="headerlink" href="#821-python" title="Permanent link"></a></h4>
 <p><strong>NumPy / SciPy —— 数值计算的基石</strong></p>
-<p>PACE 中的 MAC 运算可以表示为矩阵乘法：$\mathbf{y} = \mathbf{W}\mathbf{x}$，其中 $\mathbf{W}$ 是光子权重矩阵，$\mathbf{x}$ 是输入向量。由于光子器件存在热噪声、散粒噪声（shot noise）和串扰（crosstalk），实际输出是：</p>
-<p>$$\mathbf{y} = \mathbf{W}\mathbf{x} + \mathbf{n}<em _text_shot="\text{shot">{\text{thermal}} + \mathbf{n}</em>$$}} + \mathbf{n}_{\text{crosstalk}</p>
+<p>PACE 中的 MAC 运算可以表示为矩阵乘法：<span class="arithmatex">\(\mathbf{y} = \mathbf{W}\mathbf{x}\)</span>，其中 <span class="arithmatex">\(\mathbf{W}\)</span> 是光子权重矩阵，<span class="arithmatex">\(\mathbf{x}\)</span> 是输入向量。由于光子器件存在热噪声、散粒噪声（shot noise）和串扰（crosstalk），实际输出是：</p>
+<div class="arithmatex">\[\mathbf{y} = \mathbf{W}\mathbf{x} + \mathbf{n}_{\text{thermal}} + \mathbf{n}_{\text{shot}} + \mathbf{n}_{\text{crosstalk}}\]</div>
 <p>NumPy 是处理这类矩阵运算和噪声分析的首选工具。</p>
 <ul>
 <li><strong>典型任务</strong>：模拟 64×64 矩阵乘法的数值精度；分析不同位宽（bit-width）下的量化噪声；计算信噪比（SNR）与有效位数（ENOB, Effective Number of Bits）的关系。</li>
@@ -2644,7 +2654,7 @@ $$</p>
 <li>PACE 论文中的光栅耦合器典型耦合损耗约 3-5 dB，对准精度直接影响测量结果。</li>
 </ul>
 <h4 id="833">8.3.3 热控制<a class="headerlink" href="#833" title="Permanent link"></a></h4>
-<p>PACE 的热光调谐器（thermo-optic tuner）对温度极其敏感。硅的热光系数（thermo-optic coefficient）约为 $1.86 \times 10^{-4} \, \text{K}^{-1}$，意味着 1°C 的温度变化会导致约 1 GHz 的共振频率偏移。</p>
+<p>PACE 的热光调谐器（thermo-optic tuner）对温度极其敏感。硅的热光系数（thermo-optic coefficient）约为 <span class="arithmatex">\(1.86 \times 10^{-4} \, \text{K}^{-1}\)</span>，意味着 1°C 的温度变化会导致约 1 GHz 的共振频率偏移。</p>
 <ul>
 <li><strong>温度腔（Temperature Chamber）</strong>：用于表征器件的温度依赖性。</li>
 <li><strong>热电冷却器（TEC, Thermo-Electric Cooler）</strong>：用于主动稳定芯片温度，精度 ±0.01°C。</li>
@@ -2769,7 +2779,7 @@ $$</p>
 </ul>
 <p><strong>薄膜铌酸锂（TFLN, Thin-Film Lithium Niobate）</strong></p>
 <ul>
-<li><strong>优势</strong>：极高的电光系数（$r_{33} \approx 30 \, \text{pm/V}$，是硅的 100 倍），可以实现 GHz 速度的纯电子调谐（无需热光调谐）。</li>
+<li><strong>优势</strong>：极高的电光系数（<span class="arithmatex">\(r_{33} \approx 30 \, \text{pm/V}\)</span>，是硅的 100 倍），可以实现 GHz 速度的纯电子调谐（无需热光调谐）。</li>
 <li><strong>应用</strong>：高速调制器、光学神经网络中的快速权重更新。</li>
 <li><strong>代表工作</strong>：Harvard 的 Marko Lončar 组、HyperLight Corporation。</li>
 <li><strong>与 PACE 的对比</strong>：PACE 使用热光调谐（速度受限于热时间常数，~μs 级），TFLN 可以实现 ns 级电光调谐。</li>
@@ -2851,7 +2861,7 @@ $$</p>
 </ul>
 <p><strong>Boson Sampling</strong></p>
 <ul>
-<li><strong>问题定义</strong>：$n$ 个不可区分的光子输入到 $m$ 个模式的线性光学网络，采样输出分布。</li>
+<li><strong>问题定义</strong>：<span class="arithmatex">\(n\)</span> 个不可区分的光子输入到 <span class="arithmatex">\(m\)</span> 个模式的线性光学网络，采样输出分布。</li>
 <li><strong>经典难度</strong>：这个问题被证明对于经典计算机是困难的（#P-hard）。</li>
 <li><strong>实验进展</strong>：</li>
 <li><strong>Xanadu</strong>：Borealis 光子量子计算机，216 个压缩态（squeezed state）模式，Nature 2022。</li>
@@ -2903,9 +2913,9 @@ $$</p>
 <p>PACE 的一个关键局限是<strong>缺乏片上光学非线性</strong>（on-chip optical nonlinearity）。论文中的&rdquo;计算&rdquo;实际上是线性矩阵乘法，非线性激活函数（如 ReLU、sigmoid）需要光电转换后在电子域实现。这限制了速度和能效。</p>
 <p><strong>Kerr 效应（Kerr Effect）</strong></p>
 <ul>
-<li><strong>原理</strong>：材料的折射率随光强变化：$n = n_0 + n_2 I$。</li>
+<li><strong>原理</strong>：材料的折射率随光强变化：<span class="arithmatex">\(n = n_0 + n_2 I\)</span>。</li>
 <li><strong>应用</strong>：全光开关（all-optical switch）、光学晶体管（optical transistor）。</li>
-<li><strong>挑战</strong>：硅的 Kerr 系数很小（$n_2 \approx 4 \times 10^{-18} \, \text{m}^2/\text{W}$），需要高光功率或高 Q 值谐振腔。</li>
+<li><strong>挑战</strong>：硅的 Kerr 系数很小（<span class="arithmatex">\(n_2 \approx 4 \times 10^{-18} \, \text{m}^2/\text{W}\)</span>），需要高光功率或高 Q 值谐振腔。</li>
 <li><strong>代表工作</strong>：MIT 的 Rajeev Ram 组在硅微环（microring）中实现 Kerr 效应全光开关。</li>
 </ul>
 <p><strong>可饱和吸收（Saturable Absorption）</strong></p>
@@ -2922,7 +2932,7 @@ $$</p>
 <h4 id="932">9.3.2 新材料平台<a class="headerlink" href="#932" title="Permanent link"></a></h4>
 <p><strong>薄膜铌酸锂（TFLN, Thin-Film Lithium Niobate）</strong></p>
 <p>前文已提到 TFLN 的高速电光调制能力。除此之外：<br />
-- <strong>非线性光学</strong>：铌酸锂的二阶非线性系数（$d_{33} \approx 27 \, \text{pm/V}$）使其成为频率转换（frequency conversion）和参量放大（parametric amplification）的理想材料。<br />
+- <strong>非线性光学</strong>：铌酸锂的二阶非线性系数（<span class="arithmatex">\(d_{33} \approx 27 \, \text{pm/V}\)</span>）使其成为频率转换（frequency conversion）和参量放大（parametric amplification）的理想材料。<br />
 - <strong>学习资源</strong>：<br />
   - 综述：&rdquo;Thin-film lithium niobate: a new platform for integrated photonics&rdquo; (Pohl et al., 2020)<br />
   - 公司：HyperLight、NanoLN</p>
@@ -3000,7 +3010,7 @@ $$</p>
 <p><strong>多项目晶圆（MPW, Multi-Project Wafer）</strong></p>
 <ul>
 <li>MPW 是将多个小芯片设计放在同一晶圆上流片的服务，大幅降低原型成本。</li>
-<li>典型成本：$10,000-$50,000 每平方毫米（取决于工艺节点）。</li>
+<li>典型成本：<span class="arithmatex">\(10,000-\)</span>50,000 每平方毫米（取决于工艺节点）。</li>
 <li>主要服务提供商：Europractice（欧洲）、CMC Microsystems（加拿大）、OpSIS（美国，已并入 AIM Photonics）。</li>
 </ul>
 <p><strong>学习路径</strong>：<br />
