@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>太空算力与光芯片</title>
+<style>
+
+/* ========== Variables ========== */
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --border: #d1d9e0;
+  --surface: #f6f8fa;
+  --accent: #0969da;
+  --accent-fg: #ffffff;
+  --code-bg: #f5f5f5;
+  --toc-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(31,35,40,0.12);
+  --radius: 8px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --fg: #c9d1d9;
+  --muted: #8b949e;
+  --border: #30363d;
+  --surface: #161b22;
+  --accent: #58a6ff;
+  --accent-fg: #0d1117;
+  --code-bg: #161b22;
+  --toc-bg: #161b22;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.75;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ========== Layout ========== */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+@media (max-width: 900px) {
+  .content-wrapper { flex-direction: column-reverse; gap: 20px; }
+}
+
+/* ========== Header ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+[data-theme="dark"] .site-header {
+  background: rgba(13,17,23,0.85);
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+}
+
+.site-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+#theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+#theme-toggle:hover { background: var(--border); }
+
+/* ========== Article ========== */
+article.markdown-body {
+  flex: 1;
+  min-width: 0;
+}
+
+article h1 { font-size: 2rem; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
+article h2 { font-size: 1.5rem; margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+article h3 { font-size: 1.2rem; margin-top: 1.5em; }
+article h4 { font-size: 1.05rem; }
+article a { color: var(--accent); text-decoration: none; }
+article a:hover { text-decoration: underline; }
+article img { max-width: 100%; border-radius: var(--radius); }
+article blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+article blockquote > p:first-child { margin-top: 0; }
+article blockquote > p:last-child { margin-bottom: 0; }
+article hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+/* ========== Table ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 0.92rem;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+th { background: var(--surface); font-weight: 600; }
+tr:nth-child(even) { background: rgba(150,150,150,0.04); }
+
+/* ========== Code ========== */
+code {
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 16px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+}
+pre code { padding: 0; background: none; }
+
+/* Pygments / highlight */
+.highlight { background: var(--code-bg); border-radius: var(--radius); }
+.hll { background-color: rgba(150,150,150,0.1); }
+.c, .cm, .c1, .cs { color: #6e7781; font-style: italic; }
+.k, .kc, .kd, .kn, .kp, .kr, .kt { color: #cf222e; }
+.o, .ow { color: #953800; }
+.m, .mb, .mf, .mh, .mi, .mo { color: #0550ae; }
+.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #0a3069; }
+.na, .nb, .nc, .nd, .ne, .nf, .nl, .nn, .no, .nt, .nv { color: #8250df; }
+[data-theme="dark"] .c, [data-theme="dark"] .cm, [data-theme="dark"] .c1 { color: #8b949e; }
+[data-theme="dark"] .k, [data-theme="dark"] .kc, [data-theme="dark"] .kd { color: #ff7b72; }
+[data-theme="dark"] .o, [data-theme="dark"] .ow { color: #ffa657; }
+[data-theme="dark"] .m, [data-theme="dark"] .mb { color: #79c0ff; }
+[data-theme="dark"] .s, [data-theme="dark"] .s2, [data-theme="dark"] .s1 { color: #a5d6ff; }
+[data-theme="dark"] .na, [data-theme="dark"] .nb { color: #d2a8ff; }
+
+/* ========== TOC ========== */
+.toc-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 76px;
+  align-self: flex-start;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.toc-sidebar h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.toc-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88rem;
+}
+.toc-sidebar li { margin: 6px 0; }
+.toc-sidebar a {
+  color: var(--muted);
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.toc-sidebar a:hover { color: var(--accent); background: var(--surface); }
+.toc-sidebar ul ul { padding-left: 12px; }
+
+@media (max-width: 900px) {
+  .toc-sidebar { width: 100%; position: static; max-height: none; margin-bottom: 20px; }
+}
+
+/* ========== Index Page ========== */
+.index-page { padding-top: 60px; padding-bottom: 80px; }
+.index-page h1 { font-size: 2.2rem; margin-bottom: 8px; }
+.lead { color: var(--muted); font-size: 1.15rem; margin-bottom: 40px; }
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.report-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.report-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--accent);
+}
+.report-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.report-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.report-card .meta {
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ========== Footer ========== */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-bar">
+    <a class="site-title" href="../index.html">Research Notes</a>
+    <nav class="nav-links">
+      <a href="../index.html">首页</a>
+      <a href="./pace/skill-tree.html">报告A：PACE 背景知识与技能进阶路线图</a>
+    </nav>
+    <button id="theme-toggle" aria-label="切换主题">🌙</button>
+  </div>
+</header>
+
+<main class="container content-wrapper">
+  <article class="markdown-body">
+    <hr />
+<h1 id="_1">太空算力与光芯片<a class="headerlink" href="#_1" title="Permanent link"></a></h1>
+<h2 id="_2">深度调研报告<a class="headerlink" href="#_2" title="Permanent link"></a></h2>
+<hr />
+<p><strong>摘要</strong>：随着低轨卫星巨型星座的加速部署，太空正从&rdquo;通信中继站&rdquo;演变为&rdquo;分布式计算节点&rdquo;。本报告系统梳理了太空算力产业的驱动因素、技术挑战、全球竞争格局，并深入分析了光芯片（Photonic Chip）在太空环境中的独特优势——从抗辐射特性到低功耗、高带宽密度、轻量化与热不敏感性。报告覆盖近地轨道计算星座、深空探测光通信、太空-地面协同计算等前沿方向，为产业决策与技术投资提供参考。</p>
+<hr />
+<h2 id="1">第1章：太空算力概述<a class="headerlink" href="#1" title="Permanent link"></a></h2>
+<h3 id="11">1.1 什么是太空算力？<a class="headerlink" href="#11" title="Permanent link"></a></h3>
+<p><strong>太空算力（Space Computing / Orbital Computing）</strong> 指在地球轨道及深空环境中部署计算资源，使卫星不再仅仅是&rdquo;信号中继器&rdquo;，而是具备数据存储、处理、分析与决策能力的&rdquo;轨道数据中心&rdquo;。</p>
+<p>传统卫星采用&rdquo;弯管式&rdquo;（Bent-pipe）架构——地面站发送信号，卫星放大后转发给另一地面站，所有计算都在地面完成。这种模式在通信时代尚可应对，但在遥感数据爆炸、实时决策需求激增的今天，已成为严重的瓶颈。</p>
+<p>太空算力的核心范式转变体现在三个层面：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">层级</th>
+<th style="text-align: left;">传统模式</th>
+<th style="text-align: left;">太空算力模式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>数据流</strong></td>
+<td style="text-align: left;">采集 → 全量下传 → 地面处理</td>
+<td style="text-align: left;">采集 → 在轨处理 → 只传结果</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>延迟</strong></td>
+<td style="text-align: left;">分钟至小时级（取决于地面站覆盖）</td>
+<td style="text-align: left;">毫秒至秒级（边缘计算）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>自主性</strong></td>
+<td style="text-align: left;">地面遥控为主</td>
+<td style="text-align: left;">星上自主决策</td>
+</tr>
+</tbody>
+</table>
+<p>太空算力的技术形态包括：<br />
+- <strong>星上边缘计算（On-board Edge Computing）</strong>：在卫星上运行 AI 推理模型，实时筛选、压缩、分析遥感图像<br />
+- <strong>轨道数据中心（Orbital Data Center）</strong>：将数据中心级 GPU/AI 加速器部署到太空，执行模型训练等高负载任务<br />
+- <strong>星间计算网络（Inter-Satellite Computing Mesh）</strong>：通过激光链路互联的卫星集群，形成分布式计算网络</p>
+<h3 id="12">1.2 需求驱动：从通信到计算<a class="headerlink" href="#12" title="Permanent link"></a></h3>
+<p>太空算力的崛起并非偶然，而是由多重需求叠加驱动的必然结果。</p>
+<p><strong>（一）数据洪流与下行带宽瓶颈</strong></p>
+<p>现代遥感卫星产生的数据量呈指数级增长。以欧洲哨兵（Sentinel）系列为例，单颗卫星每天产生约 1.5 TB 数据。若采用传统全量下传模式，需要庞大的地面站网络支撑，且大量数据（如云层覆盖图像）本就不具备下传价值。</p>
+<p>研究表明，通过在轨 AI 处理，可将下行带宽需求降低 <strong>85%</strong> ——卫星只将&rdquo;有价值&rdquo;的洞察传回地面，而非原始像素。这种&rdquo;数据精简&rdquo;（Data Reduction）能力是太空算力的首要价值。</p>
+<p><strong>（二）低延迟边缘计算需求</strong></p>
+<p>对于国防侦察、海事监控、灾害应急等场景，&rdquo;实时性&rdquo;意味着生死。传统模式下，卫星图像需经过下传、地面处理、分发，延迟可达数十分钟。而星上边缘计算可在秒级内完成目标检测、变化识别和告警生成。</p>
+<p>例如，在野火监测中，星上 AI 可在卫星过顶瞬间识别火点并触发告警，为消防响应争取宝贵时间。</p>
+<p><strong>（三）自主导航与深空任务</strong></p>
+<p>深空探测面临与地面通信的巨大延迟。火星任务中，信号单程传输需 <strong>4-24 分钟</strong>，使得地面实时遥控不可能。探测器必须具备自主导航、自主避障、自主科学决策能力——这本质上是太空算力问题。</p>
+<p>NASA 的&rdquo;自主科学航天器实验&rdquo;（Autonomous Sciencecraft Experiment）早在 2000 年代就验证了星上自主目标识别与重规划能力。未来的载人火星任务将需要更强大的星上计算支持。</p>
+<p><strong>（四）AI 时代的算力饥渴</strong></p>
+<p>地球数据中心的电力消耗正成为制约 AI 发展的瓶颈。2023 年，美国数据中心消耗了全国约 <strong>4.4%</strong> 的电力，预计到 2028 年将增至 <strong>6.7%-12%</strong>。在此背景下，太空——拥有近乎无限的太阳能和天然的辐射冷却——被视为潜在的算力释放空间。</p>
+<h3 id="13">1.3 市场规模与增长预测<a class="headerlink" href="#13" title="Permanent link"></a></h3>
+<p>太空算力市场正处于爆发前夜，不同研究机构给出了差异化的规模估算，反映了定义边界的差异：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">细分市场</th>
+<th style="text-align: left;">2024-2025 估值</th>
+<th style="text-align: left;">复合年增长率（CAGR）</th>
+<th style="text-align: left;">2034-2035 预测</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">太空在轨计算平台（Space On-Board Computing Platform）</td>
+<td style="text-align: left;">15.5 亿美元</td>
+<td style="text-align: left;">11.95%</td>
+<td style="text-align: left;">47.9 亿美元</td>
+</tr>
+<tr>
+<td style="text-align: left;">太空边缘计算（Space-Based Edge Computing，狭义）</td>
+<td style="text-align: left;">38 亿美元</td>
+<td style="text-align: left;">19.3%</td>
+<td style="text-align: left;">186 亿美元</td>
+</tr>
+<tr>
+<td style="text-align: left;">太空云计算（Space Cloud Computing，欧洲）</td>
+<td style="text-align: left;">13.8 亿欧元</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">56.4 亿欧元</td>
+</tr>
+<tr>
+<td style="text-align: left;">太空边缘计算（广义，含地面基础设施）</td>
+<td style="text-align: left;">1689 亿美元</td>
+<td style="text-align: left;">8.26%</td>
+<td style="text-align: left;">3450 亿美元</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注：广义估算将地面站、网络基础设施和下游应用纳入统计，而狭义估算仅统计星上计算硬件与软件。</p>
+</blockquote>
+<p><strong>关键增长驱动因素</strong>：</p>
+<ol>
+<li>
+<p><strong>LEO 巨型星座扩张</strong>：截至 2025 年底，在轨活跃卫星超过 <strong>12,000 颗</strong>，其中 LEO 卫星占比 <strong>88%-93%</strong>。预计到 2034 年将超过 <strong>25,000 颗</strong>。</p>
+</li>
+<li>
+<p><strong>国防投入激增</strong>：美国太空发展局（SDA）已承诺到 2030 年投入超过 <strong>130 亿美元</strong>用于&rdquo;扩散型作战人员太空架构&rdquo;（PWSA）。</p>
+</li>
+<li>
+<p><strong>发射成本断崖式下降</strong>：SpaceX 猎鹰 9 号（Falcon 9）复用发射成本已降至约 <strong>1,500-2,940 美元/千克</strong>，而星舰（Starship）的目标是将这一数字推向 <strong>100 美元/千克以下</strong>。</p>
+</li>
+<li>
+<p><strong>软件定义卫星</strong>：可编程载荷使单颗卫星可动态切换任务，提升了计算资源的利用率。</p>
+</li>
+</ol>
+<hr />
+<h2 id="2">第2章：太空环境与技术挑战<a class="headerlink" href="#2" title="Permanent link"></a></h2>
+<p>太空并非友好环境。在轨计算系统必须面对地面数据中心无需考虑的极端条件。</p>
+<h3 id="21">2.1 辐射效应<a class="headerlink" href="#21" title="Permanent link"></a></h3>
+<p>太空辐射是电子系统面临的首要威胁。辐射环境由三部分组成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">辐射源</th>
+<th style="text-align: left;">成分</th>
+<th style="text-align: left;">能量范围</th>
+<th style="text-align: left;">主要影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>地球辐射带</strong></td>
+<td style="text-align: left;">被地磁场捕获的电子和质子</td>
+<td style="text-align: left;">电子：keV-MeV；质子：MeV-GeV</td>
+<td style="text-align: left;">长期累积损伤</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>银河宇宙射线（GCR）</strong></td>
+<td style="text-align: left;">高能质子、α粒子、重离子</td>
+<td style="text-align: left;">高达 10¹² eV</td>
+<td style="text-align: left;">单粒子事件</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>太阳粒子事件（SPE）</strong></td>
+<td style="text-align: left;">太阳耀斑和日冕物质抛射产生的高能粒子</td>
+<td style="text-align: left;">10-100 MeV</td>
+<td style="text-align: left;">短期高强度暴露</td>
+</tr>
+</tbody>
+</table>
+<p>辐射对电子器件的损害分为两大类：</p>
+<p><strong>（一）总电离剂量（Total Ionizing Dose, TID）</strong></p>
+<p>TID 是长期累积效应，由辐射在绝缘层（如栅氧化层）中产生电子-空穴对并导致电荷俘获引起。对 CMOS 器件的影响包括：<br />
+- 阈值电压漂移（数十至数百毫伏）<br />
+- 漏电流增加（可达数个数量级）<br />
+- 时序特性退化<br />
+- 功耗上升</p>
+<p>典型空间任务的 TID 要求为 <strong>100 krad(Si)</strong> 量级。商业级 CMOS 器件在数十 Gy 剂量下即开始退化，而航天级器件可耐受 100-300 krad(Si)。</p>
+<p><strong>（二）单粒子效应（Single Event Effects, SEEs）</strong></p>
+<p>SEE 是瞬态、随机事件，由单个高能粒子 strike 产生。分为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">非破坏性效应</th>
+<th style="text-align: left;">破坏性效应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">单粒子翻转（SEU）——比特翻转</td>
+<td style="text-align: left;">单粒子闩锁（SEL）</td>
+</tr>
+<tr>
+<td style="text-align: left;">单粒子瞬态（SET）</td>
+<td style="text-align: left;">单粒子烧毁（SEB）</td>
+</tr>
+<tr>
+<td style="text-align: left;">多比特翻转（MBU）</td>
+<td style="text-align: left;">单粒子栅击穿（SEGR）</td>
+</tr>
+<tr>
+<td style="text-align: left;">单粒子功能中断（SEFI）</td>
+<td style="text-align: left;">—</td>
+</tr>
+</tbody>
+</table>
+<p>随着工艺节点缩小，器件对 SEE 的敏感性反而增加——更小的电容意味着更少的电荷即可翻转一个节点。</p>
+<h3 id="22">2.2 热管理<a class="headerlink" href="#22" title="Permanent link"></a></h3>
+<p>卫星在轨经历极端的温度循环：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">工况</th>
+<th style="text-align: left;">温度范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">阳光直射面</td>
+<td style="text-align: left;">最高可达 <strong>+121°C</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">地球阴影区（日食）</td>
+<td style="text-align: left;">最低可达 <strong>-157°C</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">LEO 典型轨道（每 90 分钟一圈）</td>
+<td style="text-align: left;">总波动约 <strong>220°C</strong></td>
+</tr>
+</tbody>
+</table>
+<p>由于太空是真空环境，<strong>对流散热完全不存在</strong>，热量只能通过辐射方式散失。这带来了独特的热管理挑战：</p>
+<ul>
+<li><strong>散热器面积需求</strong>：在 20°C 表面温度下，每平方米散热器仅能排散约 600-700 W 热量</li>
+<li><strong>热管技术</strong>：回路热管（Loop Heat Pipe, LHP）是卫星热管理的核心，工作范围覆盖 <strong>-160°C 至 +120°C</strong></li>
+<li><strong>相变材料（PCM）</strong>：作为&rdquo;热电池&rdquo;在热相吸收热量、冷相释放热量</li>
+<li><strong>多层隔热（MLI）</strong>：防止过度散热</li>
+</ul>
+<p>对于高功率计算载荷，热管理尤为严峻。Starcloud 等轨道数据中心公司声称太空的辐射冷却具有优势，但实际上，在真空中排散 1 MW 热量需要约 <strong>1,200 平方米</strong>的散热器面积——相当于 4 个网球场。</p>
+<h3 id="23">2.3 功耗与能源限制<a class="headerlink" href="#23" title="Permanent link"></a></h3>
+<p>卫星的能源主要来自太阳能电池板，但可用功率严格受限：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">卫星类型</th>
+<th style="text-align: left;">典型功率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">CubeSat（立方星）</td>
+<td style="text-align: left;">1-10 W</td>
+</tr>
+<tr>
+<td style="text-align: left;">小型通信卫星</td>
+<td style="text-align: left;">100-500 W</td>
+</tr>
+<tr>
+<td style="text-align: left;">Starlink V2 Mini</td>
+<td style="text-align: left;">~2-3 kW</td>
+</tr>
+<tr>
+<td style="text-align: left;">Starlink V3（预计）</td>
+<td style="text-align: left;">更高功率</td>
+</tr>
+<tr>
+<td style="text-align: left;">大型遥感卫星</td>
+<td style="text-align: left;">5-15 kW</td>
+</tr>
+</tbody>
+</table>
+<p>功率预算必须分配给通信、姿态控制、热管理和计算。对于计算载荷，每增加 1 W 计算功耗，可能需要额外 0.3-0.5 W 用于散热。</p>
+<h3 id="24">2.4 重量与发射成本<a class="headerlink" href="#24" title="Permanent link"></a></h3>
+<p>尽管发射成本已大幅下降，但重量仍是关键约束：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">发射系统</th>
+<th style="text-align: left;">LEO 成本（美元/千克）</th>
+<th style="text-align: left;">备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">猎鹰 9 号（复用）</td>
+<td style="text-align: left;">1,500-2,940</td>
+<td style="text-align: left;">当前主流</td>
+</tr>
+<tr>
+<td style="text-align: left;">猎鹰重型（复用）</td>
+<td style="text-align: left;">~1,500</td>
+<td style="text-align: left;">大载荷</td>
+</tr>
+<tr>
+<td style="text-align: left;">星舰（初期目标）</td>
+<td style="text-align: left;">100-500</td>
+<td style="text-align: left;">完全复用</td>
+</tr>
+<tr>
+<td style="text-align: left;">星舰（长期目标）</td>
+<td style="text-align: left;">10-67</td>
+<td style="text-align: left;">高频次发射</td>
+</tr>
+</tbody>
+</table>
+<p>对于巨型星座，单颗卫星的重量直接决定发射总成本。Starlink V2 Mini 单颗重约 800 kg，而 V3 预计更重。计算载荷的增加会直接影响星座部署的经济性。</p>
+<hr />
+<h2 id="3">第3章：国内外布局<a class="headerlink" href="#3" title="Permanent link"></a></h2>
+<h3 id="31-spacex-amazon-kuipernasa">3.1 美国：SpaceX 星链、Amazon Kuiper、NASA<a class="headerlink" href="#31-spacex-amazon-kuipernasa" title="Permanent link"></a></h3>
+<p><strong>（一）SpaceX 星链（Starlink）与星盾（Starshield）</strong></p>
+<p>SpaceX 的星链是全球最大的卫星星座，截至 2025 年底在轨活跃卫星超过 <strong>7,000 颗</strong>，占全球活跃卫星总数的约 60%。</p>
+<p>星链卫星的计算能力经历了代际跃升：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">指标</th>
+<th style="text-align: left;">V2 Mini</th>
+<th style="text-align: left;">V3（预计 2026 年）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">下行容量</td>
+<td style="text-align: left;">~100 Gbps</td>
+<td style="text-align: left;"><strong>1 Tbps</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">上行容量</td>
+<td style="text-align: left;">~7 Gbps</td>
+<td style="text-align: left;"><strong>160 Gbps</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">RF + 激光回程总容量</td>
+<td style="text-align: left;">较低</td>
+<td style="text-align: left;">~4 Tbps</td>
+</tr>
+<tr>
+<td style="text-align: left;">单星算力</td>
+<td style="text-align: left;">有限</td>
+<td style="text-align: left;">支持轨道数据中心</td>
+</tr>
+</tbody>
+</table>
+<p>星链 V3 卫星将搭载新一代计算系统、先进调制解调器和复杂的波束成形与交换能力，并配备高速星间激光链路，形成 mesh 网络。</p>
+<p><strong>星盾（Starshield）</strong> 是 SpaceX 面向美国军方的星链变体，已签署多项重大合同：<br />
+- 2024 年 3 月：与美国国家侦察局（NRO）签署 <strong>18 亿美元</strong>合同，部署数百颗侦察卫星<br />
+- 2025 年 12 月：与美国太空军合作开发 <strong>约 480 颗卫星</strong>的 MILNET 军事通信星座<br />
+- 星盾具备增强加密、抗干扰通信和星上安全数据处理能力</p>
+<p><strong>（二）Amazon Project Kuiper</strong></p>
+<p>Amazon 的 Kuiper 星座计划部署 <strong>3,236 颗卫星</strong>，2025 年 4 月完成首批商业发射。</p>
+<p>Kuiper 的技术亮点在于其自研芯片：<br />
+- <strong>&ldquo;Prometheus&rdquo; 处理器</strong>：集成 5G 调制解调器、蜂窝基站和微波回传天线功能，单颗卫星可处理 <strong>1 Tbps</strong> 数据<br />
+- <strong>AWS Graviton 衍生边缘计算</strong>：将 Amazon 云端的自研芯片能力延伸至太空<br />
+- 架构支持&rdquo;再生式中继&rdquo;——卫星可解调、路由、再编码信号，而非简单放大转发</p>
+<p>Kuiper 与 AWS 深度整合，企业客户可通过 Kuiper 将偏远设施（石油平台、矿场、农村站点）直连 AWS 云基础设施。</p>
+<p><strong>（三）NASA 与新兴企业</strong></p>
+<ul>
+<li><strong>Starcloud（2024 年成立）</strong>：2025 年 11 月发射 Starcloud-1 卫星，搭载 <strong>NVIDIA H100 GPU</strong>，在 325 km 轨道完成史上首次太空 LLM 训练（NanoGPT）和推理（Google Gemma/Gemini）。2026 年 3 月完成 <strong>1.7 亿美元 A 轮融资</strong>，估值 11 亿美元，成为最快达到独角兽地位的 YC 企业（17 个月）。</li>
+<li><strong>HPE Spaceborne Computer-2</strong>：部署于国际空间站，验证在轨边缘处理</li>
+<li><strong>Azure Space</strong>：微软的太空云计划，扩展在轨 AI 合作伙伴关系</li>
+</ul>
+<h3 id="32-esaoneweb">3.2 欧洲：ESA、OneWeb<a class="headerlink" href="#32-esaoneweb" title="Permanent link"></a></h3>
+<p><strong>（一）欧洲航天局（ESA）</strong></p>
+<p>ESA 在太空计算和光通信领域布局深远：</p>
+<ul>
+<li><strong>Phi-Lab 和 FAST 项目</strong>：推进在轨数据处理</li>
+<li><strong>欧洲数据中继系统（EDRS）</strong>： nicknamed &ldquo;太空数据高速公路&rdquo;，是世界上首个商业化的光学卫星通信系统</li>
+<li>EDRS-A（2016 年发射）和 EDRS-C（2019 年发射）位于地球静止轨道</li>
+<li>激光通信终端（LCT）数据速率达 <strong>1.8 Gbps</strong></li>
+<li>截至 2024 年 10 月，已完成 <strong>80,000 余次</strong>成功激光连接，可靠性达 <strong>99.53%</strong></li>
+<li>
+<p>累计下传数据超过 <strong>2.5 PB</strong></p>
+</li>
+<li>
+<p><strong>欧几里得（Euclid）任务</strong>：ESA 的暗能量/暗物质探测望远镜，2023 年 7 月发射。使用传统 X 波段和 K 波段射频通信（非激光），K 波段下行速率约 55-74 Mbps。</p>
+</li>
+<li>
+<p><strong>昴宿星（Pleiades Neo）</strong>：Airbus 的地球观测星座，配备 Tesat Spacecom 激光通信终端，通过 EDRS 实现近实时数据中继。</p>
+</li>
+</ul>
+<p><strong>（二）OneWeb</strong></p>
+<p>OneWeb 第一代星座已完成 <strong>634 颗 LEO 卫星</strong>部署，被 Eutelsat 收购后更名为 Eutelsat OneWeb。</p>
+<p>ESA 与 OneWeb 的合作重点：<br />
+- <strong>Sunrise 合作伙伴计划</strong>：开发 JoeySat 演示卫星（2023 年 5 月发射），测试数字波束成形、跳波束和再生处理<br />
+- <strong>Copernicus 数据枢纽</strong>：在非洲等偏远地区部署配备 OneWeb 用户终端和专用处理单元的数据枢纽<br />
+- <strong>5G-Advanced NR-NTN</strong>：2025 年实现全球首个基于 OneWeb LEO 卫星的 Rel-19 5G-Advanced 非地面网络连接</p>
+<h3 id="33">3.3 中国：卫星互联网星座、商业航天<a class="headerlink" href="#33" title="Permanent link"></a></h3>
+<p><strong>（一）GW 星座（国网星座）</strong></p>
+<p>GW 星座是中国国家主导的 LEO 卫星互联网项目，由中国卫星网络集团（China SatNet）运营：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">规格</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">规划卫星总数</td>
+<td style="text-align: left;"><strong>12,992 颗</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">GW-A59 子星座</td>
+<td style="text-align: left;">6,080 颗（&lt;500 km 极低轨道）</td>
+</tr>
+<tr>
+<td style="text-align: left;">GW-A2 子星座</td>
+<td style="text-align: left;">6,912 颗（1,145 km 轨道）</td>
+</tr>
+<tr>
+<td style="text-align: left;">ITU 申报时间</td>
+<td style="text-align: left;">2020 年 9 月</td>
+</tr>
+</tbody>
+</table>
+<p>2024-2025 年发射进展：<br />
+- 2024 年 12 月 16 日：长征五号 B/远征二号首次批量组网发射（一箭十星），标志星座建设正式启动<br />
+- 2025 年：发射节奏从&rdquo;每月一次&rdquo;加速至&rdquo;每三天一组&rdquo;，截至 2025 年底累计完成 <strong>17 次组网发射</strong>，<strong>136 颗卫星</strong>在轨<br />
+- 2029 年 9 月 ITU 截止：需部署约 <strong>1,300 颗卫星</strong>（总量的 10%）以保留频谱/轨道资源</p>
+<p><strong>（二）千帆星座（G60 星链）</strong></p>
+<p>上海垣信卫星运营的千帆星座规划 <strong>15,000 颗卫星</strong>：<br />
+- 2024 年 8 月首批发射<br />
+- 2024 年融资 <strong>67 亿元</strong><br />
+- 规划 2025 年部署一期 <strong>648 颗</strong></p>
+<p><strong>（三）银河航天（Galaxy Space）</strong></p>
+<ul>
+<li>中国商业航天首家独角兽公司，估值约 <strong>115 亿元</strong></li>
+<li>2024 年发射卫星超 <strong>50 颗</strong></li>
+<li>建成<strong>全球最大商业卫星工厂</strong>，实现百颗卫星量产能力</li>
+<li>单颗卫星成本降至传统方案的 <strong>1/6</strong></li>
+<li>2024 年 5 月完成<strong>泰国首次低轨宽带卫星互联网测试</strong></li>
+</ul>
+<p><strong>（四）时空道宇（Spacemore）</strong></p>
+<ul>
+<li>吉利控股集团旗下商业航天企业，估值超 <strong>百亿元</strong></li>
+<li>全球首个深度融合航天制造与汽车制造能力的卫星量产工厂</li>
+<li>2024 年实现<strong>前装车载卫星通信终端产品规模化应用落地</strong>——全球率先</li>
+<li>开创&rdquo;卫星制造 + 车联网应用&rdquo;的商业闭环</li>
+</ul>
+<p><strong>（五）中国太空光通信进展</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">时间</th>
+<th style="text-align: left;">卫星/项目</th>
+<th style="text-align: left;">速率</th>
+<th style="text-align: left;">里程碑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">2011 年</td>
+<td style="text-align: left;">海洋二号</td>
+<td style="text-align: left;">504 Mbps</td>
+<td style="text-align: left;">国内首次星地激光通信在轨试验</td>
+</tr>
+<tr>
+<td style="text-align: left;">2016 年</td>
+<td style="text-align: left;">墨子号</td>
+<td style="text-align: left;">5.12 Gbps</td>
+<td style="text-align: left;">国内首个低轨卫星对地相干激光通信</td>
+</tr>
+<tr>
+<td style="text-align: left;">2017 年</td>
+<td style="text-align: left;">实践十三号</td>
+<td style="text-align: left;">5 Gbps</td>
+<td style="text-align: left;">国际首次高轨卫星与地面双向高速激光通信</td>
+</tr>
+<tr>
+<td style="text-align: left;">2019-2020 年</td>
+<td style="text-align: left;"><strong>实践二十号</strong></td>
+<td style="text-align: left;"><strong>10 Gbps</strong></td>
+<td style="text-align: left;"><strong>国际首个 QPSK 相干体制，创世界纪录</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">2020 年</td>
+<td style="text-align: left;">行云二号</td>
+<td style="text-align: left;">100 Mbps</td>
+<td style="text-align: left;">中国首次低轨星间激光通信实验</td>
+</tr>
+<tr>
+<td style="text-align: left;">2023 年</td>
+<td style="text-align: left;">吉林一号 MF02A04</td>
+<td style="text-align: left;">10 Gbps</td>
+<td style="text-align: left;">首次面向业务化应用的星地激光高速通信</td>
+</tr>
+<tr>
+<td style="text-align: left;">2024 年底</td>
+<td style="text-align: left;">吉林一号平台 02A02</td>
+<td style="text-align: left;"><strong>100 Gbps</strong></td>
+<td style="text-align: left;">国内首次星地激光 100Gbps 超高速传输</td>
+</tr>
+<tr>
+<td style="text-align: left;">2025 年 3 月</td>
+<td style="text-align: left;">光传 01/02 试验星</td>
+<td style="text-align: left;"><strong>400 Gbps</strong></td>
+<td style="text-align: left;">国内首次在轨星间 400Gbps 超高速激光通信</td>
+</tr>
+</tbody>
+</table>
+<h3 id="34">3.4 其他：日本、印度、俄罗斯<a class="headerlink" href="#34" title="Permanent link"></a></h3>
+<p><strong>（一）日本（JAXA）</strong></p>
+<p>JAXA 目前<strong>没有</strong>专门的卫星互联网宽带星座计划，但正在推进：<br />
+- <strong>LEO PNT 星座</strong>：规划 240 颗卫星（2030 年）至 480 颗（2035 年），用于 GNSS 增强（定位精度提升至约 10 cm），而非互联网宽带</p>
+<p><strong>（二）印度（ISRO）</strong></p>
+<p>印度<strong>没有</strong> ISRO 主导的卫星互联网星座，但采取&rdquo;民营主导&rdquo;策略：<br />
+- Ananth Technologies 获 IN-SPACe 批准，计划 2028 年推出印度首个私营卫星宽带服务（300 亿卢比项目，地球静止轨道）<br />
+- ISRO 为外国星座提供商业发射服务（如 2025 年底为 AST SpaceMobile 发射 BlueBird 卫星）<br />
+- 现有卫星互联网由 Hughes Communications India、OneWeb（Bharti 合作）、Jio-SES 等提供</p>
+<p><strong>（三）俄罗斯</strong></p>
+<p>俄罗斯正加速建设自主卫星互联网，受地缘政治压力驱动：<br />
+- <strong>Skif 星座</strong>：2025 年开始部署，原型星 Skif-D 于 2022 年 10 月发射<br />
+- <strong>Rassvet（黎明）星座</strong>：2025 年 3 月政府批准，规划 292 颗工作星 + 91 颗备份星<br />
+- 2025-2030 年拨款 <strong>1,160 亿卢布</strong>用于卫星互联网发展<br />
+- 目标：2027 年向公众提供服务</p>
+<hr />
+<h2 id="4">第4章：光芯片在太空中的优势<a class="headerlink" href="#4" title="Permanent link"></a></h2>
+<p>光芯片（Photonic Integrated Circuit, PIC），又称光子集成电路，将激光器、调制器、波导、探测器等光学元件集成在单一芯片上。与传统电子芯片相比，光芯片在太空环境中展现出独特的优势。</p>
+<h3 id="41">4.1 抗辐射特性<a class="headerlink" href="#41" title="Permanent link"></a></h3>
+<p>光芯片最根本的优势在于其信息载体——<strong>光子（Photon）</strong> 不受电磁场直接影响。</p>
+<p><strong>电子 vs 光子的辐射响应差异</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">电子（传统 CMOS）</th>
+<th style="text-align: left;">光子（光芯片）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">信息载体</td>
+<td style="text-align: left;">电子电荷</td>
+<td style="text-align: left;">光子（无电荷）</td>
+</tr>
+<tr>
+<td style="text-align: left;">SEU 敏感性</td>
+<td style="text-align: left;"><strong>极高</strong>——单粒子即可翻转比特</td>
+<td style="text-align: left;"><strong>本质免疫</strong>——光子不受单粒子 strike 影响</td>
+</tr>
+<tr>
+<td style="text-align: left;">TID 机制</td>
+<td style="text-align: left;">氧化层电荷俘获，阈值漂移</td>
+<td style="text-align: left;">无氧化层，无阈值概念</td>
+</tr>
+<tr>
+<td style="text-align: left;">主要损伤机制</td>
+<td style="text-align: left;">电离损伤 + 位移损伤</td>
+<td style="text-align: left;">主要为位移损伤（晶格原子位移）</td>
+</tr>
+<tr>
+<td style="text-align: left;">EMI 敏感性</td>
+<td style="text-align: left;">高</td>
+<td style="text-align: left;"><strong>免疫</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>实验验证</strong>：</p>
+<p>2023 年，Soria-Gómez 等人在 SPIE/ICSO 会议上发表了 InP 基光芯片的辐射硬度评估结果：<br />
+- 测试器件：SOA（半导体光放大器）、电光相位调制器、波导、MMI 耦合器、光电探测器<br />
+- 伽马射线剂量：最高 <strong>106 krad</strong><br />
+- 质子辐照：最高 <strong>1.5 × 10¹¹ p⁺/cm²</strong><br />
+- <strong>结论</strong>：所有基础器件在典型空间任务剂量范围内均表现出辐射硬度，未观察到系统性退化</p>
+<p><strong>里程碑式的在轨实验</strong>：</p>
+<p>2024 年发表在 <em>Science Advances</em> 上的研究报道了首次在 LEO 真实空间环境中对硅光芯片进行为期 <strong>325 天</strong>的暴露实验（MISSE-FF 平台，ISS 外部，&gt;2,000 km 轨道）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">载流子迁移率</td>
+<td style="text-align: left;"><strong>无变化</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">自由载流子寿命</td>
+<td style="text-align: left;">降低约 55%（500 ps → 226 ps）</td>
+</tr>
+<tr>
+<td style="text-align: left;">电光调制效率</td>
+<td style="text-align: left;"><strong>保持不变</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">光电带宽</td>
+<td style="text-align: left;"><strong>扩大</strong>（因载流子寿命降低）</td>
+</tr>
+<tr>
+<td style="text-align: left;">消光比（MRM）</td>
+<td style="text-align: left;">从 24 dB 降至 14 dB（仍 &gt;10 dB，满足通信需求）</td>
+</tr>
+<tr>
+<td style="text-align: left;">有源波导损耗</td>
+<td style="text-align: left;">增加 <strong>+20 dB/cm</strong></td>
+</tr>
+</tbody>
+</table>
+<p>关键发现：地面高剂量 X 射线/伽马射线测试与实际空间粒子辐射产生的损伤机制<strong>完全不同</strong>。实际空间辐射下，载流子迁移率和调制效率未受影响——这与地面测试的预测截然相反。</p>
+<h3 id="42">4.2 低功耗<a class="headerlink" href="#42" title="Permanent link"></a></h3>
+<p>光计算的核心优势之一是<strong>光传播的&rdquo;免费&rdquo;加法</strong>。</p>
+<p>在传统电子计算中，矩阵乘法等操作需要大量晶体管开关，每个开关都消耗能量并产生热量。而在光域中：<br />
+- 光信号的叠加（干涉）是<strong>被动过程</strong>，几乎不消耗能量<br />
+- 波分复用（Wavelength Division Multiplexing, WDM）可在单根光纤中同时传输数十至数百个波长的信号，每个波长独立承载数据<br />
+- 光互连的能耗可低至 <strong>每比特亚皮焦（sub-pJ/bit）</strong></p>
+<p>对于太空应用，低功耗意味着：<br />
+- 更小的太阳能电池板面积<br />
+- 更少的热管理负担<br />
+- 更长的任务寿命</p>
+<p>2024 年清华大学发布的 <strong>&ldquo;太极&rdquo;（Taichi）光芯片</strong>实现了 <strong>160 TOPS/W</strong> 的能效，远超现有电子 AI 加速器（如 NVIDIA H100 约为 30-60 TOPS/W）。</p>
+<h3 id="43">4.3 高带宽密度<a class="headerlink" href="#43" title="Permanent link"></a></h3>
+<p>WDM 技术使光芯片能够在极小的物理空间内实现极高的带宽密度：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">技术</th>
+<th style="text-align: left;">带宽密度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">铜缆电互连</td>
+<td style="text-align: left;">~10 Gbps/mm</td>
+</tr>
+<tr>
+<td style="text-align: left;">单模光纤</td>
+<td style="text-align: left;">~100 Tbps（使用 WDM）</td>
+</tr>
+<tr>
+<td style="text-align: left;">光芯片波导</td>
+<td style="text-align: left;">可在 mm² 面积内容纳数十条波导，每条支持 100+ Gbps</td>
+</tr>
+</tbody>
+</table>
+<p>NASA 的 TBIRD（TeraByte InfraRed Delivery）任务在 2022 年展示了 <strong>200 Gbps</strong> 的星地激光通信速率，使用 WDM + 双偏振 QPSK 调制，单次过顶传输 <strong>4.8 TB</strong> 无误码数据。这一速率是传统射频通信的 <strong>1,000 倍</strong>。</p>
+<h3 id="44">4.4 轻量化<a class="headerlink" href="#44" title="Permanent link"></a></h3>
+<p>光互连的物理载体——光纤——比铜缆轻得多：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">对比项</th>
+<th style="text-align: left;">铜缆</th>
+<th style="text-align: left;">光纤</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">重量（同带宽）</td>
+<td style="text-align: left;">重 5-10 倍</td>
+<td style="text-align: left;">轻</td>
+</tr>
+<tr>
+<td style="text-align: left;">直径</td>
+<td style="text-align: left;">粗</td>
+<td style="text-align: left;">细（单模光纤芯径 9 μm）</td>
+</tr>
+<tr>
+<td style="text-align: left;">弯曲半径</td>
+<td style="text-align: left;">较大</td>
+<td style="text-align: left;">小</td>
+</tr>
+<tr>
+<td style="text-align: left;">电磁屏蔽需求</td>
+<td style="text-align: left;">需要</td>
+<td style="text-align: left;">不需要</td>
+</tr>
+</tbody>
+</table>
+<p>对于卫星内部互连，光芯片可将收发器、波导和调制器集成在单一芯片上，大幅减小体积和重量。EDRS 的激光通信终端重量约 <strong>50 kg</strong>，而传统射频终端达到同等数据率可能需要数倍重量。</p>
+<h3 id="45">4.5 热不敏感性（非相干架构的温度鲁棒性）<a class="headerlink" href="#45" title="Permanent link"></a></h3>
+<p>光芯片存在相干（Coherent）与非相干（Incoherent）两种架构，后者在温度稳定性方面具有显著优势：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">相干光计算</th>
+<th style="text-align: left;">非相干光计算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">工作原理</td>
+<td style="text-align: left;">保持光相位关系，需精确相位控制</td>
+<td style="text-align: left;">基于光强度/功率，不依赖相位</td>
+</tr>
+<tr>
+<td style="text-align: left;">温度敏感性</td>
+<td style="text-align: left;"><strong>极高</strong>——相位强依赖温度</td>
+<td style="text-align: left;"><strong>显著更低</strong>——强度受温度影响小</td>
+</tr>
+<tr>
+<td style="text-align: left;">热管理开销</td>
+<td style="text-align: left;">可能成为系统功耗的重要组成</td>
+<td style="text-align: left;">最小化或无需</td>
+</tr>
+<tr>
+<td style="text-align: left;">系统复杂度</td>
+<td style="text-align: left;">高（需 TEC、反馈控制）</td>
+<td style="text-align: left;">简单，更具成本效益</td>
+</tr>
+</tbody>
+</table>
+<p>硅材料的热光系数约为 <strong>1.86 × 10⁻⁴ K⁻¹</strong>，是二氧化硅的约 10 倍。这意味着温度变化会显著改变硅波导的折射率和物理尺寸，导致谐振波长漂移。</p>
+<p>然而，<strong>非相干架构</strong>通过使用光强度而非相位来编码信息，从根本上规避了这一问题。此外，<strong>氮化硅（Si₃N₄）</strong>平台因其更低的热光系数，成为温度敏感应用的理想选择——具备高热稳定性和低热光系数，同时保持超低光损耗（&lt;1 dB/cm）。</p>
+<p>研究表明，采用 MZI（马赫-曾德尔干涉仪）自补偿设计的波导可在 <strong>&gt;50°C</strong> 范围内实现零净温度灵敏度，为太空宽温环境应用提供了可行路径。</p>
+<hr />
+<h2 id="5">第5章：光计算太空化的技术路线<a class="headerlink" href="#5" title="Permanent link"></a></h2>
+<h3 id="51">5.1 太空光通信（已有成熟应用）<a class="headerlink" href="#51" title="Permanent link"></a></h3>
+<p>太空光通信是光芯片在太空中最成熟的应用方向，已从技术验证走向商业运营。</p>
+<p><strong>（一）NASA 光通信项目</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">时间</th>
+<th style="text-align: left;">轨道/距离</th>
+<th style="text-align: left;">数据速率</th>
+<th style="text-align: left;">里程碑意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>LCRD</strong></td>
+<td style="text-align: left;">2021 年 12 月发射</td>
+<td style="text-align: left;">GEO（35,786 km）</td>
+<td style="text-align: left;">1.2 Gbps</td>
+<td style="text-align: left;">NASA 首个双向端到端光学中继系统</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>TBIRD</strong></td>
+<td style="text-align: left;">2022 年 5 月发射</td>
+<td style="text-align: left;">LEO（482 km）</td>
+<td style="text-align: left;"><strong>200 Gbps</strong></td>
+<td style="text-align: left;">单次过顶传输 4.8 TB，速率是 RF 的 1,000 倍</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ILLUMA-T</strong></td>
+<td style="text-align: left;">2023 年 11 月发射</td>
+<td style="text-align: left;">ISS</td>
+<td style="text-align: left;">1.2 Gbps</td>
+<td style="text-align: left;">首个载人航天光学通信系统</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>DSOC</strong></td>
+<td style="text-align: left;">2023 年 10 月发射</td>
+<td style="text-align: left;">深空（Psyche 任务）</td>
+<td style="text-align: left;">267 Mbps（最近点）</td>
+<td style="text-align: left;">2024 年 12 月创纪录地从 <strong>3.07 亿英里</strong>（4.94 亿公里）传输数据</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>O2O</strong></td>
+<td style="text-align: left;">计划 2026 年</td>
+<td style="text-align: left;">月球轨道</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">阿尔忒弥斯 II 任务，支持 4K 超高清视频</td>
+</tr>
+</tbody>
+</table>
+<p>DSOC 的成就尤为突出：在相当于地球-火星最大距离的位置，实现了 267 Mbps 的数据传输，证明了激光通信在深空的可行性。</p>
+<p><strong>（二）ESA EDRS</strong></p>
+<p>EDRS 是迄今为止最成功的商业化太空光通信系统：<br />
+- 两颗 GEO 卫星（EDRS-A 于 2016 年，EDRS-C 于 2019 年）<br />
+- 激光终端由 Tesat Spacecom 制造，数据率 <strong>1.8 Gbps</strong><br />
+- 最大链路距离 <strong>80,000 公里</strong><br />
+- 服务哨兵系列、国际空间站、军事/安全用户<br />
+- 截至 2024 年 10 月：<strong>80,000+ 成功激光连接，99.53% 可靠性，2.5+ PB 数据下传</strong></p>
+<p><strong>（三）中国实践二十号</strong></p>
+<p>实践二十号卫星（2019 年 12 月发射）是中国太空光通信的里程碑：<br />
+- <strong>10 Gbps</strong> QPSK 相干体制星地激光通信<br />
+- <strong>国际首个</strong> QPSK 相干体制星地激光链路<br />
+- 地面站：丽江光学地面站</p>
+<p>后续进展迅速：<br />
+- 2024 年底：吉林一号实现 <strong>100 Gbps</strong> 星地激光传输<br />
+- 2025 年 3 月：光传试验星实现 <strong>400 Gbps</strong> 星间激光通信</p>
+<h3 id="52">5.2 太空光计算（前沿探索）<a class="headerlink" href="#52" title="Permanent link"></a></h3>
+<p>太空光计算目前处于早期探索阶段，技术成熟度（TRL）约为 2-3 级。</p>
+<p><strong>（一）光神经网络加速器</strong></p>
+<p>2024-2025 年的关键突破：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">成果</th>
+<th style="text-align: left;">年份</th>
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">太空相关性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Taichi 光芯片</strong>（清华大学）</td>
+<td style="text-align: left;">2024</td>
+<td style="text-align: left;">160 TOPS/W，大规模光子集成</td>
+<td style="text-align: left;">超高能效，对功率受限卫星至关重要</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>光谱 CNN 芯片</strong>（Cui 等）</td>
+<td style="text-align: left;">2025</td>
+<td style="text-align: left;">直接处理非相干自然光</td>
+<td style="text-align: left;">无需相干激光源，简化太空系统</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ROSA 架构</strong></td>
+<td style="text-align: left;">2025</td>
+<td style="text-align: left;">鲁棒型微环光神经网络</td>
+<td style="text-align: left;">提升恶劣环境下的可靠性</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>TRON 架构</strong></td>
+<td style="text-align: left;">2025</td>
+<td style="text-align: left;">可训练、可重构随机光网络</td>
+<td style="text-align: left;">适应变化的任务需求</td>
+</tr>
+</tbody>
+</table>
+<p><strong>（二）太空光计算路线图</strong></p>
+<p>2025 年发布的一篇关于系外行星高对比度成像的路线图首次明确规划了光计算加速器进入太空的时间表：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">时间</th>
+<th style="text-align: left;">里程碑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>2025-2030 年</strong></td>
+<td style="text-align: left;">地基望远镜部署光计算协处理器，实现 &gt;5 kHz 的自适应光学闭环带宽</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2030-2035 年</strong></td>
+<td style="text-align: left;"><strong>空间站搭载光子人工智能加速器</strong>，完成在轨系外行星大气成分分析</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2040 年后</strong></td>
+<td style="text-align: left;">光子神经形态芯片与量子传感器融合，用于宇宙原恒星系统的分子谱线成像</td>
+</tr>
+</tbody>
+</table>
+<p><strong>（三）在轨 AI 计算的现状</strong></p>
+<p>当前在轨计算仍以电子加速器为主：<br />
+- Starcloud-1（2025 年 11 月）：搭载 NVIDIA H100，在 325 km 轨道完成 LLM 训练和推理<br />
+- SpaceX 星链 V3：计划支持轨道数据中心，利用高速激光链路形成分布式计算网络</p>
+<p>光计算芯片尚未进入太空，但地面进展迅速。预计 <strong>2030-2035 年</strong>将出现首个太空光计算演示任务。</p>
+<h3 id="53">5.3 技术差距与突破点<a class="headerlink" href="#53" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">差距</th>
+<th style="text-align: left;">现状</th>
+<th style="text-align: left;">突破方向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>规模化</strong></td>
+<td style="text-align: left;">演示系统 &lt;3 层、数百神经元</td>
+<td style="text-align: left;">大规模集成、多层网络</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>非线性激活</strong></td>
+<td style="text-align: left;">需光电混合实现</td>
+<td style="text-align: left;">全光非线性器件</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>精度与校准</strong></td>
+<td style="text-align: left;">模拟计算精度受限</td>
+<td style="text-align: left;">主动误差校正、数字辅助</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>太空鉴定</strong></td>
+<td style="text-align: left;">尚无光 NN 加速器通过飞行鉴定</td>
+<td style="text-align: left;">辐射硬化、热真空测试</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>与航天器系统集成</strong></td>
+<td style="text-align: left;">电源、数据接口、软件栈未标准化</td>
+<td style="text-align: left;">制定标准、开发配套生态</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>成本</strong></td>
+<td style="text-align: left;">光芯片制造成本高</td>
+<td style="text-align: left;">开放式多项目晶圆（MPW）、规模化生产</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6">第6章：前景与展望<a class="headerlink" href="#6" title="Permanent link"></a></h2>
+<h3 id="61">6.1 近地轨道计算星座<a class="headerlink" href="#61" title="Permanent link"></a></h3>
+<p>LEO 计算星座是太空算力最现实的近期应用场景。</p>
+<p><strong>SpaceX 的轨道数据中心愿景</strong>：</p>
+<p>Elon Musk 已明确表示：&rdquo;通过扩展具有高速激光链路的 Starlink V3 卫星，可以实现轨道数据中心。SpaceX 将这样做。&rdquo;</p>
+<p>SpaceX 分析的轨道数据中心优势：<br />
+- 太阳能：单位面积接收能量是地面的 <strong>5 倍</strong><br />
+- 冷却效率：辐射冷却无需水，PUE 可低至 <strong>1.02-1.05</strong>（地面最佳约 1.2-1.5）<br />
+- 10 年期 40 MW 集群成本：约 <strong>820 万美元</strong> vs 地面约 <strong>1.67 亿美元</strong></p>
+<p><strong>竞争格局</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">公司</th>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">状态</th>
+<th style="text-align: left;">时间表</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Starcloud</strong></td>
+<td style="text-align: left;">轨道数据中心</td>
+<td style="text-align: left;">H100 已入轨</td>
+<td style="text-align: left;">Starcloud-2：2026 年底（Blackwell B200）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>SpaceX</strong></td>
+<td style="text-align: left;">Starlink 扩展</td>
+<td style="text-align: left;">已申请百万卫星星座</td>
+<td style="text-align: left;">5 年计划</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Google</strong></td>
+<td style="text-align: left;">Project Suncatcher</td>
+<td style="text-align: left;">开发中</td>
+<td style="text-align: left;">原型发射：2027 年</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Blue Origin</strong></td>
+<td style="text-align: left;">TeraWave</td>
+<td style="text-align: left;">2025 年底宣布</td>
+<td style="text-align: left;">政府客户优先</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>中国/国星宇航</strong></td>
+<td style="text-align: left;">三体计算星座</td>
+<td style="text-align: left;">12 颗卫星已发射（2025 年 5 月）</td>
+<td style="text-align: left;">2030 年 2,800 颗</td>
+</tr>
+</tbody>
+</table>
+<p><strong>光芯片在 LEO 计算星座中的角色</strong>：</p>
+<ul>
+<li><strong>星间光互连</strong>：WDM 激光链路提供 Tbps 级带宽，连接计算节点</li>
+<li><strong>光计算加速</strong>：用于 AI 推理、图像处理等任务的低功耗加速</li>
+<li><strong>光存储互连</strong>：替代铜缆，减轻重量、降低功耗</li>
+</ul>
+<h3 id="62">6.2 深空探测中的光计算<a class="headerlink" href="#62" title="Permanent link"></a></h3>
+<p>深空任务对计算和通信提出了最极端的要求。</p>
+<p><strong>通信延迟挑战</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">目标</th>
+<th style="text-align: left;">单向延迟</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">月球</td>
+<td style="text-align: left;">1.3 秒</td>
+</tr>
+<tr>
+<td style="text-align: left;">火星（最近）</td>
+<td style="text-align: left;">4 分钟</td>
+</tr>
+<tr>
+<td style="text-align: left;">火星（最远）</td>
+<td style="text-align: left;">24 分钟</td>
+</tr>
+<tr>
+<td style="text-align: left;">木星</td>
+<td style="text-align: left;">32 分钟</td>
+</tr>
+<tr>
+<td style="text-align: left;">土星</td>
+<td style="text-align: left;">1 小时</td>
+</tr>
+</tbody>
+</table>
+<p>如此长的延迟使得地面实时控制不可能，航天器必须具备完全自主的决策能力。</p>
+<p><strong>光计算的优势</strong>：</p>
+<ol>
+<li><strong>辐射硬度</strong>：深空辐射环境比 LEO 更恶劣，光芯片的抗辐射特性尤为珍贵</li>
+<li><strong>低功耗</strong>：深空航天器能源极其有限（依赖太阳能或放射性同位素电源），光计算的高能效可延长任务寿命</li>
+<li><strong>高带宽通信</strong>：DSOC 已证明在深空距离上可实现 267 Mbps 的激光通信，未来光计算可与光通信无缝集成</li>
+</ol>
+<p><strong>应用场景</strong>：<br />
+- 自主导航与避障（如 NASA 的自主科学航天器）<br />
+- 实时科学数据分析（如识别感兴趣的地质特征并自主调整观测计划）<br />
+- 航天器健康监测与故障自主诊断</p>
+<h3 id="63-">6.3 太空-地面协同计算<a class="headerlink" href="#63-" title="Permanent link"></a></h3>
+<p>太空算力并非要取代地面数据中心，而是与地面形成<strong>协同计算架构</strong>。</p>
+<p><strong>协同模式</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">模式</th>
+<th style="text-align: left;">描述</th>
+<th style="text-align: left;">示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>数据预处理</strong></td>
+<td style="text-align: left;">卫星执行数据清洗、压缩、筛选，只传有价值数据</td>
+<td style="text-align: left;">遥感图像去云、去噪后下传</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>模型推理</strong></td>
+<td style="text-align: left;">星上运行训练好的 AI 模型，地面负责训练</td>
+<td style="text-align: left;">Starcloud 在轨运行 Gemma 模型</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>联邦学习</strong></td>
+<td style="text-align: left;">多颗卫星分布式训练，只传模型更新</td>
+<td style="text-align: left;">未来星座级分布式 AI</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>任务卸载</strong></td>
+<td style="text-align: left;">根据延迟/带宽需求，动态分配计算任务</td>
+<td style="text-align: left;">低延迟任务在星上，复杂分析在地面</td>
+</tr>
+</tbody>
+</table>
+<p><strong>光芯片在协同架构中的价值</strong>：</p>
+<ul>
+<li><strong>高速星地链路</strong>：TBIRD 的 200 Gbps 速率使大规模模型更新传输成为可能</li>
+<li><strong>光互连降低星座内部延迟</strong>：激光星间链路（OISL）延迟仅毫秒级</li>
+<li><strong>边缘-云端无缝衔接</strong>：光通信的高带宽使&rdquo;太空边缘 + 地面云&rdquo;的协同模式流畅运行</li>
+</ul>
+<hr />
+<h2 id="_3">结语<a class="headerlink" href="#_3" title="Permanent link"></a></h2>
+<p>太空算力正站在从&rdquo;概念验证&rdquo;到&rdquo;规模部署&rdquo;的历史转折点上。光芯片——凭借其抗辐射、低功耗、高带宽、轻量化和温度鲁棒性——为太空计算提供了独特的技术路径。</p>
+<p>当前，太空光通信已进入商业化运营阶段（EDRS、中国实践二十号/吉林一号系列），而太空光计算仍处于实验室向工程化过渡的早期。预计 2030-2035 年将迎来光计算芯片的首次太空演示，2040 年后可能实现与量子传感器融合的先进光子智能系统。</p>
+<p>对于产业参与者而言，关键投资方向包括：<br />
+1. <strong>辐射硬化光芯片</strong>：针对空间环境优化材料和设计<br />
+2. <strong>非相干光计算架构</strong>：降低温度敏感性，简化太空系统<br />
+3. <strong>星间光互连标准</strong>：推动 WDM 激光链路的互操作性<br />
+4. <strong>太空-地面协同软件栈</strong>：使光计算资源可被地面应用无缝调用</p>
+<p>太空算力与光芯片的结合，不仅是技术的融合，更是人类计算边界向最终 frontier 的拓展。</p>
+<hr />
+<p><strong>参考来源</strong>：</p>
+<ul>
+<li><a href="https://www.fortunebusinessinsights.com/space-based-edge-computing-market-108137">Space-Based Edge Computing Market Size, Share, Forecast, 2034</a></li>
+<li><a href="https://www.precedenceresearch.com/space-on-board-computing-platform-market">Space On Board Computing Platform Market Size to Hit USD 4.79 Billion by 2034</a></li>
+<li><a href="https://gearmusk.com/2024/10/30/amd-chips-power-spacex-starlink-satellites/">AMD Chips Power SpaceX Starlink Satellites</a></li>
+<li><a href="https://gearmusk.com/2025/01/01/spacex-v3-starlink-satellites/">SpaceX V3 Starlink Satellites: 20x More Powerful</a></li>
+<li><a href="https://www.tmtpost.com/7748367.html">Musk Pushes Starlink Into Space-Based Computing</a></li>
+<li><a href="https://lasvegassun.com/news/2026/mar/30/starcloud-raises-170m-series-a-at-11bn-valuation-led-by-benchmark-and-eqt-ventures/">Starcloud Raises $170M Series A at $1.1bn Valuation</a></li>
+<li><a href="https://analyticsindiamag.com/ai-news-updates/starcloud-becomes-first-to-train-llms-in-space-using-nvidia-h100/">Starcloud Becomes First to Train LLMs in Space Using NVIDIA H100</a></li>
+<li><a href="https://satnews.com/2025/12/29/u-s-space-force-and-spacex-partner-to-develop-480-satellite-milnet-constellation/">U.S. Space Force and SpaceX Partner to Develop 480-Satellite MILNET Constellation</a></li>
+<li><a href="https://www.techtarget.com/whatis/feature/Amazons-Project-Kuiper-vs-Starlink-How-do-they-compare">Amazon&rsquo;s Project Kuiper vs. Starlink</a></li>
+<li><a href="https://semiconductorx.com/sector-space-military.html">Space &amp; Defense Semiconductors — Sector Supply Chain</a></li>
+<li><a href="https://baike.baidu.com/en/item/China%20SatNet%20GW%20Constellation/1477932">China SatNet GW Constellation</a></li>
+<li><a href="https://spacenews.com/china-adds-new-satellites-to-guowang-constellation-eyes-accelerated-launch-rate/">China adds new satellites to Guowang constellation</a></li>
+<li><a href="https://www.skylinker.io/p/guowang-xingwang-gw-a59-china-satnet-chinese-leo-satcom-constellation-overview-eng">GuoWang - Overview of the Chinese State-Owned LEO SatCom Constellation</a></li>
+<li><a href="https://www.spacejournal.cn/zght/article/id/0bf6d04d-d14d-4c45-a386-bb590b61f3a1">2024年中国商业航天发展回顾与展望</a></li>
+<li><a href="https://tiu.taibo.cn/p/558">银河航天：中国商业航天首家独角兽</a></li>
+<li><a href="http://paper.people.com.cn/rmlt/pc/content/202507/01/content_30087745.html">中国商业航天的前景趋势与促进举措</a></li>
+<li><a href="https://tass.com/science/1535097">Russia to start deploying Skif satellite constellation</a></li>
+<li><a href="https://hammermindset.com/isro-to-launch-ast-spacemobiles-bluebird-satellite-in-late-2025/">ISRO to Launch AST SpaceMobile&rsquo;s BlueBird Satellite in Late 2025</a></li>
+<li><a href="https://www.nasa.gov/missions/tech-demonstration/laser-communications-relay-demonstration-lcrd-overview/">NASA LCRD Overview</a></li>
+<li><a href="https://www.ll.mit.edu/r-d/projects/laser-communications-relay-demonstration">NASA TBIRD Mission</a></li>
+<li><a href="https://www.jpl.nasa.gov/missions/deep-space-optical-communications-dsoc/">NASA DSOC Mission</a></li>
+<li><a href="https://spacenews.com/nasa-laser-comms-demo-achieves-record-data-transmission-from-deep-space/">NASA laser comms demo achieves record data transmission from deep space</a></li>
+<li><a href="https://connectivity.esa.int/archives/partnership-projects/european-data-relay-system-edrs">European Data Relay System (EDRS)</a></li>
+<li><a href="https://www.airbus.com/en/products-services/defence/military-space/space-data-highway">Space Data Highway | European Data Relay System</a></li>
+<li><a href="https://spacenews.com/first-european-data-relay-system-satellite-forges-20000-successful-laser-links/">First European Data Relay System Satellite Forges 20,000 Successful Laser Links</a></li>
+<li><a href="https://www.spacechina.com/n25/n2014789/n2014804/c2885351/content.html">实践二十号卫星激光通信通过在轨验证</a></li>
+<li><a href="https://www.laserfair.com/yingyong/202005/14/76867.html">超高速激光通信技术在实践二十号卫星完成验证</a></li>
+<li><a href="https://pibaojiameng.com/ccefdc2d73e96d8d/98cd42c161ceec87.html">国内外卫星激光通信进展</a></li>
+<li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10776012/">Space Qualifying Silicon Photonic Modulators and Circuits</a></li>
+<li><a href="https://ui.adsabs.harvard.edu/abs/2023SPIE12777E..6FP/abstract">Evaluation of radiation hardness of InP-based photonic integrated circuits for space applications</a></li>
+<li><a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sat.1552">Photonic Integrated Circuits for Optical Satellite Links: A Review</a></li>
+<li><a href="https://www.photondelta.com/blog/how-do-photonic-chips-perform-in-space-environments/">How do photonic chips perform in space environments?</a></li>
+<li><a href="https://www.photondelta.com/blog/what-is-the-difference-between-coherent-and-incoherent-photonic-chips/">What is the difference between coherent and incoherent photonic chips?</a></li>
+<li><a href="https://www.mdpi.com/2304-6732/12/2/94">Thermal Stability and Optical Behavior of Porous Silicon Photonic Crystals</a></li>
+<li><a href="https://www.electronics-cooling.com/2026/01/spacecraft-thermal-control-in-extreme-environments-surviving-lunar-night-and-martian-dust/">Spacecraft Thermal Control in Extreme Environments</a></li>
+<li><a href="https://www.assembtek.com/blogs/insight/core-heat-dissipation-methods-in-space-how-do-orbital-data-centers-thermal-management">Core Heat Dissipation Methods in Space</a></li>
+<li><a href="https://spacenexus.us/guide/space-launch-cost-comparison">Space Launch Cost Comparison 2026</a></li>
+<li><a href="https://posvirtual.fapam.edu.br/fapam-news/spacex-starship-the-true-cost-per-kilogram-1764800565">SpaceX Starship: The True Cost Per Kilogram</a></li>
+<li><a href="https://marketintelo.com/report/orbital-data-center-space-based-ai-computing-market">Orbital Data Center &amp; Space-Based AI Computing Market Research Report 2034</a></li>
+<li><a href="https://www.scientificamerican.com/article/data-centers-in-space/">Data Centers in Space Aren&rsquo;t as Wild as They Sound</a></li>
+<li><a href="https://www.peraspera.us/realities-of-space-based-compute/">Realities of Space-Based Compute</a></li>
+<li><a href="https://www.ijtsrd.com/papers/ijtsrd64541.pdf">Edge Computing in Space: Enhancing Data Processing and Communication</a></li>
+<li><a href="https://stlpartners.com/articles/edge-computing/space-edge-computing/">Space edge computing: Shaping the future of space operations</a></li>
+<li><a href="https://orbitalxploration.com/how-many-satellites-are-orbiting-earth-in-2025-latest-facts-and-surprising-insights">How Many Satellites Are Orbiting Earth in 2025?</a></li>
+<li><a href="https://www.statista.com/statistics/897719/number-of-active-satellites-by-year/">Number of active satellites by year 2024</a></li>
+<li><a href="http://www.ati.ac.cn/en/article/pdf/preview/10.61977/ati2025031.pdf">Optical Neural Networks: Principles, Challenges, and Future Prospects</a></li>
+<li><a href="https://www.mdpi.com/2304-6732/12/10/1030">Roadmap for Exoplanet High-Contrast Imaging</a></li>
+<li><a href="https://arxiv.org/html/2605.16849v1">SpaceMoE: Towards Orbital General Intelligence</a></li>
+<li><a href="https://radiationtestsolutions.com/blogs/total-ionizing-dose-tid-effects-on-electronics/">Total Ionizing Dose (TID) Effects on Electronics</a></li>
+<li><a href="https://www.laser2cots.com/en/article/7.TID.html">What is the TID Effect?</a></li>
+<li><a href="https://www.nasa.gov/smallsat-institute/sst-soa/thermal-control/">NASA Small Spacecraft Systems Virtual Institute - Thermal Control</a></li>
+<li><a href="https://www.arquimea.com/blog/satellites-loop-heat-pipes-technology/">Loop Heat Pipes Technology for Satellites</a></li>
+<li><a href="https://connectivity.esa.int/news/esa-geoville-and-eutelsat-oneweb-deliver-connectivity-distribute-earth-observation-data-across-africa">ESA, GeoVille and Eutelsat OneWeb to deliver connectivity</a></li>
+<li><a href="https://www.ukspace.org/oneweb-astroscale-uksa-esa-launch-space-junk-servicer-elsam/">OneWeb, Astroscale, UK Space Agency and ESA partner to launch space junk servicer ELSA-M</a></li>
+<li><a href="https://www.spacedaily.com/reports/D_Orbit_signs_contract_with_OneWeb_in_the_frame_of_ESA_project_Sunrise_999.html">D-Orbit signs contract with OneWeb in the frame of ESA project Sunrise</a></li>
+<li><a href="https://www.spacex.com/starshield/">Starshield</a></li>
+<li><a href="https://spacesecurity.wse.jhu.edu/2024/09/23/spacexs-starshield-shapes-the-earth-observation-and-national-security-industries/">SpaceX&rsquo;s Starshield shapes the Earth observation and national security industries</a></li>
+<li><a href="https://introl.com/blog/orbital-data-centers-space-ai-infrastructure-guide-2025">Orbital Data Centers: The Complete Guide to Space-Based AI Infrastructure</a></li>
+<li><a href="https://builtin.com/articles/orbital-data-centers-ai">What Are Orbital Data Centers?</a></li>
+<li><a href="https://orbitaltoday.com/2026/04/01/ai-in-orbit-starclouds-170m-raise-pushes-the-idea-forward/">AI in Orbit? Starcloud&rsquo;s $170M Raise Pushes the Idea Forward</a></li>
+<li><a href="https://introl.com/blog/spacex-million-satellite-orbital-data-center-2026">SpaceX Files for Million-Satellite Orbital Data Center</a></li>
+</ul>
+<hr />
+<p><em>报告完成日期：2026 年 5 月 25 日</em></p>
+  </article>
+  <aside class="toc-sidebar"><div class="toc"><span class="toctitle">目录</span><ul>
+<li><a href="#_2">深度调研报告</a></li>
+<li><a href="#1">第1章：太空算力概述</a><ul>
+<li><a href="#11">1.1 什么是太空算力？</a></li>
+<li><a href="#12">1.2 需求驱动：从通信到计算</a></li>
+<li><a href="#13">1.3 市场规模与增长预测</a></li>
+</ul>
+</li>
+<li><a href="#2">第2章：太空环境与技术挑战</a><ul>
+<li><a href="#21">2.1 辐射效应</a></li>
+<li><a href="#22">2.2 热管理</a></li>
+<li><a href="#23">2.3 功耗与能源限制</a></li>
+<li><a href="#24">2.4 重量与发射成本</a></li>
+</ul>
+</li>
+<li><a href="#3">第3章：国内外布局</a><ul>
+<li><a href="#31-spacex-amazon-kuipernasa">3.1 美国：SpaceX 星链、Amazon Kuiper、NASA</a></li>
+<li><a href="#32-esaoneweb">3.2 欧洲：ESA、OneWeb</a></li>
+<li><a href="#33">3.3 中国：卫星互联网星座、商业航天</a></li>
+<li><a href="#34">3.4 其他：日本、印度、俄罗斯</a></li>
+</ul>
+</li>
+<li><a href="#4">第4章：光芯片在太空中的优势</a><ul>
+<li><a href="#41">4.1 抗辐射特性</a></li>
+<li><a href="#42">4.2 低功耗</a></li>
+<li><a href="#43">4.3 高带宽密度</a></li>
+<li><a href="#44">4.4 轻量化</a></li>
+<li><a href="#45">4.5 热不敏感性（非相干架构的温度鲁棒性）</a></li>
+</ul>
+</li>
+<li><a href="#5">第5章：光计算太空化的技术路线</a><ul>
+<li><a href="#51">5.1 太空光通信（已有成熟应用）</a></li>
+<li><a href="#52">5.2 太空光计算（前沿探索）</a></li>
+<li><a href="#53">5.3 技术差距与突破点</a></li>
+</ul>
+</li>
+<li><a href="#6">第6章：前景与展望</a><ul>
+<li><a href="#61">6.1 近地轨道计算星座</a></li>
+<li><a href="#62">6.2 深空探测中的光计算</a></li>
+<li><a href="#63-">6.3 太空-地面协同计算</a></li>
+</ul>
+</li>
+<li><a href="#_3">结语</a></li>
+</ul>
+</div>
+</aside>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>Research Notes &middot; Generated on 2026-05-25</p>
+  </div>
+</footer>
+
+<script>
+
+(function() {
+  // Theme toggle
+  const btn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  function updateIcon() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+  updateIcon();
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateIcon();
+  });
+
+  // TOC active highlight on scroll
+  const toc = document.querySelector('.toc-sidebar');
+  if (toc) {
+    const links = toc.querySelectorAll('a[href^="#"]');
+    const headings = Array.from(document.querySelectorAll('article [id]'));
+    if (headings.length && links.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(l => l.style.color = '');
+            const link = toc.querySelector('a[href="#' + entry.target.id + '"]');
+            if (link) link.style.color = 'var(--accent)';
+          }
+        });
+      }, { rootMargin: '-80px 0px -60% 0px' });
+      headings.forEach(h => observer.observe(h));
+    }
+  }
+})();
+</script>
+</body>
+</html>

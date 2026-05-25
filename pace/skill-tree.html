@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>报告A：PACE 背景知识与技能进阶路线图</title>
+<style>
+
+/* ========== Variables ========== */
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --border: #d1d9e0;
+  --surface: #f6f8fa;
+  --accent: #0969da;
+  --accent-fg: #ffffff;
+  --code-bg: #f5f5f5;
+  --toc-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(31,35,40,0.12);
+  --radius: 8px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --fg: #c9d1d9;
+  --muted: #8b949e;
+  --border: #30363d;
+  --surface: #161b22;
+  --accent: #58a6ff;
+  --accent-fg: #0d1117;
+  --code-bg: #161b22;
+  --toc-bg: #161b22;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.75;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ========== Layout ========== */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+@media (max-width: 900px) {
+  .content-wrapper { flex-direction: column-reverse; gap: 20px; }
+}
+
+/* ========== Header ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+[data-theme="dark"] .site-header {
+  background: rgba(13,17,23,0.85);
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+}
+
+.site-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+#theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+#theme-toggle:hover { background: var(--border); }
+
+/* ========== Article ========== */
+article.markdown-body {
+  flex: 1;
+  min-width: 0;
+}
+
+article h1 { font-size: 2rem; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
+article h2 { font-size: 1.5rem; margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+article h3 { font-size: 1.2rem; margin-top: 1.5em; }
+article h4 { font-size: 1.05rem; }
+article a { color: var(--accent); text-decoration: none; }
+article a:hover { text-decoration: underline; }
+article img { max-width: 100%; border-radius: var(--radius); }
+article blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+article blockquote > p:first-child { margin-top: 0; }
+article blockquote > p:last-child { margin-bottom: 0; }
+article hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+/* ========== Table ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 0.92rem;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+th { background: var(--surface); font-weight: 600; }
+tr:nth-child(even) { background: rgba(150,150,150,0.04); }
+
+/* ========== Code ========== */
+code {
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 16px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+}
+pre code { padding: 0; background: none; }
+
+/* Pygments / highlight */
+.highlight { background: var(--code-bg); border-radius: var(--radius); }
+.hll { background-color: rgba(150,150,150,0.1); }
+.c, .cm, .c1, .cs { color: #6e7781; font-style: italic; }
+.k, .kc, .kd, .kn, .kp, .kr, .kt { color: #cf222e; }
+.o, .ow { color: #953800; }
+.m, .mb, .mf, .mh, .mi, .mo { color: #0550ae; }
+.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #0a3069; }
+.na, .nb, .nc, .nd, .ne, .nf, .nl, .nn, .no, .nt, .nv { color: #8250df; }
+[data-theme="dark"] .c, [data-theme="dark"] .cm, [data-theme="dark"] .c1 { color: #8b949e; }
+[data-theme="dark"] .k, [data-theme="dark"] .kc, [data-theme="dark"] .kd { color: #ff7b72; }
+[data-theme="dark"] .o, [data-theme="dark"] .ow { color: #ffa657; }
+[data-theme="dark"] .m, [data-theme="dark"] .mb { color: #79c0ff; }
+[data-theme="dark"] .s, [data-theme="dark"] .s2, [data-theme="dark"] .s1 { color: #a5d6ff; }
+[data-theme="dark"] .na, [data-theme="dark"] .nb { color: #d2a8ff; }
+
+/* ========== TOC ========== */
+.toc-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 76px;
+  align-self: flex-start;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.toc-sidebar h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.toc-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88rem;
+}
+.toc-sidebar li { margin: 6px 0; }
+.toc-sidebar a {
+  color: var(--muted);
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.toc-sidebar a:hover { color: var(--accent); background: var(--surface); }
+.toc-sidebar ul ul { padding-left: 12px; }
+
+@media (max-width: 900px) {
+  .toc-sidebar { width: 100%; position: static; max-height: none; margin-bottom: 20px; }
+}
+
+/* ========== Index Page ========== */
+.index-page { padding-top: 60px; padding-bottom: 80px; }
+.index-page h1 { font-size: 2.2rem; margin-bottom: 8px; }
+.lead { color: var(--muted); font-size: 1.15rem; margin-bottom: 40px; }
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.report-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.report-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--accent);
+}
+.report-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.report-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.report-card .meta {
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ========== Footer ========== */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-bar">
+    <a class="site-title" href="../index.html">Research Notes</a>
+    <nav class="nav-links">
+      <a href="../index.html">首页</a>
+      
+    </nav>
+    <button id="theme-toggle" aria-label="切换主题">🌙</button>
+  </div>
+</header>
+
+<main class="container content-wrapper">
+  <article class="markdown-body">
+    <h1 id="apace">报告A：PACE 背景知识与技能进阶路线图<a class="headerlink" href="#apace" title="Permanent link"></a></h1>
+<blockquote>
+<p><strong>目标读者</strong>：具备量子光学实验背景、希望系统掌握光芯片（Photonic IC）设计到系统集成全流程的研究者<br />
+<strong>覆盖范围</strong>：从理论基础 → 设计工具 → 工艺制造 → 系统集成 → 技能进阶路径</p>
+</blockquote>
+<hr />
+<h2 id="pace">第零章：前置说明——PACE 是什么？<a class="headerlink" href="#pace" title="Permanent link"></a></h2>
+<p>Lightelligence 的 <strong>PACE</strong>（Photonic Arithmetic Computing Engine）是目前公开报道中最先进的光子计算加速器之一：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>PACE</th>
+<th>PACE2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>矩阵规模</td>
+<td>64 × 64 MZI mesh</td>
+<td>128 × 128</td>
+</tr>
+<tr>
+<td>离散光子器件数</td>
+<td>&gt;12,000</td>
+<td>&gt;48,000</td>
+</tr>
+<tr>
+<td>系统时钟</td>
+<td>1 GHz</td>
+<td>2 GHz</td>
+</tr>
+<tr>
+<td>光学计算延迟</td>
+<td>150 ps</td>
+<td>~100 ps</td>
+</tr>
+<tr>
+<td>集成方式</td>
+<td>3D Flip-Chip 键合（PIC + EIC）</td>
+<td>同左</td>
+</tr>
+<tr>
+<td>应用场景</td>
+<td>Ising 求解器、AI 推理</td>
+<td>大规模优化问题</td>
+</tr>
+</tbody>
+</table>
+<p>核心思想：用 <strong>马赫-曾德尔干涉仪（MZI）网格</strong> 实现矩阵-向量乘法（MVM），将神经网络的权重矩阵编码到光路中，输入向量通过电光调制加载，输出通过光电探测器读取。</p>
+<hr />
+<h2 id="1">第1章：知识地图总览<a class="headerlink" href="#1" title="Permanent link"></a></h2>
+<h3 id="11-pace">1.1 从量子光学到 PACE 的完整知识链条<a class="headerlink" href="#11-pace" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code>量子光学实验背景
+        │
+        ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  理论基础层（第2章）                                                   │
+│  ├─ 电磁学与波导理论        ← 你的 MZI 经验直接迁移                      │
+│  ├─ 半导体物理与器件                                                  │
+│  ├─ 集成电路设计基础（模拟/混合信号）                                    │
+│  ├─ 信号处理与控制系统                                                 │
+│  └─ 机器学习与优化算法                                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│  设计工具层（第3章）                                                   │
+│  ├─ 光子设计工具链（Lumerical, IPKISS, GDSFactory）                   │
+│  ├─ 电子设计自动化（Cadence Virtuoso, Spectre）                       │
+│  ├─ 封装与热仿真                                                       │
+│  └─ 算法仿真与验证（Neurophox, MEEP）                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│  工艺与制造层（第4章）                                                   │
+│  ├─ 硅光子代工厂与 PDK（AIM, AMF, CORNERSTONE）                       │
+│  ├─ CMOS 工艺节点选择                                                   │
+│  ├─ 封装工艺（2.5D/3D, Flip-Chip, 混合键合）                          │
+│  └─ 测试与良率管理                                                       │
+├─────────────────────────────────────────────────────────────────────┤
+│  系统集成层（第5章）                                                   │
+│  ├─ 硬件-软件协同设计                                                   │
+│  ├─ 控制系统（FPGA, DAC/ADC 阵列）                                    │
+│  └─ 算法到硬件的映射（ONNX → MZI 配置）                                │
+└─────────────────────────────────────────────────────────────────────┘
+</code></pre></div>
+
+<h3 id="12">1.2 各阶段所需技能一览表<a class="headerlink" href="#12" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>核心技能</th>
+<th>工具/平台</th>
+<th>时间投入（全职）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>理论基础</td>
+<td>波导理论、半导体物理、电路设计</td>
+<td>教材、在线课程</td>
+<td>3-6 个月</td>
+</tr>
+<tr>
+<td>设计实践</td>
+<td>版图设计、仿真验证、DRC/LVS</td>
+<td>Lumerical, KLayout, GDSFactory</td>
+<td>3-6 个月</td>
+</tr>
+<tr>
+<td>电子设计</td>
+<td>TIA/ADC/DAC 设计、CMOS 布局</td>
+<td>Cadence Virtuoso</td>
+<td>6-12 个月</td>
+</tr>
+<tr>
+<td>系统集成</td>
+<td>FPGA 控制、校准算法、接口协议</td>
+<td>Xilinx Vivado, Python</td>
+<td>3-6 个月</td>
+</tr>
+<tr>
+<td>工艺制造</td>
+<td>PDK 使用、流片流程、封装测试</td>
+<td>代工厂 PDK, 测试设备</td>
+<td>6-12 个月</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2">第2章：理论基础层<a class="headerlink" href="#2" title="Permanent link"></a></h2>
+<h3 id="21">2.1 电磁学与波导理论<a class="headerlink" href="#21" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>重要性</th>
+<th>核心概念</th>
+<th>与你现有知识的关联</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>介质波导模式</strong></td>
+<td>★★★★★</td>
+<td>TE/TM 偏振、有效折射率、模式限制</td>
+<td>自由空间 MZI → 导波 MZI，物理本质相同</td>
+</tr>
+<tr>
+<td><strong>高折射率对比波导</strong></td>
+<td>★★★★★</td>
+<td>SOI 平台（220 nm Si / 2-3 μm SiO₂），n_Si~3.45</td>
+<td>限制机制从自由空间变为波导边界</td>
+</tr>
+<tr>
+<td><strong>耦合模理论（CMT）</strong></td>
+<td>★★★★★</td>
+<td>定向耦合器、功率转移、耦合长度</td>
+<td>分束比设计的关键</td>
+</tr>
+<tr>
+<td><strong>转移矩阵法（TMM）</strong></td>
+<td>★★★★☆</td>
+<td>级联器件分析、S 参数提取</td>
+<td>从单器件到系统的桥梁</td>
+</tr>
+<tr>
+<td><strong>弯曲损耗与辐射</strong></td>
+<td>★★★★☆</td>
+<td>最小弯曲半径（~5 μm）、欧拉弯曲</td>
+<td>版图面积优化的核心</td>
+</tr>
+<tr>
+<td><strong>色散工程</strong></td>
+<td>★★★☆☆</td>
+<td>群速度色散（GVD）、相位匹配</td>
+<td>WDM 系统设计</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键洞察</strong>：你在自由空间 MZI 中积累的相位控制经验（压电陶瓷、环境隔振）将直接帮助你理解片上热调相的稳定性挑战——只是控制对象从机械位移变为温度场。</p>
+<h3 id="22">2.2 半导体物理与器件<a class="headerlink" href="#22" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>应用场景</th>
+<th>物理机制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PN 结电光效应</strong></td>
+<td>高速硅调制器（载流子耗尽/注入）</td>
+<td>等离子色散效应：Δn ∝ ΔN_e, ΔN_h</td>
+</tr>
+<tr>
+<td><strong>Franz-Keldysh / QCSE</strong></td>
+<td>Ge 电吸收调制器</td>
+<td>电场调制带边吸收</td>
+</tr>
+<tr>
+<td><strong>光电探测机制</strong></td>
+<td>Ge-on-Si 光电探测器</td>
+<td>带隙工程：Ge 带隙 ~0.67 eV（C 波段敏感）</td>
+</tr>
+<tr>
+<td><strong>热光效应</strong></td>
+<td>热相位调谐器</td>
+<td>dn/dT ~ 1.8×10⁻⁴ K⁻¹（硅）</td>
+</tr>
+<tr>
+<td><strong>等离子色散效应</strong></td>
+<td>载流子注入型调制器</td>
+<td>Δn = -8.8×10⁻²² ΔN_e - 8.5×10⁻¹⁸ (ΔN_h)^0.8</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23">2.3 集成电路设计基础（模拟/混合信号）<a class="headerlink" href="#23" title="Permanent link"></a></h3>
+<p>PACE 的电子芯片（EIC）需要以下模拟电路模块：</p>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>功能</th>
+<th>设计挑战</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>跨阻放大器（TIA）</strong></td>
+<td>光电流 → 电压</td>
+<td>噪声-带宽权衡、输入电容补偿</td>
+</tr>
+<tr>
+<td><strong>限幅放大器 / AGC</strong></td>
+<td>信号整形</td>
+<td>增益控制、失调消除</td>
+</tr>
+<tr>
+<td><strong>调制器驱动器</strong></td>
+<td>驱动光调制器</td>
+<td>摆幅（2-4V for PN 结）、带宽</td>
+</tr>
+<tr>
+<td><strong>DAC</strong></td>
+<td>数字权重 → 模拟相移电压</td>
+<td>分辨率（8-16 bit）、线性度</td>
+</tr>
+<tr>
+<td><strong>ADC</strong></td>
+<td>光电探测输出数字化</td>
+<td>速度 vs 功耗、有效位数（ENOB）</td>
+</tr>
+<tr>
+<td><strong>带隙基准 / LDO</strong></td>
+<td>温度稳定偏置</td>
+<td>电源抑制比（PSR）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>推荐教材</strong>：Razavi《Design of Analog CMOS Integrated Circuits》（模拟设计圣经）、《Design of Integrated Circuits for Optical Communications》（光通信专用）。</p>
+<h3 id="24">2.4 信号处理与控制系统<a class="headerlink" href="#24" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>主题</th>
+<th>应用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>反馈控制环路</strong></td>
+<td>MZI 偏置稳定、热漂移补偿</td>
+</tr>
+<tr>
+<td><strong>卡尔曼滤波 / 状态估计</strong></td>
+<td>实时相位误差跟踪</td>
+</tr>
+<tr>
+<td><strong>自适应滤波</strong></td>
+<td>工艺偏差补偿</td>
+</tr>
+<tr>
+<td><strong>数字 PWM</strong></td>
+<td>热调相器的时分复用控制</td>
+</tr>
+</tbody>
+</table>
+<h3 id="25">2.5 机器学习与优化算法<a class="headerlink" href="#25" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>梯度下降 / SGD</strong></td>
+<td>编程 MZI 网格权重矩阵</td>
+</tr>
+<tr>
+<td><strong>原位反向传播（In-situ BP）</strong></td>
+<td>在芯片上训练光子神经网络</td>
+</tr>
+<tr>
+<td><strong>Haar 初始化</strong></td>
+<td>加速大型 MZI 网格收敛（Stanford）</td>
+</tr>
+<tr>
+<td><strong>物理感知训练（PAT）</strong></td>
+<td>将硬件非理想性纳入训练</td>
+</tr>
+<tr>
+<td><strong>随机优化</strong></td>
+<td>同时扰动所有相移器（2 次计算/迭代 vs 2N）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3">第3章：设计工具层<a class="headerlink" href="#3" title="Permanent link"></a></h2>
+<h3 id="31">3.1 光子设计工具链<a class="headerlink" href="#31" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>类型</th>
+<th>用途</th>
+<th>获取成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lumerical FDTD</strong></td>
+<td>物理仿真（时域有限差分）</td>
+<td>器件级电磁仿真：波导模式、光栅耦合器、弯曲损耗</td>
+<td>商业（$$$$）</td>
+</tr>
+<tr>
+<td><strong>Lumerical MODE / EME</strong></td>
+<td>物理仿真（本征模/特征模展开）</td>
+<td>模式求解、波导传播分析</td>
+<td>商业（$$$$）</td>
+</tr>
+<tr>
+<td><strong>Lumerical INTERCONNECT</strong></td>
+<td>电路仿真</td>
+<td>基于 S 参数的 PIC 系统仿真</td>
+<td>商业（$$$$）</td>
+</tr>
+<tr>
+<td><strong>IPKISS (Luceda)</strong></td>
+<td>参数化设计框架</td>
+<td>Python 驱动版图、层次化 PCell、多视图（版图/网表/3D）</td>
+<td>商业（$$$）</td>
+</tr>
+<tr>
+<td><strong>GDSFactory</strong></td>
+<td>开源版图</td>
+<td>Python 参数化单元、布线、PDK 集成</td>
+<td>免费</td>
+</tr>
+<tr>
+<td><strong>SiEPIC-Tools (KLayout)</strong></td>
+<td>开源版图 + 验证</td>
+<td>波导布线、DRC、网表提取、电路仿真</td>
+<td>免费</td>
+</tr>
+<tr>
+<td><strong>MEEP</strong></td>
+<td>开源 FDTD</td>
+<td>Lumerical FDTD 的免费替代</td>
+<td>免费</td>
+</tr>
+</tbody>
+</table>
+<p><strong>推荐工作流</strong>：</p>
+<div class="highlight"><pre><span></span><code>IPKISS / GDSFactory（版图）
+        ↓
+Lumerical FDTD / EME（器件仿真）
+        ↓
+S 参数提取
+        ↓
+Lumerical INTERCONNECT / Caphe（电路仿真）
+        ↓
+GDSII 导出 → 代工厂
+</code></pre></div>
+
+<h3 id="32-eda">3.2 电子设计自动化（EDA）<a class="headerlink" href="#32-eda" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>工具/流程</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cadence Virtuoso</strong></td>
+<td>模拟/混合信号 IC 设计（原理图、版图、仿真）</td>
+</tr>
+<tr>
+<td><strong>Synopsys Custom Compiler</strong></td>
+<td>替代模拟设计平台</td>
+</tr>
+<tr>
+<td><strong>Spectre / HSPICE</strong></td>
+<td>电路仿真</td>
+</tr>
+<tr>
+<td><strong>Innovus / ICC2</strong></td>
+<td>数字布局布线</td>
+</tr>
+<tr>
+<td><strong>Calibre</strong></td>
+<td>物理验证（DRC, LVS, PEX）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33">3.3 封装与热仿真<a class="headerlink" href="#33" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>挑战</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>热光漂移</td>
+<td>主动 TEC 控制、闭环反馈</td>
+</tr>
+<tr>
+<td>相移器间热串扰</td>
+<td>矩阵寻址 + 集成二极管 + PWM 控制</td>
+</tr>
+<tr>
+<td>CPO 与 GPU/ASIC 的热耦合</td>
+<td>与计算散热协同设计、AlN 衬底</td>
+</tr>
+<tr>
+<td>激光器发热</td>
+<td>独立温控区、衬底挖槽隔热</td>
+</tr>
+</tbody>
+</table>
+<h3 id="34">3.4 算法仿真与验证<a class="headerlink" href="#34" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用途</th>
+<th>链接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Neurophox</strong></td>
+<td>MZI 网格仿真与训练</td>
+<td>https://github.com/solgaardlab/neurophox</td>
+</tr>
+<tr>
+<td><strong>PyTorch / TensorFlow</strong></td>
+<td>神经网络定义与训练</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>ONNX</strong></td>
+<td>模型交换格式</td>
+<td>硬件编译器的输入</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4">第4章：工艺与制造层<a class="headerlink" href="#4" title="Permanent link"></a></h2>
+<h3 id="41-pdk">4.1 硅光子代工厂与 PDK<a class="headerlink" href="#41-pdk" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>SOI 厚度</th>
+<th>光刻</th>
+<th>关键特性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AIM Photonics (SUNY Poly)</strong></td>
+<td>220 nm</td>
+<td>300 mm, 193 nm 浸没</td>
+<td>最先进、完整 PDK</td>
+</tr>
+<tr>
+<td><strong>AMF (Singapore)</strong></td>
+<td>220 nm SOI / 400 nm SiN</td>
+<td>193 nm (Si) / 248 nm (SiN)</td>
+<td>多材料平台</td>
+</tr>
+<tr>
+<td><strong>CORNERSTONE (UK)</strong></td>
+<td>220 nm</td>
+<td>200 mm, DUV</td>
+<td>学术导向</td>
+</tr>
+<tr>
+<td><strong>IMEC (Belgium)</strong></td>
+<td>220 nm</td>
+<td>200 mm</td>
+<td>通过 ePIXfab 联盟</td>
+</tr>
+<tr>
+<td><strong>IHP (Germany)</strong></td>
+<td>220 nm</td>
+<td>248 nm</td>
+<td>兼容 BiCMOS</td>
+</tr>
+<tr>
+<td><strong>GlobalFoundries</strong></td>
+<td>170 nm</td>
+<td>300 mm</td>
+<td>商业批量</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-cmos">4.2 CMOS 工艺节点选择<a class="headerlink" href="#42-cmos" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>应用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>180 nm / 130 nm</strong></td>
+<td>TIA、限幅放大器、偏置电路</td>
+<td>成熟、低成本，许多光应用足够</td>
+</tr>
+<tr>
+<td><strong>65 nm / 45 nm</strong></td>
+<td>高速调制器驱动器、SerDes</td>
+<td>&gt;25 Gbps 必需</td>
+</tr>
+<tr>
+<td><strong>28 nm / 16 nm</strong></td>
+<td>ADC/DAC、数字信号处理</td>
+<td>先进 DSP 和控制</td>
+</tr>
+<tr>
+<td><strong>FinFET (7 nm+)</strong></td>
+<td>数字逻辑、存储</td>
+<td>未来单片集成</td>
+</tr>
+</tbody>
+</table>
+<h3 id="43-25d3d">4.3 封装工艺（2.5D/3D）<a class="headerlink" href="#43-25d3d" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>技术</th>
+<th>描述</th>
+<th>用例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>2.5D（硅中介层）</strong></td>
+<td>PIC + EIC 通过 TSV 在 Si 中介层上</td>
+<td>当前主流（TSMC COUPE, Intel EMIB）</td>
+</tr>
+<tr>
+<td><strong>3D Flip-Chip</strong></td>
+<td>微凸点垂直堆叠</td>
+<td>Lightelligence PACE 方案</td>
+</tr>
+<tr>
+<td><strong>混合键合</strong></td>
+<td>低温下直接 Cu-Cu 键合</td>
+<td>未来高密度集成</td>
+</tr>
+<tr>
+<td><strong>光子引线键合（PWB）</strong></td>
+<td>3D 打印自由曲面光波导</td>
+<td>光纤到芯片、芯片间光路由</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44">4.4 测试与良率管理<a class="headerlink" href="#44" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>设备</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>晶圆级</strong></td>
+<td>EXFO OPAL-MD, ficonTEC WLT</td>
+<td>自动化光电探针、光栅/边缘耦合</td>
+</tr>
+<tr>
+<td><strong>芯片级</strong></td>
+<td>可调激光器、偏振控制器、功率计</td>
+<td>光谱响应、插入损耗、消光比</td>
+</tr>
+<tr>
+<td><strong>封装模块</strong></td>
+<td>误码率测试仪（BERT）、示波器</td>
+<td>端到端链路表征</td>
+</tr>
+<tr>
+<td><strong>系统级</strong></td>
+<td>FPGA + DAC/ADC 测试平台</td>
+<td>算法验证、校准</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5">第5章：技能进阶路径<a class="headerlink" href="#5" title="Permanent link"></a></h2>
+<h3 id="51-3-6">5.1 入门阶段（3-6 个月）<a class="headerlink" href="#51-3-6" title="Permanent link"></a></h3>
+<p><em>充分利用你的量子光学背景</em></p>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>主题</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Yariv &amp; Yeh, &ldquo;Photonics: Optical Electronics in Modern Communications&rdquo; (6th ed.)</strong></td>
+<td>集成光学理论、波导、CMT</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>Reed &amp; Knights, &ldquo;Silicon Photonics: An Introduction&rdquo;</strong></td>
+<td>硅特定波导性质、工艺</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>Chrostowski &amp; Hochberg, &ldquo;Silicon Photonics Design: From Devices to Systems&rdquo;</strong></td>
+<td>实用设计流程、PDK、代工厂就绪设计</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><strong>edX: UBC &ldquo;Silicon Photonics Design, Fabrication and Data Analysis&rdquo;</strong></td>
+<td>带实际流片的动手课程</td>
+<td>★★★★★</td>
+</tr>
+</tbody>
+</table>
+<p><strong>阶段目标</strong>：理解 SOI 波导与自由空间光学的核心差异；能使用 KLayout + SiEPIC-Tools 绘制简单版图。</p>
+<h3 id="52-6-12">5.2 进阶阶段（6-12 个月）<a class="headerlink" href="#52-6-12" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>技能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lumerical FDTD/MODE/INTERCONNECT 教程</strong></td>
+<td>器件和电路仿真</td>
+</tr>
+<tr>
+<td><strong>GDSFactory + KLayout + SiEPIC-Tools</strong></td>
+<td>开源版图和验证</td>
+</tr>
+<tr>
+<td><strong>IPKISS 教程 (Luceda)</strong></td>
+<td>参数化设计（如有访问权限）</td>
+</tr>
+<tr>
+<td><strong>Neurophox (GitHub: solgaardlab/neurophox)</strong></td>
+<td>仿真和训练基于 MZI 的光神经网络</td>
+</tr>
+</tbody>
+</table>
+<p><strong>阶段目标</strong>：完成一个完整的光神经网络仿真项目（从 PyTorch 模型 → MZI 网格配置 → INTERCONNECT 验证）。</p>
+<h3 id="53-4-8">5.3 电子与控制（并行 4-8 个月）<a class="headerlink" href="#53-4-8" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>主题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Razavi, &ldquo;Design of Analog CMOS Integrated Circuits&rdquo; (2nd Ed.)</strong></td>
+<td>模拟 CMOS 基础</td>
+</tr>
+<tr>
+<td><strong>Razavi, &ldquo;Design of Integrated Circuits for Optical Communications&rdquo; (2nd Ed.)</strong></td>
+<td>TIA、限幅放大器、调制器驱动器</td>
+</tr>
+<tr>
+<td><strong>Razavi, &ldquo;Analysis and Design of Data Converters&rdquo; (2023)</strong></td>
+<td>ADC/DAC 架构</td>
+</tr>
+<tr>
+<td><strong>UBC ELEC 506: Photonic ICs (Dr. Sudip Shekhar)</strong></td>
+<td>CMOS-光子协同设计</td>
+</tr>
+</tbody>
+</table>
+<p><strong>阶段目标</strong>：理解 TIA 和 DAC 的噪声-带宽权衡；能用 Spectre 仿真一个简单的接收机链路。</p>
+<h3 id="54-6-18">5.4 系统与流片（6-18 个月）<a class="headerlink" href="#54-6-18" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>主题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Colorado State University 论文: &ldquo;Hardware-software codesign of silicon photonic AI accelerators&rdquo;</strong></td>
+<td>完整协同设计方法论</td>
+</tr>
+<tr>
+<td><strong>FPGA 开发 (Xilinx Zynq, Vivado)</strong></td>
+<td>控制系统实现</td>
+</tr>
+<tr>
+<td><strong>MIT INPRIS 架构论文</strong></td>
+<td>大规模相移器控制、串扰</td>
+</tr>
+<tr>
+<td><strong>Ghent University 矩阵寻址论文</strong></td>
+<td>PWM 控制、扩展到 1000+ 相移器</td>
+</tr>
+<tr>
+<td><strong>AIM Photonics / CORNERSTONE / ePIXfab MPW 流片</strong></td>
+<td>实际制造经验</td>
+</tr>
+<tr>
+<td><strong>PHIX Photonics Assembly 资源</strong></td>
+<td>封装最佳实践</td>
+</tr>
+<tr>
+<td><strong>Marvell / Intel / TSMC CPO 白皮书</strong></td>
+<td>2.5D/3D 集成</td>
+</tr>
+</tbody>
+</table>
+<p><strong>阶段目标</strong>：提交一次 MPW 流片（即使只是简单的测试结构）；搭建一个 FPGA + DAC 的相移器控制原型。</p>
+<h3 id="55">5.5 关键开源工具清单<a class="headerlink" href="#55" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用途</th>
+<th>链接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GDSFactory</strong></td>
+<td>PIC 版图</td>
+<td>https://gdsfactory.github.io/gdsfactory/</td>
+</tr>
+<tr>
+<td><strong>SiEPIC-Tools</strong></td>
+<td>KLayout 硅光子插件</td>
+<td>https://github.com/SiEPIC/SiEPIC-Tools</td>
+</tr>
+<tr>
+<td><strong>Neurophox</strong></td>
+<td>MZI 网格仿真与训练</td>
+<td>https://github.com/solgaardlab/neurophox</td>
+</tr>
+<tr>
+<td><strong>MEEP</strong></td>
+<td>开源 FDTD</td>
+<td>https://meep.readthedocs.io/</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_1">附录：关键成功因素<a class="headerlink" href="#_1" title="Permanent link"></a></h2>
+<ol>
+<li>
+<p><strong>从仿真开始</strong>：在接触任何制造之前，先在 Lumerical INTERCONNECT + Neurophox 中搭建一个完整的类 PACE 仿真系统。</p>
+</li>
+<li>
+<p><strong>先原型化控制</strong>：使用 FPGA + DAC 评估板配合商用硅光子芯片（如 SiEPICfab 或 AIM Photonics）验证控制算法。</p>
+</li>
+<li>
+<p><strong>尽早提交 MPW</strong>：即使是简单的测试结构（光栅耦合器、直波导、MZI），通过 CORNERSTONE 或 AIM Photonics 的实际流片经验将远超数月的阅读。</p>
+</li>
+<li>
+<p><strong>拥抱硬件-软件协同设计</strong>：光学部分只占挑战的 ~30%。电子控制、校准和算法映射同等关键。</p>
+</li>
+<li>
+<p><strong>加入社区</strong>：SiEPIC、AIM Photonics、ePIXfab 有活跃的用户社区。GDSFactory Slack 和 Luceda 论坛 invaluable。</p>
+</li>
+</ol>
+<hr />
+<p><em>本报告为技能路线图，侧重&rdquo;知道什么&rdquo;和&rdquo;如何学习&rdquo;。具体技术细节和参数会随工艺节点和设计目标变化，建议以目标代工厂的 PDK 文档为准。</em></p>
+  </article>
+  <aside class="toc-sidebar"><div class="toc"><span class="toctitle">目录</span><ul>
+<li><a href="#pace">第零章：前置说明——PACE 是什么？</a></li>
+<li><a href="#1">第1章：知识地图总览</a><ul>
+<li><a href="#11-pace">1.1 从量子光学到 PACE 的完整知识链条</a></li>
+<li><a href="#12">1.2 各阶段所需技能一览表</a></li>
+</ul>
+</li>
+<li><a href="#2">第2章：理论基础层</a><ul>
+<li><a href="#21">2.1 电磁学与波导理论</a></li>
+<li><a href="#22">2.2 半导体物理与器件</a></li>
+<li><a href="#23">2.3 集成电路设计基础（模拟/混合信号）</a></li>
+<li><a href="#24">2.4 信号处理与控制系统</a></li>
+<li><a href="#25">2.5 机器学习与优化算法</a></li>
+</ul>
+</li>
+<li><a href="#3">第3章：设计工具层</a><ul>
+<li><a href="#31">3.1 光子设计工具链</a></li>
+<li><a href="#32-eda">3.2 电子设计自动化（EDA）</a></li>
+<li><a href="#33">3.3 封装与热仿真</a></li>
+<li><a href="#34">3.4 算法仿真与验证</a></li>
+</ul>
+</li>
+<li><a href="#4">第4章：工艺与制造层</a><ul>
+<li><a href="#41-pdk">4.1 硅光子代工厂与 PDK</a></li>
+<li><a href="#42-cmos">4.2 CMOS 工艺节点选择</a></li>
+<li><a href="#43-25d3d">4.3 封装工艺（2.5D/3D）</a></li>
+<li><a href="#44">4.4 测试与良率管理</a></li>
+</ul>
+</li>
+<li><a href="#5">第5章：技能进阶路径</a><ul>
+<li><a href="#51-3-6">5.1 入门阶段（3-6 个月）</a></li>
+<li><a href="#52-6-12">5.2 进阶阶段（6-12 个月）</a></li>
+<li><a href="#53-4-8">5.3 电子与控制（并行 4-8 个月）</a></li>
+<li><a href="#54-6-18">5.4 系统与流片（6-18 个月）</a></li>
+<li><a href="#55">5.5 关键开源工具清单</a></li>
+</ul>
+</li>
+<li><a href="#_1">附录：关键成功因素</a></li>
+</ul>
+</div>
+</aside>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>Research Notes &middot; Generated on 2026-05-25</p>
+  </div>
+</footer>
+
+<script>
+
+(function() {
+  // Theme toggle
+  const btn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  function updateIcon() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+  updateIcon();
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateIcon();
+  });
+
+  // TOC active highlight on scroll
+  const toc = document.querySelector('.toc-sidebar');
+  if (toc) {
+    const links = toc.querySelectorAll('a[href^="#"]');
+    const headings = Array.from(document.querySelectorAll('article [id]'));
+    if (headings.length && links.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(l => l.style.color = '');
+            const link = toc.querySelector('a[href="#' + entry.target.id + '"]');
+            if (link) link.style.color = 'var(--accent)';
+          }
+        });
+      }, { rootMargin: '-80px 0px -60% 0px' });
+      headings.forEach(h => observer.observe(h));
+    }
+  }
+})();
+</script>
+</body>
+</html>
