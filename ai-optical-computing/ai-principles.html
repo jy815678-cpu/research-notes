@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 运作原理与光计算：从 Transformer 到光子芯片</title>
+<style>
+
+/* ========== Variables ========== */
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --border: #d1d9e0;
+  --surface: #f6f8fa;
+  --accent: #0969da;
+  --accent-fg: #ffffff;
+  --code-bg: #f5f5f5;
+  --toc-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(31,35,40,0.12);
+  --radius: 8px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --fg: #c9d1d9;
+  --muted: #8b949e;
+  --border: #30363d;
+  --surface: #161b22;
+  --accent: #58a6ff;
+  --accent-fg: #0d1117;
+  --code-bg: #161b22;
+  --toc-bg: #161b22;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.75;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ========== Layout ========== */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+@media (max-width: 900px) {
+  .content-wrapper { flex-direction: column-reverse; gap: 20px; }
+}
+
+/* ========== Header ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+[data-theme="dark"] .site-header {
+  background: rgba(13,17,23,0.85);
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+}
+
+.site-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+#theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+#theme-toggle:hover { background: var(--border); }
+
+/* ========== Article ========== */
+article.markdown-body {
+  flex: 1;
+  min-width: 0;
+}
+
+article h1 { font-size: 2rem; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
+article h2 { font-size: 1.5rem; margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+article h3 { font-size: 1.2rem; margin-top: 1.5em; }
+article h4 { font-size: 1.05rem; }
+article a { color: var(--accent); text-decoration: none; }
+article a:hover { text-decoration: underline; }
+article img { max-width: 100%; border-radius: var(--radius); }
+article blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+article blockquote > p:first-child { margin-top: 0; }
+article blockquote > p:last-child { margin-bottom: 0; }
+article hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+/* ========== Table ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 0.92rem;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+th { background: var(--surface); font-weight: 600; }
+tr:nth-child(even) { background: rgba(150,150,150,0.04); }
+
+/* ========== Code ========== */
+code {
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 16px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+}
+pre code { padding: 0; background: none; }
+
+/* Pygments / highlight */
+.highlight { background: var(--code-bg); border-radius: var(--radius); }
+.hll { background-color: rgba(150,150,150,0.1); }
+.c, .cm, .c1, .cs { color: #6e7781; font-style: italic; }
+.k, .kc, .kd, .kn, .kp, .kr, .kt { color: #cf222e; }
+.o, .ow { color: #953800; }
+.m, .mb, .mf, .mh, .mi, .mo { color: #0550ae; }
+.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #0a3069; }
+.na, .nb, .nc, .nd, .ne, .nf, .nl, .nn, .no, .nt, .nv { color: #8250df; }
+[data-theme="dark"] .c, [data-theme="dark"] .cm, [data-theme="dark"] .c1 { color: #8b949e; }
+[data-theme="dark"] .k, [data-theme="dark"] .kc, [data-theme="dark"] .kd { color: #ff7b72; }
+[data-theme="dark"] .o, [data-theme="dark"] .ow { color: #ffa657; }
+[data-theme="dark"] .m, [data-theme="dark"] .mb { color: #79c0ff; }
+[data-theme="dark"] .s, [data-theme="dark"] .s2, [data-theme="dark"] .s1 { color: #a5d6ff; }
+[data-theme="dark"] .na, [data-theme="dark"] .nb { color: #d2a8ff; }
+
+/* ========== TOC ========== */
+.toc-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 76px;
+  align-self: flex-start;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.toc-sidebar h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.toc-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88rem;
+}
+.toc-sidebar li { margin: 6px 0; }
+.toc-sidebar a {
+  color: var(--muted);
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.toc-sidebar a:hover { color: var(--accent); background: var(--surface); }
+.toc-sidebar ul ul { padding-left: 12px; }
+
+@media (max-width: 900px) {
+  .toc-sidebar { width: 100%; position: static; max-height: none; margin-bottom: 20px; }
+}
+
+/* ========== Index Page ========== */
+.index-page { padding-top: 60px; padding-bottom: 80px; }
+.index-page h1 { font-size: 2.2rem; margin-bottom: 8px; }
+.lead { color: var(--muted); font-size: 1.15rem; margin-bottom: 40px; }
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.report-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.report-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--accent);
+}
+.report-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.report-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.report-card .meta {
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ========== Footer ========== */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-bar">
+    <a class="site-title" href="../index.html">Research Notes</a>
+    <nav class="nav-links">
+      <a href="../index.html">首页</a>
+      
+    </nav>
+    <button id="theme-toggle" aria-label="切换主题">🌙</button>
+  </div>
+</header>
+
+<main class="container content-wrapper">
+  <article class="markdown-body">
+    <h1 id="ai-transformer">AI 运作原理与光计算：从 Transformer 到光子芯片<a class="headerlink" href="#ai-transformer" title="Permanent link"></a></h1>
+<blockquote>
+<p><strong>面向自由空间光干涉研究者的系统入门指南</strong></p>
+<p>作者：Claude（基于用户研究需求整理）<br />
+版本：v1.0<br />
+日期：2026-05-21</p>
+</blockquote>
+<hr />
+<h2 id="_1">目录<a class="headerlink" href="#_1" title="Permanent link"></a></h2>
+<ul>
+<li><a href="#第一章绪论从光干涉到-ai-计算的桥梁">第一章：绪论——从光干涉到 AI 计算的桥梁</a></li>
+<li><a href="#第二章神经网络基础为-transformer-铺垫">第二章：神经网络基础（为 Transformer 铺垫）</a></li>
+<li><a href="#第三章深度学习的发展为什么需要-transformer">第三章：深度学习的发展——为什么需要 Transformer</a></li>
+<li><a href="#第四章transformer-架构系统详解">第四章：Transformer 架构系统详解</a></li>
+<li><a href="#第五章光计算技术路线全景">第五章：光计算技术路线全景</a></li>
+<li><a href="#第六章曦智科技lightelligence-深度案例">第六章：曦智科技（Lightelligence）深度案例</a></li>
+<li><a href="#第七章自由空间光干涉与-ai-的交叉前沿">第七章：自由空间光干涉与 AI 的交叉前沿</a></li>
+<li><a href="#附录-a关键公式汇总">附录 A：关键公式汇总</a></li>
+<li><a href="#附录-b术语表中英文对照">附录 B：术语表</a></li>
+<li><a href="#附录-c推荐延伸阅读">附录 C：推荐延伸阅读</a></li>
+</ul>
+<hr />
+<h2 id="ai">第一章：绪论——从光干涉到 AI 计算的桥梁<a class="headerlink" href="#ai" title="Permanent link"></a></h2>
+<h3 id="11-ai">1.1 一个光学研究者的 AI 入口<a class="headerlink" href="#11-ai" title="Permanent link"></a></h3>
+<p>如果你研究过自由空间光干涉、空间光调制器（SLM）或衍射光学，那么你其实已经站在理解 AI 计算本质的极佳起点上。</p>
+<p>现代深度学习——无论是 ChatGPT 背后的 GPT-4，还是图像生成模型 Stable Diffusion——其核心运算可以归纳为两类：</p>
+<ol>
+<li><strong>大规模矩阵乘法（Matrix Multiplication）</strong>：输入数据与权重矩阵的线性变换</li>
+<li><strong>逐元素非线性激活（Element-wise Nonlinearity）</strong>：如 ReLU、Sigmoid、Softmax 等</li>
+</ol>
+<p>而这两者，恰好与光学的天然能力形成了完美的对应关系：</p>
+<blockquote>
+<p><strong>光的相干叠加 = 矩阵乘法</strong><br />
+多个波场的复振幅叠加，本质上就是在进行复数域的线性运算。当两束相干光在空间中叠加时，输出场的强度分布就是输入场的加权求和——这正是矩阵乘法的物理实现。</p>
+<p><strong>光学非线性介质 = 非线性激活</strong><br />
+虽然光的线性叠加天然高效，但纯光学非线性仍然是一个活跃的研究领域。从饱和吸收体到热光效应，从克尔介质到电光调制器，非线性光学元件正是实现神经网络中非线性激活函数的物理载体。</p>
+</blockquote>
+<h3 id="12-ai">1.2 AI 算力的&rdquo;指数级饥饿&rdquo;<a class="headerlink" href="#12-ai" title="Permanent link"></a></h3>
+<p>理解光计算为何在 2020 年代突然成为热门，需要先理解 AI 对算力的需求增长速度。</p>
+<p>根据 OpenAI 的研究，自 2012 年 AlexNet 以来，AI 训练所需的计算量呈指数增长：</p>
+<p>$$<br />
+\text{计算需求} \propto 2^{t / 3.4\text{个月}}<br />
+$$</p>
+<p>这意味着<strong>每 3.4 个月，AI 训练所需的计算量就要翻一倍</strong>。作为对比，摩尔定律（Moore&rsquo;s Law）的翻倍周期约为 18-24 个月。换言之，AI 算力需求的增长速度大约是晶体管密度增长速度的 <strong>5-7 倍</strong>。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">模型</th>
+<th style="text-align: left;">年份</th>
+<th style="text-align: left;">参数量</th>
+<th style="text-align: left;">训练算力（FLOPs）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">AlexNet</td>
+<td style="text-align: left;">2012</td>
+<td style="text-align: left;">6.1×10⁷</td>
+<td style="text-align: left;">4.7×10¹⁷</td>
+</tr>
+<tr>
+<td style="text-align: left;">ResNet-152</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">6.0×10⁷</td>
+<td style="text-align: left;">1.1×10²⁰</td>
+</tr>
+<tr>
+<td style="text-align: left;">Transformer (Base)</td>
+<td style="text-align: left;">2017</td>
+<td style="text-align: left;">6.5×10⁷</td>
+<td style="text-align: left;">3.3×10¹⁸</td>
+</tr>
+<tr>
+<td style="text-align: left;">GPT-3</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">1.75×10¹¹</td>
+<td style="text-align: left;">3.14×10²³</td>
+</tr>
+<tr>
+<td style="text-align: left;">GPT-4</td>
+<td style="text-align: left;">2023</td>
+<td style="text-align: left;">~1.8×10¹²</td>
+<td style="text-align: left;">~2.0×10²⁵</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gemini Ultra</td>
+<td style="text-align: left;">2024</td>
+<td style="text-align: left;">~1.0×10¹²</td>
+<td style="text-align: left;">~5.0×10²⁵</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 1.1：代表性 AI 模型的参数量与训练算力增长趋势</em></p>
+<p>这种增长速度意味着，仅仅依靠传统电子计算（CMOS 工艺的持续微缩）已经无法满足前沿 AI 的需求。我们需要新的计算范式——而光计算正是被寄予厚望的方向之一。</p>
+<h3 id="13">1.3 &ldquo;内存墙&rdquo;：电子计算的瓶颈<a class="headerlink" href="#13" title="Permanent link"></a></h3>
+<p>在深入光计算之前，还需要理解电子计算面临的另一个根本限制：<strong>内存墙（Memory Wall）</strong>。</p>
+<p>现代 AI 模型通常有数百亿甚至上万亿参数。在推理过程中，这些参数需要从内存（DRAM/HBM）加载到处理单元（GPU 的 CUDA Core/Tensor Core）中进行计算。问题在于：</p>
+<p>$$<br />
+\text{数据传输能耗} \gg \text{实际计算能耗}<br />
+$$</p>
+<p>以 GPT-3 级别的模型为例，一次前向传播需要将约 1750 亿个参数（约 350 GB，FP16）从 HBM 加载到计算核心。虽然 NVIDIA H100 的 HBM3 带宽高达 3.35 TB/s，但数据搬运的能耗仍然占据总能耗的 <strong>60%-80%</strong>。</p>
+<p>光计算的潜在优势在于：</p>
+<ul>
+<li><strong>超高带宽</strong>：光的载波频率在数百 THz 量级，理论上单根光纤可以同时传输数百个波长的信号（WDM，波分复用），总带宽可达数十 Tb/s</li>
+<li><strong>低传输损耗</strong>：光在波导中的传输损耗远低于铜线中的电阻损耗</li>
+<li><strong>天然并行性</strong>：光的叠加是并行的，一束光可以同时与多个权重&rdquo;相乘&rdquo;</li>
+<li><strong>零焦耳静态功耗</strong>：光信号本身不消耗能量（虽然光源和调制器需要能量）</li>
+</ul>
+<h3 id="14">1.4 光计算与深度学习的&rdquo;天然联姻&rdquo;<a class="headerlink" href="#14" title="Permanent link"></a></h3>
+<p>对于研究自由空间光干涉的你来说，以下几个对应关系可能会立刻引起共鸣：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">深度学习概念</th>
+<th style="text-align: left;">光学对应物</th>
+<th style="text-align: left;">物理直觉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>矩阵乘法</strong> $\mathbf{Y} = \mathbf{W}\mathbf{X}$</td>
+<td style="text-align: left;"><strong>相干叠加 / 衍射积分</strong></td>
+<td style="text-align: left;">多路光场的复振幅叠加</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>权重矩阵</strong> $\mathbf{W}$</td>
+<td style="text-align: left;"><strong>相位掩模 / 透射率分布</strong></td>
+<td style="text-align: left;">SLM 或衍射屏的相位/振幅调制</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>输入向量</strong> $\mathbf{X}$</td>
+<td style="text-align: left;"><strong>入射光场</strong></td>
+<td style="text-align: left;">平面波或高斯光束的复振幅分布</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>特征提取</strong></td>
+<td style="text-align: left;"><strong>空间频率滤波</strong></td>
+<td style="text-align: left;">4F 系统中的傅里叶平面滤波</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>并行计算</strong></td>
+<td style="text-align: left;"><strong>光的波前并行传播</strong></td>
+<td style="text-align: left;">一整个二维光场同时衍射演化</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>注意力权重</strong></td>
+<td style="text-align: left;"><strong>干涉强度分布</strong></td>
+<td style="text-align: left;">多光束干涉的归一化强度</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 1.2：深度学习概念与光学物理的对应关系</em></p>
+<h3 id="15">1.5 本文档的阅读指南<a class="headerlink" href="#15" title="Permanent link"></a></h3>
+<p>本文档按以下逻辑组织：</p>
+<ul>
+<li><strong>第二章至第四章</strong>：建立对现代 AI（尤其是 Transformer）的系统性理解。我们会从感知机出发，逐步构建到 GPT 级别的 Decoder-only 架构。每一章都会穿插与光学的类比。</li>
+<li><strong>第五章至第六章</strong>：深入光计算的技术路线，以曦智科技（Lightelligence）为核心案例，分析光电混合计算的商业化实践。</li>
+<li><strong>第七章</strong>：聚焦你最有直觉的领域——自由空间光干涉与 AI 的交叉前沿，包括衍射神经网络、4F 系统卷积、相位调制神经网络等。</li>
+</ul>
+<p><strong>建议阅读方式</strong>：<br />
+- 如果你对 AI 已有基础，可以快速浏览第二、三章，重点阅读第四章的 Transformer 详解<br />
+- 如果你对曦智科技的最新产品更感兴趣，可以直接跳到第六章<br />
+- 如果你最关心自由空间光学如何直接用于 AI 计算，第七章是为你量身定制的</p>
+<hr />
+<h2 id="transformer">第二章：神经网络基础（为 Transformer 铺垫）<a class="headerlink" href="#transformer" title="Permanent link"></a></h2>
+<h3 id="21">2.1 从感知机到多层网络<a class="headerlink" href="#21" title="Permanent link"></a></h3>
+<h4 id="211-perceptron">2.1.1 感知机（Perceptron）：最简单的&rdquo;光开关&rdquo;<a class="headerlink" href="#211-perceptron" title="Permanent link"></a></h4>
+<p>1958 年，Frank Rosenblatt 提出了感知机模型——神经网络的原型。它的数学表达极其简洁：</p>
+<p>$$<br />
+y = f\left(\sum_{i=1}^{n} w_i x_i + b\right) = f(\mathbf{w}^T \mathbf{x} + b)<br />
+$$</p>
+<p>其中：<br />
+- $x_i$ 是输入信号（类比：入射光场的各点振幅）<br />
+- $w_i$ 是权重（类比：SLM 各像素对光的调制系数）<br />
+- $b$ 是偏置（类比：背景光强或直流偏置）<br />
+- $f$ 是激活函数（类比：非线性光学效应的输入-输出关系）</p>
+<p><strong>光学类比</strong>：想象一个单像素的光学系统——入射光通过分束器分成多路，每一路用 SLM 调节相位/振幅，然后重新汇聚到探测器上。探测器的响应如果是线性的（光电二极管），那就没有激活函数；如果通过一个饱和吸收体或阈值器件，那就实现了激活函数。</p>
+<p>感知机可以学习线性可分的问题（如与、或逻辑），但无法解决异或（XOR）问题——这是 1969 年 Minsky 和 Papert 在《Perceptrons》一书中证明的。这一发现导致第一次&rdquo;AI 寒冬&rdquo;。</p>
+<h4 id="212-mlp">2.1.2 多层感知机（MLP）：隐藏层的魔法<a class="headerlink" href="#212-mlp" title="Permanent link"></a></h4>
+<p>解决 XOR 问题的关键在于引入<strong>隐藏层（Hidden Layer）</strong>：</p>
+<p>$$<br />
+\mathbf{z}^{[1]} = \mathbf{W}^{[1]} \mathbf{x} + \mathbf{b}^{[1]} \<br />
+\mathbf{a}^{[1]} = f(\mathbf{z}^{[1]}) \<br />
+\mathbf{z}^{[2]} = \mathbf{W}^{[2]} \mathbf{a}^{[1]} + \mathbf{b}^{[2]} \<br />
+\mathbf{a}^{[2]} = f(\mathbf{z}^{[2]})<br />
+$$</p>
+<p>一个具有至少一个隐藏层的 MLP，在激活函数非线性的条件下，可以<strong>逼近任意连续函数</strong>（Universal Approximation Theorem, Cybenko 1989; Hornik et al. 1989）。</p>
+<p><strong>光学类比</strong>：多层光学系统——例如多屏衍射系统。每一层衍射屏对光场进行一次线性调制（乘以复透射率）和非线性传播（菲涅尔衍射积分，本质上是线性但包含平方相位因子）。多层衍射屏的级联，就是深度神经网络在光学中的直接对应物。事实上，这正是第七章要详细讨论的 <strong>D²NN（Diffractive Deep Neural Network）</strong> 的核心思想。</p>
+<h3 id="22">2.2 激活函数：给光加&rdquo;个性&rdquo;<a class="headerlink" href="#22" title="Permanent link"></a></h3>
+<p>激活函数引入非线性，使神经网络能够学习复杂的模式。以下是几种最常见的激活函数及其物理直觉。</p>
+<h4 id="221-sigmoid-tanh">2.2.1 Sigmoid 与 tanh：平滑的饱和<a class="headerlink" href="#221-sigmoid-tanh" title="Permanent link"></a></h4>
+<p>$$<br />
+\sigma(x) = \frac{1}{1 + e^{-x}}<br />
+$$</p>
+<p>Sigmoid 将任意实数映射到 $(0, 1)$ 区间，输出可以解释为&rdquo;概率&rdquo;。tanh 则映射到 $(-1, 1)$，以零为中心。</p>
+<p><strong>物理直觉</strong>：饱和吸收体（Saturable Absorber）的透射率-光强关系就是 S 形的。低光强时吸收强（输出接近 0），高光强时饱和透明（输出接近 1）。这种非线性响应是许多超快激光器中被动锁模的核心机制。</p>
+<p><strong>问题</strong>：Sigmoid 在 $|x|$ 较大时梯度接近于零，导致<strong>梯度消失（Vanishing Gradient）</strong>问题。这在深层网络中尤为严重。</p>
+<h4 id="222-relu">2.2.2 ReLU：简单粗暴但有效<a class="headerlink" href="#222-relu" title="Permanent link"></a></h4>
+<p>$$<br />
+\text{ReLU}(x) = \max(0, x)<br />
+$$</p>
+<p>Rectified Linear Unit（修正线性单元）是 2012 年 AlexNet 之后的主流选择。</p>
+<p><strong>优点</strong>：<br />
+- 计算极其简单（一个阈值比较）<br />
+- 正半轴梯度恒为 1，不存在梯度消失<br />
+- 经验上收敛速度快</p>
+<p><strong>缺点</strong>：负半轴神经元&rdquo;死亡&rdquo;（梯度永远为 0）。Leaky ReLU、PReLU、GELU 等变体试图解决这个问题。</p>
+<p><strong>物理直觉</strong>：光学中的<strong>阈值探测器</strong>或<strong>限幅器</strong>。例如，一个光电倍增管在低于某个阈值时没有响应（或响应被截止），高于阈值时输出与输入成正比。在电光调制中，某些工作区间也近似于这种&rdquo;开/关&rdquo;行为。</p>
+<h4 id="223-softmax">2.2.3 Softmax：多类分类的概率归一化<a class="headerlink" href="#223-softmax" title="Permanent link"></a></h4>
+<p>$$<br />
+\text{Softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}<br />
+$$</p>
+<p>Softmax 将 $K$ 个任意实数转换为概率分布（和为 1，每个值在 0 到 1 之间）。</p>
+<p><strong>物理直觉</strong>：<strong>玻尔兹曼分布</strong>或<strong>热平衡态的占据概率</strong>。在统计物理中，系统处于能量为 $E_i$ 的态的概率正比于 $e^{-E_i/k_B T}$。Softmax 的&rdquo;温度&rdquo;参数（将在第四章详述）直接借用了这个概念。</p>
+<h3 id="23">2.3 损失函数：&rdquo;错得多远&rdquo;的度量<a class="headerlink" href="#23" title="Permanent link"></a></h3>
+<p>神经网络的训练就是最小化损失函数。最常见的两种损失函数：</p>
+<h4 id="231-mse">2.3.1 均方误差（MSE）：回归问题<a class="headerlink" href="#231-mse" title="Permanent link"></a></h4>
+<p>$$<br />
+\mathcal{L}<em i="1">{\text{MSE}} = \frac{1}{N} \sum</em>)^2}^{N} (y_i^{\text{pred}} - y_i^{\text{true}<br />
+$$</p>
+<p><strong>物理直觉</strong>：最小二乘拟合。你在光学实验中做数据拟合时，最小化残差平方和，本质上就是在最小化 MSE。</p>
+<h4 id="232-cross-entropy">2.3.2 交叉熵损失（Cross-Entropy）：分类问题<a class="headerlink" href="#232-cross-entropy" title="Permanent link"></a></h4>
+<p>$$<br />
+\mathcal{L}<em i="1">{\text{CE}} = -\sum</em>)}^{N} y_i^{\text{true}} \log(y_i^{\text{pred}<br />
+$$</p>
+<p>其中 $y_i^{\text{true}}$ 是 one-hot 编码的真实标签（只有一个 1，其余为 0），$y_i^{\text{pred}}$ 是 Softmax 输出的预测概率。</p>
+<p><strong>物理直觉</strong>：信息论中的<strong>相对熵</strong>（Kullback-Leibler divergence）。衡量&rdquo;真实分布&rdquo;与&rdquo;预测分布&rdquo;之间的差异。在统计物理中，这与<strong>自由能最小化</strong>有深刻联系——系统趋向于使预测与实际观测之间的&rdquo;信息差异&rdquo;最小。</p>
+<h3 id="24">2.4 反向传播：梯度下降的核心引擎<a class="headerlink" href="#24" title="Permanent link"></a></h3>
+<p>反向传播（Backpropagation）是训练神经网络的核心算法，由 Rumelhart, Hinton 和 Williams 于 1986 年系统提出。</p>
+<h4 id="241">2.4.1 链式法则的神经网络版本<a class="headerlink" href="#241" title="Permanent link"></a></h4>
+<p>给定损失函数 $\mathcal{L}$ 和网络输出 $\hat{y} = f_L(f_{L-1}(\cdots f_1(\mathbf{x})))$，我们需要计算每一层参数的梯度 $\partial \mathcal{L} / \partial \mathbf{W}^{[l]}$。</p>
+<p>根据链式法则：</p>
+<p>$$<br />
+\frac{\partial \mathcal{L}}{\partial \mathbf{W}^{[l]}} = \frac{\partial \mathcal{L}}{\partial \mathbf{z}^{[L]}} \cdot \frac{\partial \mathbf{z}^{[L]}}{\partial \mathbf{a}^{[L-1]}} \cdots \frac{\partial \mathbf{a}^{[l]}}{\partial \mathbf{z}^{[l]}} \cdot \frac{\partial \mathbf{z}^{[l]}}{\partial \mathbf{W}^{[l]}}<br />
+$$</p>
+<p>关键洞察：<strong>误差从输出层向输入层反向传播</strong>，每一步只计算局部梯度并传递。</p>
+<h4 id="242-sgd">2.4.2 梯度下降与随机梯度下降（SGD）<a class="headerlink" href="#242-sgd" title="Permanent link"></a></h4>
+<p>参数更新规则：</p>
+<p>$$<br />
+\mathbf{W}^{[l]} \leftarrow \mathbf{W}^{[l]} - \eta \frac{\partial \mathcal{L}}{\partial \mathbf{W}^{[l]}}<br />
+$$</p>
+<p>其中 $\eta$ 是学习率（Learning Rate）。</p>
+<p><strong>随机梯度下降</strong>（Stochastic Gradient Descent）每次只用一个或小批量（mini-batch）样本计算梯度，大大加快了训练速度。</p>
+<h4 id="243">2.4.3 与光学优化的类比：相位恢复算法<a class="headerlink" href="#243" title="Permanent link"></a></h4>
+<p>如果你做过相位恢复（Phase Retrieval），例如 Gerchberg-Saxton（GS）算法或误差减少算法（ER），你会发现一个惊人的相似性：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">反向传播</th>
+<th style="text-align: left;">相位恢复算法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">固定输入，优化权重</td>
+<td style="text-align: left;">固定输出（目标强度），优化相位掩模</td>
+</tr>
+<tr>
+<td style="text-align: left;">前向传播计算预测</td>
+<td style="text-align: left;">正向衍射计算输出光场</td>
+</tr>
+<tr>
+<td style="text-align: left;">计算损失（预测 vs 真实）</td>
+<td style="text-align: left;">比较输出强度与目标强度</td>
+</tr>
+<tr>
+<td style="text-align: left;">反向传播梯度</td>
+<td style="text-align: left;">反向传播相位误差</td>
+</tr>
+<tr>
+<td style="text-align: left;">更新权重（梯度下降）</td>
+<td style="text-align: left;">更新相位分布（误差减少）</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 2.1：反向传播与相位恢复算法的对应关系</em></p>
+<p>事实上，<strong>GS 算法可以看作是神经网络的特例</strong>——一个只有相位参数、约束条件特殊（振幅约束在输入和输出平面）的光学网络。而深度学习框架（如 PyTorch）已经被直接用于优化衍射光学元件（DOE）的设计。</p>
+<h3 id="25">2.5 本节小结<a class="headerlink" href="#25" title="Permanent link"></a></h3>
+<ul>
+<li>神经网络 = 线性变换（矩阵乘法）+ 非线性激活</li>
+<li>多层网络具有万能逼近能力</li>
+<li>反向传播通过链式法则高效计算梯度</li>
+<li><strong>核心洞察</strong>：神经网络训练的数学结构与光学相位恢复、自适应光学优化的数学结构高度同构</li>
+</ul>
+<hr />
+<h2 id="transformer_1">第三章：深度学习的发展——为什么需要 Transformer<a class="headerlink" href="#transformer_1" title="Permanent link"></a></h2>
+<h3 id="31-rnn-lstm">3.1 RNN 与 LSTM：序列建模的先驱<a class="headerlink" href="#31-rnn-lstm" title="Permanent link"></a></h3>
+<h4 id="311-rnn">3.1.1 循环神经网络（RNN）：记忆是有代价的<a class="headerlink" href="#311-rnn" title="Permanent link"></a></h4>
+<p>在处理序列数据（文本、语音、时间序列）时，RNN 引入了&rdquo;隐藏状态&rdquo;作为记忆：</p>
+<p>$$<br />
+\mathbf{h}<em hh="hh">t = f(\mathbf{W}</em>} \mathbf{h<em xh="xh">{t-1} + \mathbf{W}</em>_h)} \mathbf{x}_t + \mathbf{b<br />
+$$</p>
+<p>理论上，$\mathbf{h}_t$ 包含了从 $t=1$ 到 $t$ 的所有历史信息。但实际上，由于梯度消失/爆炸问题，RNN 只能有效记忆约 <strong>10-20 个时间步</strong>的信息。</p>
+<p><strong>物理直觉</strong>：RNN 像一个阻尼振荡器——每次新的输入都会改变系统状态，但早期的扰动会被逐渐遗忘。如果阻尼太大（梯度消失），信号传不远；阻尼太小（梯度爆炸），系统会发散。</p>
+<h4 id="312-lstm-gru">3.1.2 LSTM 与 GRU：门控机制的引入<a class="headerlink" href="#312-lstm-gru" title="Permanent link"></a></h4>
+<p>长短期记忆网络（LSTM, Hochreiter &amp; Schmidhuber, 1997）通过<strong>门控机制</strong>解决长程依赖问题：</p>
+<p>$$<br />
+\mathbf{f}<em t-1="t-1">t = \sigma(\mathbf{W}_f [\mathbf{h}</em>}, \mathbf{x<em t-1="t-1">t] + \mathbf{b}_f) \quad \text{(遗忘门)} \<br />
+\mathbf{i}_t = \sigma(\mathbf{W}_i [\mathbf{h}</em>}, \mathbf{x<em t-1="t-1">t] + \mathbf{b}_i) \quad \text{(输入门)} \<br />
+\mathbf{o}_t = \sigma(\mathbf{W}_o [\mathbf{h}</em>}, \mathbf{x<em t-1="t-1">t] + \mathbf{b}_o) \quad \text{(输出门)} \<br />
+\tilde{\mathbf{C}}_t = \tanh(\mathbf{W}_C [\mathbf{h}</em>}, \mathbf{x<em t-1="t-1">t] + \mathbf{b}_C) \quad \text{(候选记忆)} \<br />
+\mathbf{C}_t = \mathbf{f}_t \odot \mathbf{C}</em>_t \} + \mathbf{i}_t \odot \tilde{\mathbf{C}<br />
+\mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{C}_t)<br />
+$$</p>
+<p>其中 $\odot$ 表示逐元素乘法（Hadamard 积）。</p>
+<p>LSTM 的核心创新是<strong>细胞状态（Cell State）</strong>——一条&rdquo;传送带&rdquo;，让信息可以不加改变地流过多个时间步。</p>
+<h3 id="32-rnnlstm">3.2 RNN/LSTM 的根本困境<a class="headerlink" href="#32-rnnlstm" title="Permanent link"></a></h3>
+<p>尽管 LSTM 改善了长程依赖问题，但它有<strong>两个致命弱点</strong>：</p>
+<h4 id="321">3.2.1 无法并行化<a class="headerlink" href="#321" title="Permanent link"></a></h4>
+<p>RNN 的计算是<strong>顺序的</strong>：要计算 $\mathbf{h}<em t-1="t-1">t$，必须先计算 $\mathbf{h}</em>$。这意味着在 GPU 上训练时，无法充分利用大规模并行计算能力。</p>
+<p>对于长度为 $N$ 的序列，RNN 的计算复杂度是 $O(N)$ 的<strong>串行时间</strong>。</p>
+<h4 id="322">3.2.2 长程依赖仍然受限<a class="headerlink" href="#322" title="Permanent link"></a></h4>
+<p>即使有 LSTM 的门控机制，对于极长的序列（如一篇长文档、一段长对话），信息从序列开头传到结尾仍然很困难。</p>
+<p><strong>物理类比</strong>：想象一个由 $N$ 个耦合谐振器组成的链。如果你在链的一端施加一个信号，信号要传到另一端需要经过 $N$ 次耦合。每次耦合都有能量损耗——即使损耗很小，累积起来也会使远端信号几乎完全衰减。RNN 的信息传递就类似这种&rdquo;级联衰减&rdquo;。</p>
+<h3 id="33-cnn">3.3 CNN 的尝试与局限<a class="headerlink" href="#33-cnn" title="Permanent link"></a></h3>
+<p>卷积神经网络（CNN）在图像处理中取得了巨大成功（AlexNet、ResNet 等）。研究者尝试将 CNN 用于序列任务：</p>
+<ul>
+<li><strong>一维卷积</strong>：用大小为 $k$ 的卷积核扫描序列</li>
+<li><strong>扩张/空洞卷积（Dilated Convolution）</strong>：增大感受野，捕获更远距离的关系</li>
+</ul>
+<p>但 CNN 的问题在于：<br />
+- 感受野有限，即使扩张卷积也难以建模全局依赖<br />
+- 每次卷积只处理局部窗口内的关系</p>
+<h3 id="34">3.4 注意力机制的提出<a class="headerlink" href="#34" title="Permanent link"></a></h3>
+<h4 id="341-bahdanau-2015">3.4.1 Bahdanau 注意力（2015）<a class="headerlink" href="#341-bahdanau-2015" title="Permanent link"></a></h4>
+<p>Dzmitry Bahdanau 等人在论文《Neural Machine Translation by Jointly Learning to Align and Translate》（ICLR 2015）中首次将&rdquo;注意力&rdquo;引入神经网络：</p>
+<p>在序列到序列（Seq2Seq）模型中，解码器在生成每个输出词时，不再只依赖编码器的最后一个隐藏状态，而是<strong>动态地关注编码器所有隐藏状态的不同部分</strong>。</p>
+<p>$$<br />
+c_t = \sum_{i=1}^{T} \alpha_{ti} h_i<br />
+$$</p>
+<p>其中注意力权重：</p>
+<p>$$<br />
+\alpha_{ti} = \frac{\exp(e_{ti})}{\sum_{j=1}^{T} \exp(e_{tj})}, \quad e_{ti} = a(s_{t-1}, h_i)<br />
+$$</p>
+<p><strong>核心洞察</strong>：输出序列的每个位置都可以&rdquo;查看&rdquo;输入序列的所有位置，并根据相关性赋予不同权重。</p>
+<h4 id="342-luong-2015">3.4.2 Luong 注意力（2015）<a class="headerlink" href="#342-luong-2015" title="Permanent link"></a></h4>
+<p>Thang Luong 等人提出了更简单的&rdquo;点积注意力&rdquo;变体：</p>
+<p>$$<br />
+\text{score}(s_t, h_i) = s_t^T h_i<br />
+$$</p>
+<p>这种形式的注意力计算更高效，直接计算查询向量与键向量的点积。</p>
+<h3 id="35-attention-is-all-you-needtransformer">3.5 &ldquo;Attention Is All You Need&rdquo;：Transformer 的诞生<a class="headerlink" href="#35-attention-is-all-you-needtransformer" title="Permanent link"></a></h3>
+<p>2017 年 6 月，Google Brain 团队的 Ashish Vaswani 等人发表论文 <strong>&ldquo;Attention Is All You Need&rdquo;</strong>（NeurIPS 2017）。这篇论文是现代自然语言处理的分水岭。</p>
+<p><strong>核心主张</strong>：完全摒弃 RNN 和 CNN，仅使用<strong>自注意力机制（Self-Attention）</strong>来建模序列依赖。</p>
+<p>这一主张的激进之处在于：<br />
+- <strong>完全并行化</strong>：所有位置的注意力计算可以同时进行<br />
+- <strong>全局依赖</strong>：任意两个位置之间的距离都是 $O(1)$（直接连接）<br />
+- <strong>线性复杂度优化</strong>：后续研究（如 Linear Attention、Sparse Attention）将其从 $O(N^2)$ 降低到接近 $O(N)$</p>
+<p><strong>历史背景</strong>：<br />
+- 2017 年 Transformer 论文发表时，Google 正在开发神经机器翻译系统<br />
+- 同年，OpenAI 团队迅速跟进，基于 Transformer Decoder 开发了 GPT-1<br />
+- 2018 年，Google 发布 BERT（基于 Transformer Encoder），刷新了 11 项 NLP 基准<br />
+- 此后，GPT-2（2019）、GPT-3（2020）、GPT-4（2023）一路扩展，证明了 Scale-up 的巨大威力</p>
+<h3 id="36">3.6 本节小结<a class="headerlink" href="#36" title="Permanent link"></a></h3>
+<ul>
+<li>RNN/LSTM 无法并行，长程依赖受限</li>
+<li>CNN 的感受野有限，不适合长序列全局建模</li>
+<li>注意力机制让模型&rdquo;看到&rdquo;全局信息</li>
+<li>Transformer 完全基于自注意力，实现了并行化和全局连接</li>
+<li>2017 年的这篇论文开启了现代大语言模型时代</li>
+</ul>
+<hr />
+<h2 id="transformer_2">第四章：Transformer 架构系统详解<a class="headerlink" href="#transformer_2" title="Permanent link"></a></h2>
+<p>本章是本文档的核心技术章节。我们将从零开始，完整地拆解 Transformer 的每一个组件，配以详细的数学推导和物理类比。</p>
+<h3 id="41">4.1 整体架构<a class="headerlink" href="#41" title="Permanent link"></a></h3>
+<p>Transformer 有两种主要变体：</p>
+<h4 id="411-encoder-decoder">4.1.1 Encoder-Decoder 架构（原始设计）<a class="headerlink" href="#411-encoder-decoder" title="Permanent link"></a></h4>
+<p>原始 Transformer（Vaswani et al., 2017）用于机器翻译：</p>
+<div class="highlight"><pre><span></span><code>输入（源语言）→ [Encoder] × N → 上下文表示 → [Decoder] × N → 输出（目标语言）
+</code></pre></div>
+
+<p><strong>Encoder</strong>：<br />
+- 输入：源语言词嵌入序列<br />
+- 处理：通过 Multi-Head Self-Attention + Feed-Forward Network，逐层提取特征<br />
+- 输出：每个输入位置的上下文相关表示</p>
+<p><strong>Decoder</strong>：<br />
+- 输入：已生成的目标语言词（自回归）<br />
+- 处理：Masked Self-Attention（只能看到已生成的词）+ Cross-Attention（查看 Encoder 输出）+ Feed-Forward Network<br />
+- 输出：下一个词的概率分布</p>
+<h4 id="412-encoder-onlybert">4.1.2 Encoder-only（BERT 系列）<a class="headerlink" href="#412-encoder-onlybert" title="Permanent link"></a></h4>
+<p>BERT（Bidirectional Encoder Representations from Transformers, Devlin et al., 2018）：<br />
+- 只使用 Encoder 部分<br />
+- 双向注意力：每个位置都能看到所有其他位置<br />
+- 预训练任务：Masked Language Modeling（MLM，遮盖部分词进行预测）+ Next Sentence Prediction（NSP）<br />
+- 适合：文本分类、命名实体识别、问答等<strong>理解类</strong>任务</p>
+<h4 id="413-decoder-onlygpt">4.1.3 Decoder-only（GPT 系列）<a class="headerlink" href="#413-decoder-onlygpt" title="Permanent link"></a></h4>
+<p>GPT（Generative Pre-trained Transformer）：<br />
+- 只使用 Decoder 部分<br />
+- 单向注意力：每个位置只能看到自己和前面的位置<br />
+- 预训练任务：自回归语言建模（预测下一个词）<br />
+- 适合：文本生成、对话、代码生成等<strong>生成类</strong>任务</p>
+<p><strong>GPT-3/4、Claude、Llama 等所有现代大语言模型都是 Decoder-only 架构</strong>。</p>
+<h3 id="42-token-embedding">4.2 输入嵌入（Token Embedding）<a class="headerlink" href="#42-token-embedding" title="Permanent link"></a></h3>
+<p>文本首先需要被转换为数值向量。这个过程分为两步：</p>
+<h4 id="421-tokenization">4.2.1 分词（Tokenization）<a class="headerlink" href="#421-tokenization" title="Permanent link"></a></h4>
+<p>原始文本被分割为词片段（token）。现代模型主要使用以下方法：</p>
+<ul>
+<li><strong>BPE（Byte Pair Encoding）</strong>：GPT 系列使用。从字符开始，迭代合并最常见的字符对</li>
+<li><strong>WordPiece</strong>：BERT 使用。类似的子词分词方法</li>
+<li><strong>SentencePiece</strong>：支持多种语言，不依赖空格分词</li>
+</ul>
+<p>例如，&rdquo;unhappiness&rdquo; 可能被分为 <code>["un", "happiness"]</code> 或 <code>["un", "happ", "iness"]</code>。</p>
+<h4 id="422">4.2.2 嵌入查找<a class="headerlink" href="#422" title="Permanent link"></a></h4>
+<p>每个 token 被映射到一个 $d_{\text{model}}$ 维的稠密向量：</p>
+<p>$$<br />
+\mathbf{e}_i = \mathbf{E}[t_i]<br />
+$$</p>
+<p>其中 $\mathbf{E} \in \mathbb{R}^{|V| \times d_{\text{model}}}$ 是嵌入矩阵，$|V|$ 是词汇表大小（通常为 30,000-100,000），$d_{\text{model}}$ 是模型维度（如 768、1024、2048、4096 等）。</p>
+<p><strong>物理直觉</strong>：嵌入向量将离散的符号映射到连续的&rdquo;语义空间&rdquo;。相似的词在这个空间中的距离更近。可以类比为：将不同颜色的光映射到光谱空间的坐标——相近颜色的光在光谱上距离更近。</p>
+<h3 id="43-positional-encoding">4.3 位置编码（Positional Encoding）<a class="headerlink" href="#43-positional-encoding" title="Permanent link"></a></h3>
+<h4 id="431">4.3.1 为什么需要位置编码<a class="headerlink" href="#431" title="Permanent link"></a></h4>
+<p>Self-Attention 的一个关键特性是<strong>置换不变性（Permutation Invariance）</strong>：如果你打乱输入序列的顺序，输出只是相应地被重新排列，计算结果本身不变。</p>
+<p>但语言是有顺序的！&rdquo;猫追老鼠&rdquo;和&rdquo;老鼠追猫&rdquo;含义完全不同。因此，需要显式地注入位置信息。</p>
+<h4 id="432">4.3.2 正弦/余弦位置编码（原始设计）<a class="headerlink" href="#432" title="Permanent link"></a></h4>
+<p>原始 Transformer 使用固定位置编码：</p>
+<p>$$<br />
+\text{PE}<em _text_model="\text{model">{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d</em>\right) \}}}<br />
+\text{PE}<em _text_model="\text{model">{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d</em>\right)}}}<br />
+$$</p>
+<p>其中：<br />
+- $pos$ 是词在序列中的位置（0, 1, 2, &hellip;）<br />
+- $i$ 是维度索引（0 到 $d_{\text{model}}/2 - 1$）<br />
+- $d_{\text{model}}$ 是模型维度</p>
+<p><strong>为什么不用简单的序号编码？</strong></p>
+<p>如果直接用 $pos$ 作为编码（如位置 5 编码为 5），问题是：<br />
+1. <strong>值范围不确定</strong>：序列可能非常长，编码值可能很大<br />
+2. <strong>泛化性差</strong>：训练时最大长度为 512，测试时来了长度 600 的序列，模型没见过 600 这个值<br />
+3. <strong>相对位置不易表达</strong>：模型难以从绝对位置推导出&rdquo;A 在 B 前面 3 个位置&rdquo;这样的相对关系</p>
+<p>正弦编码的优势：</p>
+<ol>
+<li><strong>有界</strong>：所有值在 $[-1, 1]$ 之间</li>
+<li><strong>可以外推</strong>：正弦函数的周期性使得模型对未见过的长度有一定泛化能力</li>
+<li><strong>相对位置可学习</strong>：对于固定的偏移 $k$，$PE_{pos+k}$ 可以表示为 $PE_{pos}$ 的线性函数：</li>
+</ol>
+<p>$$<br />
+\begin{bmatrix} \sin(\omega_k (pos + k)) \ \cos(\omega_k (pos + k)) \end{bmatrix} = \begin{bmatrix} \cos(\omega_k k) &amp; \sin(\omega_k k) \ -\sin(\omega_k k) &amp; \cos(\omega_k k) \end{bmatrix} \begin{bmatrix} \sin(\omega_k \cdot pos) \ \cos(\omega_k \cdot pos) \end{bmatrix}<br />
+$$</p>
+<p>这个旋转矩阵的形式，正是后来 <strong>RoPE（Rotary Position Embedding）</strong> 的核心思想。</p>
+<p><strong>物理直觉</strong>：位置编码就像给每个时间/空间点打上一个&rdquo;频率标签&rdquo;。低频维度（小 $i$，大波长）编码粗略的位置信息，高频维度（大 $i$，小波长）编码精细的位置信息。这与傅里叶分析中的频率分解如出一辙——用不同频率的正弦波叠加来表示任意函数。实际上，这正是一个<strong>非均匀频率梳（Non-uniform Frequency Comb）</strong>——基频按 $1/10000^{2i/d}$ 指数衰减的频率分量集合。</p>
+<h4 id="433-rope">4.3.3 可学习位置编码与 RoPE<a class="headerlink" href="#433-rope" title="Permanent link"></a></h4>
+<ul>
+<li><strong>BERT</strong>：直接使用可学习的位置嵌入（每个位置一个向量，随机初始化，训练中学习）</li>
+<li><strong>RoPE（Rotary Position Embedding, Su et al., 2021）</strong>：将位置编码融入注意力计算本身，通过旋转矩阵实现相对位置编码。被 GPT-Neo、PaLM、Llama 等模型采用</li>
+<li><strong>ALiBi（Press et al., 2021）</strong>：直接在注意力分数上添加一个基于距离的惩罚项，无需显式位置编码</li>
+</ul>
+<h3 id="44-self-attention">4.4 自注意力机制（Self-Attention）<a class="headerlink" href="#44-self-attention" title="Permanent link"></a></h3>
+<p>这是 Transformer 最核心的组件，也是光计算加速的主要目标。</p>
+<h4 id="441-query-key-value">4.4.1 Query / Key / Value 的直觉<a class="headerlink" href="#441-query-key-value" title="Permanent link"></a></h4>
+<p>自注意力的灵感来自信息检索系统：</p>
+<ul>
+<li><strong>Query（查询）</strong>：&rdquo;我正在寻找什么？&rdquo;</li>
+<li><strong>Key（键）</strong>：&rdquo;我有什么可以提供的？&rdquo;</li>
+<li><strong>Value（值）</strong>：&rdquo;具体内容是什么？&rdquo;</li>
+</ul>
+<p>对于序列中的每个位置，模型生成一个 Query 向量。然后，用这个 Query 去&rdquo;匹配&rdquo;所有位置的 Key。匹配度高的位置，其 Value 就会被更多地采纳到当前位置的输出中。</p>
+<p><strong>你的物理直觉：波场的自相关测量</strong></p>
+<p>想象你在一个多光束干涉实验中：<br />
+- <strong>Query</strong>：当前位置的&rdquo;探测波&rdquo;<br />
+- <strong>Key</strong>：其他每个位置的&rdquo;参考波&rdquo;<br />
+- <strong>匹配度（Query · Key）</strong>：两束波的相干叠加强度——相位对齐时相长干涉（高匹配），相位反相时相消干涉（低匹配）<br />
+- <strong>Value</strong>：每个位置携带的&rdquo;信息振幅&rdquo;<br />
+- <strong>输出</strong>：所有位置的 Value 按照干涉匹配度加权叠加后的总场</p>
+<p>这与全息术中参考光与物光的干涉、以及光学相干层析（OCT）中的自相关测量有着深刻的数学同构性。</p>
+<h4 id="442-scaled-dot-product-attention">4.4.2 Scaled Dot-Product Attention：完整数学推导<a class="headerlink" href="#442-scaled-dot-product-attention" title="Permanent link"></a></h4>
+<p>给定输入矩阵 $\mathbf{X} \in \mathbb{R}^{n \times d_{\text{model}}}$（$n$ 个 token，每个 $d_{\text{model}}$ 维）。</p>
+<p><strong>第一步：线性投影生成 Q, K, V</strong></p>
+<p>$$<br />
+\mathbf{Q} = \mathbf{X} \mathbf{W}^Q, \quad \mathbf{K} = \mathbf{X} \mathbf{W}^K, \quad \mathbf{V} = \mathbf{X} \mathbf{W}^V<br />
+$$</p>
+<p>其中：<br />
+- $\mathbf{W}^Q, \mathbf{W}^K, \mathbf{W}^V \in \mathbb{R}^{d_{\text{model}} \times d_k}$ 是可学习的投影矩阵<br />
+- $\mathbf{Q}, \mathbf{K}, \mathbf{V} \in \mathbb{R}^{n \times d_k}$</p>
+<p><strong>第二步：计算注意力分数（Attention Scores）</strong></p>
+<p>$$<br />
+\mathbf{S} = \frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}<br />
+$$</p>
+<p>其中 $\mathbf{S} \in \mathbb{R}^{n \times n}$，$S_{ij}$ 表示位置 $i$ 对位置 $j$ 的&rdquo;关注度&rdquo;。</p>
+<p><strong>为什么要除以 $\sqrt{d_k}$？</strong></p>
+<p>当 $d_k$ 较大时，点积的方差会增大。假设 $q$ 和 $k$ 的每个分量是均值为 0、方差为 1 的独立随机变量，那么：</p>
+<p>$$<br />
+\text{Var}(q^T k) = \sum_{i=1}^{d_k} \text{Var}(q_i k_i) = d_k \cdot 1 \cdot 1 = d_k<br />
+$$</p>
+<p>因此 $q^T k$ 的标准差为 $\sqrt{d_k}$。除以 $\sqrt{d_k}$ 将方差归一化为 1，防止 Softmax 进入极端饱和区（梯度消失）。</p>
+<p><strong>物理直觉</strong>：这就像在干涉测量中做<strong>归一化互相关</strong>。如果不归一化，当通道数（$d_k$）增加时，累积的干涉信号幅度会自然增大，导致探测器饱和。</p>
+<p><strong>第三步：Softmax 归一化</strong></p>
+<p>$$<br />
+\mathbf{A} = \text{Softmax}(\mathbf{S}) = \text{Softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)<br />
+$$</p>
+<p>其中 $\mathbf{A} \in \mathbb{R}^{n \times n}$ 是注意力权重矩阵，每行之和为 1。</p>
+<p><strong>物理直觉</strong>：Softmax 将原始的匹配分数转换为<strong>概率分布</strong>或<strong>归一化强度分布</strong>。在多光束干涉中，如果你考虑所有光束的相对贡献，Softmax 确保了总能量守恒（权重和为 1）。更精确地说，这类似于<strong>部分相干光场的归一化互强度（Mutual Intensity）</strong>——描述部分相干光场中不同点之间的相关性。</p>
+<p><strong>温度参数的物理意义</strong>：</p>
+<p>Softmax 有一个推广形式，引入&rdquo;温度&rdquo;参数 $T$：</p>
+<p>$$<br />
+\text{Softmax}(z_i; T) = \frac{e^{z_i/T}}{\sum_j e^{z_j/T}}<br />
+$$</p>
+<ul>
+<li>高温 ($T \to \infty$)：所有权重趋近于均匀分布（$1/n$），模型&rdquo;注意力分散&rdquo;</li>
+<li>低温 ($T \to 0$)：权重集中在最大值位置，模型&rdquo;注意力尖锐&rdquo;</li>
+<li>$T=1$ 是标准 Softmax</li>
+</ul>
+<p>这与统计物理中的<strong>玻尔兹曼分布</strong>完全一致：温度越高，各能量态的占据概率越均匀；温度越低，系统越倾向于占据最低能量态。在 Transformer 中，$\sqrt{d_k}$ 的缩放扮演了类似的&rdquo;温度调节&rdquo;角色——$d_k$ 越大，等效温度越低，注意力分布越尖锐。</p>
+<p><strong>第四步：加权求和 Value</strong></p>
+<p>$$<br />
+\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \mathbf{A}\mathbf{V} = \text{Softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}<br />
+$$</p>
+<p>输出 $\in \mathbb{R}^{n \times d_k}$。每个位置的输出是所有位置 Value 的加权平均，权重由注意力矩阵决定。</p>
+<p><strong>完整公式</strong>：</p>
+<p>$$<br />
+\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}<br />
+$$</p>
+<p><strong>物理直觉的总结</strong>：</p>
+<p>自注意力机制可以被视为一个<strong>&ldquo;虚拟干涉仪阵列&rdquo;</strong>：<br />
+1. 每个位置发出一个&rdquo;探测波&rdquo;（Query）<br />
+2. 与所有位置的&rdquo;参考波&rdquo;（Key）发生干涉<br />
+3. 干涉强度（点积）决定权重<br />
+4. 最终输出是&rdquo;信息场&rdquo;（Value）按干涉权重的相干叠加</p>
+<p>这种理解对于后续分析光计算如何加速注意力机制至关重要。</p>
+<h4 id="443">4.4.3 注意力权重矩阵的可视化<a class="headerlink" href="#443" title="Permanent link"></a></h4>
+<p>注意力矩阵 $\mathbf{A}$ 是一个 $n \times n$ 的方阵。可视化后，可以清晰看到模型的&rdquo;关注模式&rdquo;：</p>
+<ul>
+<li><strong>对角线强</strong>：模型主要关注邻近的词（局部依赖）</li>
+<li><strong>垂直条纹</strong>：某些位置（如 <code>[CLS]</code> 或句末标点）被全局关注</li>
+<li><strong>块状结构</strong>：不同语义块之间互相关注</li>
+<li><strong>稀疏模式</strong>：某些头（Head）只关注特定类型的位置（如代词关注其先行词）</li>
+</ul>
+<h3 id="45-multi-head-attention">4.5 多头注意力（Multi-Head Attention）<a class="headerlink" href="#45-multi-head-attention" title="Permanent link"></a></h3>
+<h4 id="451">4.5.1 为什么需要多个头<a class="headerlink" href="#451" title="Permanent link"></a></h4>
+<p>单一的注意力机制可能只捕获一种类型的关系。多头注意力让模型<strong>在不同的&rdquo;子空间&rdquo;中并行地关注不同的信息</strong>。</p>
+<h4 id="452">4.5.2 数学定义<a class="headerlink" href="#452" title="Permanent link"></a></h4>
+<p>$$<br />
+\text{MultiHead}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\mathbf{W}^O<br />
+$$</p>
+<p>其中每个头：</p>
+<p>$$<br />
+\text{head}_i = \text{Attention}(\mathbf{Q}\mathbf{W}_i^Q, \mathbf{K}\mathbf{W}_i^K, \mathbf{V}\mathbf{W}_i^V)<br />
+$$</p>
+<p>参数维度：<br />
+- $\mathbf{W}<em _text_model="\text{model">i^Q, \mathbf{W}_i^K, \mathbf{W}_i^V \in \mathbb{R}^{d</em> / h$}} \times d_k}$，其中 $d_k = d_{\text{model}<br />
+- $\mathbf{W}^O \in \mathbb{R}^{d_{\text{model}} \times d_{\text{model}}}$</p>
+<p>原始 Transformer：$d_{\text{model}} = 512$，$h = 8$，所以 $d_k = 64$。</p>
+<p>GPT-3：$d_{\text{model}} = 12288$，$h = 96$，$d_k = 128$。</p>
+<p><strong>物理直觉</strong>：多通道并行处理。想象你有 $h$ 组独立的干涉仪阵列，每组工作在不同的&rdquo;频率通道&rdquo;（子空间）上。一组可能关注语法关系（主语-动词），另一组关注语义关系（同义词），第三组关注长程指代。这类似于：<br />
+- <strong>偏振复用</strong>：不同偏振态携带独立信息<br />
+- <strong>波长复用（WDM）</strong>：不同波长通道独立传输<br />
+- <strong>空间模式复用</strong>：不同空间模式（如光纤中的 LP 模式）独立传播</p>
+<h3 id="46">4.6 残差连接与层归一化<a class="headerlink" href="#46" title="Permanent link"></a></h3>
+<h4 id="461-residual-connection">4.6.1 残差连接（Residual Connection）<a class="headerlink" href="#461-residual-connection" title="Permanent link"></a></h4>
+<p>$$<br />
+\mathbf{x}<em _text_in="\text{in">{\text{out}} = \text{Layer}(\mathbf{x}</em>}}) + \mathbf{x}_{\text{in}<br />
+$$</p>
+<p>由 He Kaiming 等人在 ResNet（2015）中提出。核心思想：让网络学习&rdquo;残差&rdquo;（需要改变多少），而不是从零学习完整的映射。</p>
+<p><strong>为什么重要？</strong></p>
+<p>深层网络中，梯度需要通过多层反向传播。如果没有残差连接，梯度在反向传播时可能衰减或爆炸：</p>
+<p>$$<br />
+\frac{\partial \mathcal{L}}{\partial \mathbf{x}<em _text_out="\text{out">{\text{in}}} = \frac{\partial \mathcal{L}}{\partial \mathbf{x}</em>\right)}}} \cdot \left(1 + \frac{\partial \text{Layer}}{\partial \mathbf{x}_{\text{in}}<br />
+$$</p>
+<p>即使 $\partial \text{Layer} / \partial \mathbf{x}_{\text{in}}$ 很小，梯度仍然可以通过&rdquo;+1&rdquo;项直接回传。这被称为<strong>梯度高速公路（Gradient Highway）</strong>。</p>
+<p>现代大语言模型通常有 24-96 层 Transformer 块，残差连接是让这么深的网络可训练的关键。</p>
+<p><strong>物理直觉</strong>：自适应光学系统中的<strong>闭环反馈</strong>。你有一个预期的波前（输入），经过某种扰动（网络层）后产生偏差。残差连接确保你总是保留了原始参考信号，可以计算并修正偏差。</p>
+<h4 id="462-layer-normalization">4.6.2 层归一化（Layer Normalization）<a class="headerlink" href="#462-layer-normalization" title="Permanent link"></a></h4>
+<p>$$<br />
+\text{LayerNorm}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \mu}{\sqrt{\sigma^2 + \epsilon}} + \boldsymbol{\beta}<br />
+$$</p>
+<p>其中：<br />
+- $\mu = \frac{1}{d} \sum_{i=1}^{d} x_i$（当前样本所有特征的均值）<br />
+- $\sigma^2 = \frac{1}{d} \sum_{i=1}^{d} (x_i - \mu)^2$（方差）<br />
+- $\boldsymbol{\gamma}, \boldsymbol{\beta}$ 是可学习的缩放和平移参数<br />
+- $\epsilon$ 是防止除零的小常数</p>
+<p>与 Batch Normalization（对一个 batch 内的所有样本做归一化）不同，LayerNorm 对每个样本<strong>独立</strong>归一化。这对于序列任务很重要，因为不同长度的序列无法保证 batch 统计量稳定。</p>
+<p><strong>物理直觉</strong>：在光学中，你经常需要对光强进行<strong>归一化</strong>或<strong>对比度拉伸</strong>。例如，在数字全息中，CCD 记录的干涉图样可能动态范围很大，需要归一化后才能进行相位恢复。LayerNorm 就是自动学习最佳&rdquo;归一化参数&rdquo;的过程。</p>
+<h3 id="47-feed-forward-network-ffn">4.7 前馈网络（Feed-Forward Network, FFN）<a class="headerlink" href="#47-feed-forward-network-ffn" title="Permanent link"></a></h3>
+<p>每个 Transformer 块中，注意力层之后是一个全连接前馈网络：</p>
+<p>$$<br />
+\text{FFN}(\mathbf{x}) = \max(0, \mathbf{x}\mathbf{W}_1 + \mathbf{b}_1)\mathbf{W}_2 + \mathbf{b}_2<br />
+$$</p>
+<p>即：线性变换 → ReLU 激活 → 线性变换。</p>
+<p>隐藏层维度 $d_{ff}$ 通常远大于模型维度 $d_{\text{model}}$（如 $d_{\text{model}} = 512$，$d_{ff} = 2048$）。</p>
+<p><strong>为什么需要 FFN？</strong></p>
+<p>自注意力是<strong>线性</strong>的（如果忽略 Softmax）。FFN 引入了<strong>逐位置的非线性变换</strong>，使模型能够学习更复杂的函数。FFN 对每个位置独立处理，不依赖序列中的其他位置。</p>
+<p>可以证明，FFN 层承担了 Transformer 中大部分的<strong>知识存储</strong>功能。有研究表明，FFN 中的权重矩阵可以近似为<strong>键值对存储</strong>：</p>
+<p>$$<br />
+\mathbf{W}<em i="i">2 \text{ReLU}(\mathbf{x}\mathbf{W}_1) \approx \sum</em>_i} \phi_i(\mathbf{x}) \cdot \mathbf{v<br />
+$$</p>
+<p>其中每个 $\mathbf{v}_i$ 类似于一个&rdquo;知识向量&rdquo;。</p>
+<p><strong>物理直觉</strong>：FFN 就像光路中的一个<strong>非线性光学元件</strong>，如饱和吸收体、克尔介质或电光晶体。注意力层完成&rdquo;相干叠加&rdquo;（线性运算），FFN 完成&rdquo;非线性响应&rdquo;（激活）。两者交替进行，就像非线性光学中常见的&rdquo;线性传播 + 非线性相互作用&rdquo;的循环结构。</p>
+<h3 id="48-masked-self-attention-cross-attention">4.8 Masked Self-Attention 与 Cross-Attention<a class="headerlink" href="#48-masked-self-attention-cross-attention" title="Permanent link"></a></h3>
+<h4 id="481-masked-self-attentiondecoder">4.8.1 Masked Self-Attention（Decoder 独有）<a class="headerlink" href="#481-masked-self-attentiondecoder" title="Permanent link"></a></h4>
+<p>在 Decoder-only 模型（GPT）中，位置 $i$ 只能关注位置 $\leq i$ 的信息：</p>
+<p>$$<br />
+\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}} + \mathbf{M}\right)\mathbf{V}<br />
+$$</p>
+<p>其中 Mask 矩阵 $\mathbf{M}$：</p>
+<p>$$<br />
+M_{ij} = \begin{cases} 0 &amp; i \geq j \ -\infty &amp; i &lt; j \end{cases}<br />
+$$</p>
+<p>加上 $-\infty$ 后，Softmax 会将这些位置的权重变为 0：</p>
+<p>$$<br />
+e^{-\infty} = 0 \Rightarrow \text{Softmax}(z_i = -\infty) = 0<br />
+$$</p>
+<p>这确保了在生成第 $i$ 个词时，模型只能看到已经生成的词，不能&rdquo;偷看&rdquo;未来的信息。</p>
+<p><strong>物理直觉</strong>：这就像<strong>因果性约束</strong>——时间在物理学中通常有明确的因果方向。Decoder 的 Masked Attention 保证了&rdquo;未来不能影响过去&rdquo;的信息流动方向，类似于相对论中的光锥结构。</p>
+<h4 id="482-cross-attentionencoder-decoder">4.8.2 Cross-Attention（Encoder-Decoder 模型）<a class="headerlink" href="#482-cross-attentionencoder-decoder" title="Permanent link"></a></h4>
+<p>在原始 Transformer 的 Decoder 中，有一层特殊的注意力：</p>
+<p>$$<br />
+\text{CrossAttention}(\mathbf{Q}<em _text_encoder="\text{encoder">{\text{decoder}}, \mathbf{K}</em>)}}, \mathbf{V}_{\text{encoder}<br />
+$$</p>
+<p>Query 来自 Decoder 的当前状态，Key 和 Value 来自 Encoder 的输出。这让 Decoder 可以&rdquo;查询&rdquo;源语言的信息。</p>
+<p><strong>物理直觉</strong>：双光束干涉——一束光来自&rdquo;目标&rdquo;（Decoder），另一束来自&rdquo;源&rdquo;（Encoder）。两者的干涉图案决定了信息如何在两种表示之间流动。</p>
+<h3 id="49-bert-gpt">4.9 从 BERT 到 GPT：架构演变<a class="headerlink" href="#49-bert-gpt" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">BERT (2018)</th>
+<th style="text-align: left;">GPT-3 (2020)</th>
+<th style="text-align: left;">GPT-4 (2023)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">架构</td>
+<td style="text-align: left;">Encoder-only</td>
+<td style="text-align: left;">Decoder-only</td>
+<td style="text-align: left;">Decoder-only</td>
+</tr>
+<tr>
+<td style="text-align: left;">参数量</td>
+<td style="text-align: left;">3.4 亿</td>
+<td style="text-align: left;">1750 亿</td>
+<td style="text-align: left;">~1.8 万亿</td>
+</tr>
+<tr>
+<td style="text-align: left;">层数</td>
+<td style="text-align: left;">24</td>
+<td style="text-align: left;">96</td>
+<td style="text-align: left;">~120</td>
+</tr>
+<tr>
+<td style="text-align: left;">$d_{\text{model}}$</td>
+<td style="text-align: left;">1024</td>
+<td style="text-align: left;">12288</td>
+<td style="text-align: left;">~10000</td>
+</tr>
+<tr>
+<td style="text-align: left;">注意力头数</td>
+<td style="text-align: left;">16</td>
+<td style="text-align: left;">96</td>
+<td style="text-align: left;">~128</td>
+</tr>
+<tr>
+<td style="text-align: left;">上下文长度</td>
+<td style="text-align: left;">512</td>
+<td style="text-align: left;">2048</td>
+<td style="text-align: left;">128K</td>
+</tr>
+<tr>
+<td style="text-align: left;">预训练数据量</td>
+<td style="text-align: left;">33 亿词</td>
+<td style="text-align: left;">3000 亿词</td>
+<td style="text-align: left;">~13 万亿 token</td>
+</tr>
+<tr>
+<td style="text-align: left;">训练计算量</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">3.14×10²³ FLOPs</td>
+<td style="text-align: left;">~2×10²⁵ FLOPs</td>
+</tr>
+<tr>
+<td style="text-align: left;">注意力方向</td>
+<td style="text-align: left;">双向</td>
+<td style="text-align: left;">单向</td>
+<td style="text-align: left;">单向</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 4.1：代表性 Transformer 模型的规模对比</em></p>
+<p><strong>BERT 与 GPT 的本质区别</strong>：</p>
+<p>BERT 像&rdquo;完形填空&rdquo;——看完整句话后填空。适合理解任务。<br />
+GPT 像&rdquo;接龙&rdquo;——根据前文续写。适合生成任务。</p>
+<p>现代大语言模型（LLM）几乎全部选择 GPT 的 Decoder-only 路线，因为：<br />
+1. 生成能力更强<br />
+2. 预训练目标更简单（只需预测下一个词）<br />
+3. Scale-up 效果更好（涌现能力）</p>
+<h3 id="410-kv-cache">4.10 KV Cache：推理加速的关键<a class="headerlink" href="#410-kv-cache" title="Permanent link"></a></h3>
+<h4 id="4101">4.10.1 自回归生成的计算浪费<a class="headerlink" href="#4101" title="Permanent link"></a></h4>
+<p>GPT 生成文本是逐 token 进行的。假设已生成了 $k$ 个 token，要生成第 $k+1$ 个：</p>
+<p>在标准的 Self-Attention 中，第 $k+1$ 个位置的 Query 需要与<strong>所有</strong> $k+1$ 个位置的 Key 计算点积。但前 $k$ 个位置的 Key 和 Value 已经在前一步计算过了！</p>
+<p><strong>没有 KV Cache 时的计算量</strong>：<br />
+- 第 1 步：计算 1 个 token 的 KV<br />
+- 第 2 步：计算 2 个 token 的 KV<br />
+- &hellip;<br />
+- 第 $n$ 步：计算 $n$ 个 token 的 KV<br />
+- <strong>总计算量</strong>：$O(1 + 2 + \cdots + n) = O(n^2)$</p>
+<h4 id="4102-kv-cache">4.10.2 KV Cache 的优化<a class="headerlink" href="#4102-kv-cache" title="Permanent link"></a></h4>
+<p>将前 $k$ 个 token 的 Key 和 Value <strong>缓存</strong>起来：</p>
+<p>$$<br />
+\mathbf{K}<em _text_cache="\text{cache">{\text{cache}}^{(k+1)} = [\mathbf{K}</em>}}^{(k)}, \mathbf{k<em _text_cache="\text{cache">{k+1}] \<br />
+\mathbf{V}</em>}}^{(k+1)} = [\mathbf{V<em k_1="k+1">{\text{cache}}^{(k)}, \mathbf{v}</em>]<br />
+$$</p>
+<p>每一步只计算<strong>新 token</strong> 的 Q、K、V，然后复用缓存的 K、V。</p>
+<p><strong>优化后计算量</strong>：$O(n)$</p>
+<p>但 KV Cache 的代价是<strong>显存</strong>：对于 GPT-3 级别模型， batch size 为 1 时 KV Cache 需要约 2 GB 显存。对于长序列（如 128K 上下文），KV Cache 可能成为显存瓶颈。</p>
+<p>这是光计算可以发挥优势的地方：如果光芯片能以极低延迟和极高带宽存储和访问 KV Cache，将显著加速 LLM 推理。</p>
+<h3 id="411">4.11 完整前向传播流程：以翻译为例<a class="headerlink" href="#411" title="Permanent link"></a></h3>
+<p>让我们以&rdquo;我爱你&rdquo;→&rdquo;I love you&rdquo;为例，走一遍原始 Encoder-Decoder Transformer 的完整流程。</p>
+<p><strong>输入处理</strong>：<br />
+1. 分词：<code>["我", "爱", "你"]</code> → Token IDs: <code>[1024, 2048, 4096]</code><br />
+2. 嵌入查找：$3 \times 512$ 矩阵 $\mathbf{E}$<br />
+3. 加位置编码：$\mathbf{E} + \mathbf{PE}$</p>
+<p><strong>Encoder（6 层，每层）</strong>：<br />
+1. Multi-Head Self-Attention<br />
+   - Q, K, V 投影<br />
+   - Scaled Dot-Product Attention<br />
+   - 拼接 + 输出投影<br />
+   - 残差连接 + LayerNorm<br />
+2. Feed-Forward Network<br />
+   - 线性扩展 (512 → 2048)<br />
+   - ReLU<br />
+   - 线性压缩 (2048 → 512)<br />
+   - 残差连接 + LayerNorm</p>
+<p><strong>Decoder（6 层，每层）</strong>：<br />
+1. Masked Multi-Head Self-Attention（只能看已生成的目标词）<br />
+2. Cross-Attention（查看 Encoder 输出）<br />
+3. Feed-Forward Network</p>
+<p><strong>输出</strong>：<br />
+- 最后一层 Decoder 输出经过线性投影到词汇表维度<br />
+- Softmax → 概率分布<br />
+- 选择概率最高的词（或采样）</p>
+<p><strong>自回归生成</strong>：<br />
+1. 输入 <code>[BOS]</code> → 输出 &ldquo;I&rdquo;<br />
+2. 输入 <code>[BOS], "I"</code> → 输出 &ldquo;love&rdquo;<br />
+3. 输入 <code>[BOS], "I", "love"</code> → 输出 &ldquo;you&rdquo;<br />
+4. 输入 <code>[BOS], "I", "love", "you"</code> → 输出 <code>[EOS]</code>（结束）</p>
+<h3 id="412">4.12 本节小结<a class="headerlink" href="#412" title="Permanent link"></a></h3>
+<ul>
+<li>Transformer = Self-Attention + FFN + 残差连接 + LayerNorm</li>
+<li>Self-Attention 的核心：$\text{softmax}(QK^T/\sqrt{d_k})V$</li>
+<li>多头注意力并行捕获多种关系</li>
+<li>Decoder-only 架构（GPT）已成为 LLM 主流</li>
+<li>KV Cache 将推理复杂度从 $O(n^2)$ 降低到 $O(n)$</li>
+<li><strong>光计算的加速目标</strong>：$QK^T$ 矩阵乘法、Softmax、以及大规模 KV Cache 的存储和访问</li>
+</ul>
+<hr />
+<h2 id="_2">第五章：光计算技术路线全景<a class="headerlink" href="#_2" title="Permanent link"></a></h2>
+<h3 id="51">5.1 光计算的驱动力：算力需求与&rdquo;后摩尔&rdquo;时代<a class="headerlink" href="#51" title="Permanent link"></a></h3>
+<h4 id="511-ai">5.1.1 AI 算力需求的指数增长<a class="headerlink" href="#511-ai" title="Permanent link"></a></h4>
+<p>如第一章所述，AI 训练算力需求每 3.4 个月翻一倍，远超摩尔定律的 18-24 个月周期。这意味着：</p>
+<ul>
+<li>单纯依靠 CMOS 工艺微缩（更小的晶体管）已无法满足需求</li>
+<li>即使 NVIDIA 的 GPU 每代性能提升 2-3 倍，仍然追不上 AI 模型的增长速度</li>
+<li>需要<strong>新的计算范式</strong>来突破电子计算的极限</li>
+</ul>
+<h4 id="512">5.1.2 电子计算的根本限制<a class="headerlink" href="#512" title="Permanent link"></a></h4>
+<p><strong>冯·诺依曼瓶颈</strong>：<br />
+在传统的冯·诺依曼架构中，数据和指令共享同一总线。CPU/GPU 需要从内存中反复读取数据和权重，计算，写回结果。这个&rdquo;数据搬运&rdquo;过程消耗了大部分时间和能量。</p>
+<p><strong>能源危机</strong>：<br />
+一个大型 AI 数据中心（如训练 GPT-4 级别的集群）可能消耗数十兆瓦的电力。据估算，全球 AI 数据中心的电力消耗到 2027 年可能达到 <strong>85-134 TWh</strong>，相当于一个小国家的用电量。</p>
+<p><strong>物理极限</strong>：<br />
+- 晶体管尺寸已经接近原子尺度（3nm 工艺的栅极长度约 12nm，仅约 50 个硅原子）<br />
+- 量子隧穿效应导致漏电流增大<br />
+- 芯片功耗密度（功率/面积）已经接近核反应堆的级别</p>
+<h3 id="52">5.2 光计算的分类框架<a class="headerlink" href="#52" title="Permanent link"></a></h3>
+<p>光计算并非单一技术，而是一个包含多种路线的广阔领域。我们按照物理实现方式分类：</p>
+<h4 id="521-free-space-optical-computing">5.2.1 自由空间光计算（Free-Space Optical Computing）<a class="headerlink" href="#521-free-space-optical-computing" title="Permanent link"></a></h4>
+<p><strong>核心原理</strong>：利用光在自由空间中的传播和衍射来进行计算。</p>
+<p><strong>代表技术</strong>：<br />
+- <strong>衍射深度神经网络（D²NN）</strong>：通过训练 3D 衍射屏的透射率分布来实现特定计算<br />
+- <strong>4F 光学系统</strong>：在傅里叶平面放置滤波器，实现频域卷积<br />
+- <strong>空间光调制器（SLM）</strong>：可编程的相位/振幅调制，实现灵活的光学运算<br />
+- <strong>光子晶体 / 超表面（Metasurface）</strong>：亚波长结构实现精确的光场调控</p>
+<p><strong>优势</strong>：<br />
+- 天然的大规模并行性（整个二维光场同时处理）<br />
+- 不需要精密的光刻制造（相对 PIC 而言）<br />
+- 理论上可以实现任意线性变换（通过全息方法）</p>
+<p><strong>劣势</strong>：<br />
+- 系统体积大，难以集成<br />
+- 对准和稳定性要求高<br />
+- 非线性光学元件难以实现<br />
+- 可编程性有限（D²NN 一旦制造完成即固定）</p>
+<p><strong>光学类比</strong>：这是最接近你研究领域的方向。D²NN 本质上就是一个&rdquo;训练好的光学系统&rdquo;——衍射屏的相位/振幅分布对应神经网络的权重。光从输入平面传播到输出平面的过程，就是一次&rdquo;前向传播&rdquo;。</p>
+<h4 id="522-integrated-photonic-computing">5.2.2 集成光子计算（Integrated Photonic Computing）<a class="headerlink" href="#522-integrated-photonic-computing" title="Permanent link"></a></h4>
+<p><strong>核心原理</strong>：在硅光芯片（Silicon Photonic Integrated Circuit, PIC）上实现光学计算单元。</p>
+<p><strong>代表技术</strong>：<br />
+- <strong>MZI（Mach-Zehnder Interferometer）阵列</strong>：通过调节 MZI 的相位实现酉矩阵变换<br />
+- <strong>微环谐振器（MRR, Microring Resonator）阵列</strong>：利用波长选择性实现加权求和<br />
+- <strong>光波导交叉阵列</strong>：直接在波导中实现光信号的路由和混合<br />
+- <strong>硅基光电子集成电路（PIC）</strong>：将所有光学元件集成在单个硅芯片上</p>
+<p><strong>优势</strong>：<br />
+- 可规模化制造（利用成熟 CMOS 产线）<br />
+- 体积小，可封装在标准服务器中<br />
+- 可编程（通过电热或电光调谐）<br />
+- 与电子芯片可异质集成</p>
+<p><strong>劣势</strong>：<br />
+- 光学损耗随规模增大<br />
+- 需要精密温控和校准<br />
+- 光电转换仍有开销<br />
+- 制造成本较高</p>
+<p><strong>核心公司</strong>：曦智科技（Lightelligence）、Lightmatter、Intel、NVIDIA、各种学术衍生公司。</p>
+<h4 id="523-in-memory-optical-computing">5.2.3 存内光计算（In-Memory Optical Computing）<a class="headerlink" href="#523-in-memory-optical-computing" title="Permanent link"></a></h4>
+<p><strong>核心原理</strong>：将计算直接在存储单元中完成，避免数据搬运。</p>
+<p><strong>代表技术</strong>：<br />
+- <strong>光相位变化存储器（Optical PCM）</strong>：利用相变材料的折射率变化存储数据并进行运算<br />
+- <strong>光子忆阻器（Photonic Memristor）</strong>：具有记忆效应的光学器件<br />
+- <strong>光存储 + 光计算融合</strong>：在存储数据的同时完成矩阵乘法</p>
+<p><strong>优势</strong>：<br />
+- 彻底消除冯·诺依曼瓶颈<br />
+- 超高能效（计算在存储介质中就地完成）</p>
+<p><strong>劣势</strong>：<br />
+- 技术尚不成熟<br />
+- 写入速度和耐久性问题<br />
+- 可编程性和精度挑战</p>
+<h3 id="53">5.3 各路线优劣势对比<a class="headerlink" href="#53" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">自由空间光计算</th>
+<th style="text-align: left;">集成光子计算</th>
+<th style="text-align: left;">存内光计算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>速度</strong></td>
+<td style="text-align: left;">快（光速传播）</td>
+<td style="text-align: left;">很快（片上光传播）</td>
+<td style="text-align: left;">取决于存储介质</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>精度</strong></td>
+<td style="text-align: left;">中等（受衍射极限影响）</td>
+<td style="text-align: left;">中等（受噪声/串扰影响）</td>
+<td style="text-align: left;">取决于材料</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>可编程性</strong></td>
+<td style="text-align: left;">差（D²NN 固定）/好（SLM）</td>
+<td style="text-align: left;">好（电调谐）</td>
+<td style="text-align: left;">中等</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>规模化</strong></td>
+<td style="text-align: left;">差（体积大）</td>
+<td style="text-align: left;">好（芯片级集成）</td>
+<td style="text-align: left;">待验证</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>能耗</strong></td>
+<td style="text-align: left;">很低（被动运算）</td>
+<td style="text-align: left;">低（但需电热调谐）</td>
+<td style="text-align: left;">极低</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>成熟度</strong></td>
+<td style="text-align: left;">实验室阶段</td>
+<td style="text-align: left;">早期商业化</td>
+<td style="text-align: left;">研究阶段</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>非线性实现</strong></td>
+<td style="text-align: left;">困难（需要非线性介质）</td>
+<td style="text-align: left;">困难（通常需要电辅助）</td>
+<td style="text-align: left;">困难</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>与电子系统集成</strong></td>
+<td style="text-align: left;">困难</td>
+<td style="text-align: left;">好（2.5D/3D 封装）</td>
+<td style="text-align: left;">待定</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 5.1：光计算技术路线对比</em></p>
+<h3 id="54">5.4 光计算的核心挑战<a class="headerlink" href="#54" title="Permanent link"></a></h3>
+<h4 id="541-snr">5.4.1 模拟精度与信噪比（SNR）<a class="headerlink" href="#541-snr" title="Permanent link"></a></h4>
+<p>光计算本质上是<strong>模拟计算</strong>。光场的振幅/相位是连续变量，不像数字电路有确定的 0 和 1。</p>
+<p><strong>噪声来源</strong>：<br />
+- 光源强度涨落（相对强度噪声 RIN）<br />
+- 散粒噪声（Shot Noise）：光子的量子本质导致 $n$ 个光子的标准差为 $\sqrt{n}$<br />
+- 热噪声（Johnson-Nyquist Noise）<br />
+- 串扰（Crosstalk）：相邻波导/光束之间的能量泄漏<br />
+-  fabrication 不均匀性：PIC 中的波导参数存在工艺偏差</p>
+<p><strong>精度限制</strong>：</p>
+<p>数字计算（FP32）有约 7 位十进制精度。光计算目前能达到的有效精度通常为 <strong>4-8 bit</strong>，这限制了可处理的神经网络规模和应用场景。</p>
+<p><strong>应对策略</strong>：<br />
+- 量化感知训练（QAT）：训练时模拟低精度，让网络适应噪声<br />
+- 噪声抑制算法<br />
+- 混合精度：光芯片做低精度大规模计算，电芯片做高精度小范围修正</p>
+<h4 id="542">5.4.2 非线性激活的光学实现<a class="headerlink" href="#542" title="Permanent link"></a></h4>
+<p>这是光计算的最大瓶颈之一。</p>
+<p><strong>为什么非线性难？</strong></p>
+<p>光在介质中的传播通常是线性的（叠加原理）。实现非线性需要：<br />
+- <strong>高功率密度</strong>（克尔效应：$n = n_0 + n_2 I$，需要足够强的光强 $I$）<br />
+- <strong>特殊材料</strong>（如石墨烯、二维材料、量子点，可与光发生强非线性相互作用）<br />
+- <strong>电光混合</strong>：光做线性运算，电做非线性激活，然后转换回光（光电混合架构）</p>
+<p>目前最接近商用的方案是<strong>光电混合</strong>：光芯片负责矩阵乘法等线性运算，电芯片负责 ReLU 等非线性激活。曦智科技、Lightmatter 等公司都采用了这一策略。</p>
+<h4 id="543">5.4.3 光电转换开销<a class="headerlink" href="#543" title="Permanent link"></a></h4>
+<p>光计算不是孤立的——数据通常以电子形式存在于内存中，需要转换为光信号才能进入光计算单元，计算结果又需要转回电信号。</p>
+<p><strong>E/O 转换（电→光）</strong>：<br />
+- 激光器调制（直接调制或外调制）<br />
+- 功耗：每个通道约 1-10 mW</p>
+<p><strong>O/E 转换（光→电）</strong>：<br />
+- 光电探测器（Photodetector, PD）<br />
+- 功耗：每个通道约 0.1-1 mW<br />
+- ADC（模数转换）：将模拟光电流转为数字信号，这是主要瓶颈之一</p>
+<p><strong>优化方向</strong>：<br />
+- <strong>共封装光学（CPO, Co-Packaged Optics）</strong>：将光模块直接封装在芯片旁边，缩短电互连距离<br />
+- <strong>低功耗 E/O、O/E 器件</strong>：如锗硅探测器、微盘激光器<br />
+- <strong>模拟域计算</strong>：尽量在光/模拟域中完成更多运算，减少 ADC/DAC 次数</p>
+<h4 id="544">5.4.4 可编程性与灵活性<a class="headerlink" href="#544" title="Permanent link"></a></h4>
+<p>早期光计算系统（如 D²NN）一旦制造完成，权重就固定了，只能执行一个特定任务。</p>
+<p><strong>可编程性解决方案</strong>：<br />
+- <strong>电光调制 MZI 阵列</strong>：通过电热或电光效应实时调节相位，改变传输矩阵<br />
+- <strong>SLM</strong>：空间光调制器可以实时更新相位/振幅图案<br />
+- <strong>可重构 PIC</strong>：片上微加热器阵列实现快速重配置<br />
+- <strong>软件定义光计算</strong>：编译器将神经网络权重自动映射到光芯片的物理参数</p>
+<hr />
+<h2 id="lightelligence">第六章：曦智科技（Lightelligence）深度案例<a class="headerlink" href="#lightelligence" title="Permanent link"></a></h2>
+<h3 id="61">6.1 公司背景与发展历程<a class="headerlink" href="#61" title="Permanent link"></a></h3>
+<h4 id="611-mit">6.1.1 起源：MIT 沈亦晨团队<a class="headerlink" href="#611-mit" title="Permanent link"></a></h4>
+<p>曦智科技（Lightelligence）于 <strong>2017 年</strong>由 MIT 研究团队创立，核心创始人 <strong>沈亦晨（Yichen Shen）</strong> 在 MIT 读博期间发表了多篇光子计算的重要论文。</p>
+<p><strong>关键里程碑</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">时间</th>
+<th style="text-align: left;">事件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">2017 年</td>
+<td style="text-align: left;">公司成立，获种子轮融资</td>
+</tr>
+<tr>
+<td style="text-align: left;">2019 年</td>
+<td style="text-align: left;">发布首款光子计算原型</td>
+</tr>
+<tr>
+<td style="text-align: left;">2021 年</td>
+<td style="text-align: left;"><strong>PACE（Photonic Arithmetic Computing Engine）</strong> 发布——64×64 光学矩阵，&gt;10,000 个光子器件</td>
+</tr>
+<tr>
+<td style="text-align: left;">2022 年</td>
+<td style="text-align: left;">PACE 实现首次客户收入</td>
+</tr>
+<tr>
+<td style="text-align: left;">2023 年</td>
+<td style="text-align: left;"><strong>OptiHummingbird（蜂鸟）</strong> 发布——首款 oNOC 产品，64 计算核心</td>
+</tr>
+<tr>
+<td style="text-align: left;">2024 年</td>
+<td style="text-align: left;">光互连业务实现初步商业化；光子计算芯片出货量全球第一</td>
+</tr>
+<tr>
+<td style="text-align: left;">2025 年</td>
+<td style="text-align: left;"><strong>PACE 2（曦智天枢）</strong> 发布——全球首款 3D TSV 封装光电混合计算卡，128×128 光子矩阵；<strong>LightSphere X（光跃）</strong> 发布——分布式光互连 GPU 超节点方案</td>
+</tr>
+<tr>
+<td style="text-align: left;">2026 年 4 月</td>
+<td style="text-align: left;"><strong>在港交所上市</strong>（股票代码：01879.HK），开盘价暴涨 380%，市值峰值约 700 亿港元，被称为&rdquo;全球 AI 硅光芯片第一股&rdquo;</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 6.1：曦智科技发展历程</em></p>
+<h4 id="612">6.1.2 融资与商业化<a class="headerlink" href="#612" title="Permanent link"></a></h4>
+<p>根据招股书及公开信息：<br />
+- <strong>2025 年营收</strong>：约 <strong>1.06 亿元人民币</strong>，同比增长 <strong>76.7%</strong><br />
+- 光互连业务（Scale-up）：8,430 万元（占 71%）<br />
+- 光子计算业务：2,020 万元（占 19%）<br />
+- 在中国独立 Scale-up 光互连市场占有率 <strong>88.3%</strong>（2025 年）<br />
+- 已部署 <strong>3 个千卡级 GPU 集群</strong> 的光互连方案</p>
+<h4 id="613">6.1.3 技术体系：三大核心技术<a class="headerlink" href="#613" title="Permanent link"></a></h4>
+<p>曦智科技的所有产品基于三大自研技术栈：</p>
+<ol>
+<li><strong>oMAC（Optical Multiply-Accumulate）</strong>：光子乘加运算核心</li>
+<li><strong>oNOC（Optical Network-on-Chip）</strong>：片上光网络互连</li>
+<li><strong>oNET（Optical Inter-Chip Networking）</strong>：片间光网络互连</li>
+</ol>
+<h3 id="62">6.2 技术路线总览：光电混合架构<a class="headerlink" href="#62" title="Permanent link"></a></h3>
+<p>曦智科技的核心理念是<strong>&ldquo;光电混合&rdquo;（Hybrid Electro-Optical）</strong>：不是用光完全替代电，而是让光做它最擅长的事情（大规模并行线性运算），让电做它最擅长的事情（非线性激活、逻辑控制、存储）。</p>
+<p><strong>架构原则</strong>：</p>
+<p>$$<br />
+\text{光电混合} = \underbrace{\text{光域：线性运算}}<em _text_激活函数、存储、调度="\text{激活函数、存储、调度">{\text{矩阵乘法、向量点积}} + \underbrace{\text{电域：非线性 + 控制}}</em>}<br />
+$$</p>
+<p>这种架构选择是务实的——当前阶段纯光计算在非线性实现和灵活性上仍有瓶颈，而光电混合可以扬长避短，快速实现商业化。</p>
+<h3 id="63-onoc">6.3 核心产品一：光子网络芯片（oNOC）<a class="headerlink" href="#63-onoc" title="Permanent link"></a></h3>
+<h4 id="631">6.3.1 问题背景：多卡通信瓶颈<a class="headerlink" href="#631" title="Permanent link"></a></h4>
+<p>现代 AI 训练使用数千甚至数万张 GPU。这些 GPU 需要频繁交换数据（如梯度同步、激活值传输）。传统电互连（PCIe、NVLink、InfiniBand）面临：</p>
+<ul>
+<li><strong>带宽瓶颈</strong>：电信号的频率受限于铜线的 RC 延迟</li>
+<li><strong>能耗问题</strong>：远距离电传输功耗巨大</li>
+<li><strong>延迟问题</strong>：电信号在铜线中的传播速度约为光速的 1/3-1/2</li>
+</ul>
+<h4 id="632-onoc">6.3.2 oNOC 的技术原理<a class="headerlink" href="#632-onoc" title="Permanent link"></a></h4>
+<p><strong>oNOC（Optical Network-on-Chip）</strong> 用光互连替代芯片间/板间的电互连：</p>
+<ul>
+<li><strong>光传输</strong>：数据通过光纤/波导传输，带宽可达数十 Tb/s</li>
+<li><strong>光交换</strong>：光开关实现数据的路由，不需要 O/E/O 转换</li>
+<li><strong>拓扑</strong>：通常采用环形、网格或全光交换网络</li>
+</ul>
+<p><strong>与电互连技术对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">技术</th>
+<th style="text-align: left;">类型</th>
+<th style="text-align: left;">带宽</th>
+<th style="text-align: left;">延迟</th>
+<th style="text-align: left;">功耗</th>
+<th style="text-align: left;">距离</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">PCIe 5.0</td>
+<td style="text-align: left;">电</td>
+<td style="text-align: left;">128 GB/s (×16)</td>
+<td style="text-align: left;">~100 ns</td>
+<td style="text-align: left;">高</td>
+<td style="text-align: left;">&lt;30 cm</td>
+</tr>
+<tr>
+<td style="text-align: left;">NVLink 4</td>
+<td style="text-align: left;">电</td>
+<td style="text-align: left;">900 GB/s</td>
+<td style="text-align: left;">~50 ns</td>
+<td style="text-align: left;">高</td>
+<td style="text-align: left;">&lt;1 m</td>
+</tr>
+<tr>
+<td style="text-align: left;">InfiniBand NDR</td>
+<td style="text-align: left;">电/光混合</td>
+<td style="text-align: left;">400 Gb/s/端口</td>
+<td style="text-align: left;">~600 ns</td>
+<td style="text-align: left;">中高</td>
+<td style="text-align: left;">&lt;10 m</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>oNOC（光）</strong></td>
+<td style="text-align: left;"><strong>光</strong></td>
+<td style="text-align: left;"><strong>多 Tb/s</strong></td>
+<td style="text-align: left;"><strong>~ns 级</strong></td>
+<td style="text-align: left;"><strong>低（传输）</strong></td>
+<td style="text-align: left;"><strong>百米级</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>表 6.2：互连技术对比</em></p>
+<h4 id="633-optihummingbird-lightsphere-x">6.3.3 产品形态：OptiHummingbird 与 LightSphere X<a class="headerlink" href="#633-optihummingbird-lightsphere-x" title="Permanent link"></a></h4>
+<p><strong>OptiHummingbird（蜂鸟）</strong>：<br />
+- 全球首款基于 oNOC 的 AI 推理加速卡<br />
+- 64 个计算核心<br />
+- PCIe Gen3 接口<br />
+- 被动散热，功耗仅 65W<br />
+- 低延迟、高带宽</p>
+<p><strong>LightSphere X（光跃，2025 年发布）</strong>：<br />
+- 全球首款分布式光互连 + 光交换 GPU 超节点方案<br />
+- 配置：LightSphere LP64、LightSphere OP32 等<br />
+- 相比电交换，传输延迟降低 <strong>&gt;90%</strong><br />
+- 模型 FLOPs 利用率（MFU）提升 <strong>&gt;50%</strong><br />
+- 与壁仞科技（Biren）合作推出 <strong>128 卡 LightSphere 超节点</strong><br />
+- 与沐曦（MetaX）合作 xPU-CPO 方案</p>
+<h4 id="634-xpu-cpo">6.3.4 xPU-CPO：共封装光学的探索<a class="headerlink" href="#634-xpu-cpo" title="Permanent link"></a></h4>
+<p>2025 年，曦智科技发布了中国首个 <strong>xPU-CPO（Co-Packaged Optics）</strong> 原型，实现了 GPU 直连光 I/O：</p>
+<ul>
+<li>将光模块直接封装在 GPU 封装基板上</li>
+<li>消除 PCB 走线带来的电信号损耗</li>
+<li>验证了从 xPU 直接出光的可行性</li>
+</ul>
+<h3 id="64-pace">6.4 核心产品二：光子计算加速器（PACE 系列）<a class="headerlink" href="#64-pace" title="Permanent link"></a></h3>
+<h4 id="641-pace">6.4.1 PACE 系列演进<a class="headerlink" href="#641-pace" title="Permanent link"></a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">产品</th>
+<th style="text-align: left;">时间</th>
+<th style="text-align: left;">光子矩阵规模</th>
+<th style="text-align: left;">光子器件数</th>
+<th style="text-align: left;">封装</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">PACE</td>
+<td style="text-align: left;">2021</td>
+<td style="text-align: left;">64×64</td>
+<td style="text-align: left;">&gt;10,000</td>
+<td style="text-align: left;">2.5D 倒装焊</td>
+<td style="text-align: left;">首次集成</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>PACE 2（曦智天枢）</strong></td>
+<td style="text-align: left;"><strong>2025.03</strong></td>
+<td style="text-align: left;"><strong>128×128</strong></td>
+<td style="text-align: left;"><strong>&gt;40,000</strong></td>
+<td style="text-align: left;"><strong>3D TSV</strong></td>
+<td style="text-align: left;">全球首款 3D 封装；支持商用 AI 算法</td>
+</tr>
+<tr>
+<td style="text-align: left;">PACE 3</td>
+<td style="text-align: left;">2026H1（Tape-out）</td>
+<td style="text-align: left;">更大规模</td>
+<td style="text-align: left;">更多</td>
+<td style="text-align: left;">先进封装</td>
+<td style="text-align: left;">聚焦 LLM 推理解码</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 6.3：PACE 系列产品演进</em></p>
+<h4 id="642-mzi">6.4.2 MZI 阵列：矩阵乘法的物理实现<a class="headerlink" href="#642-mzi" title="Permanent link"></a></h4>
+<p>PACE 的核心计算单元是 <strong>MZI（Mach-Zehnder Interferometer，马赫-曾德尔干涉仪）阵列</strong>。</p>
+<p><strong>你的视角：MZI 就是你熟悉的 MZ 干涉仪，只是被做在芯片上。</strong></p>
+<p><strong>基本原理</strong>：</p>
+<p>一个 MZI 由两个 3dB 耦合器和两个相位调制臂组成：</p>
+<p>$$<br />
+\begin{bmatrix} E_{out1} \ E_{out2} \end{bmatrix} = \mathbf{U}(\theta, \phi) \begin{bmatrix} E_{in1} \ E_{in2} \end{bmatrix}<br />
+$$</p>
+<p>其中传输矩阵：</p>
+<p>$$<br />
+\mathbf{U}(\theta, \phi) = e^{i\phi} \begin{bmatrix} e^{i\theta} \sin(\theta/2) &amp; e^{i\theta} \cos(\theta/2) \ \cos(\theta/2) &amp; -\sin(\theta/2) \end{bmatrix}<br />
+$$</p>
+<p>通过调节两个相位（$\theta$ 和 $\phi$），一个 MZI 可以实现任意 $2 \times 2$ 的酉变换。</p>
+<p><strong>扩展到 $N \times N$ 矩阵</strong>：</p>
+<p>Reck decomposition（1994）和 Clements decomposition（2016）证明：</p>
+<blockquote>
+<p>任意 $N \times N$ 酉矩阵，可以被分解为 $\frac{N(N-1)}{2}$ 个 $2 \times 2$ MZI 的级联。</p>
+</blockquote>
+<p>具体地，一个三角网格（Reck）或矩形网格（Clements）的 MZI 阵列可以实现：</p>
+<p>$$<br />
+\mathbf{U} = \mathbf{D} \cdot \prod_{i,j} \mathbf{U}<em ij="ij">{ij}(\theta</em>)}, \phi_{ij<br />
+$$</p>
+<p>其中 $\mathbf{D}$ 是对角相位矩阵。</p>
+<p><strong>在 PACE 中的实现</strong>：</p>
+<ul>
+<li>输入光信号被分配到多个波导通道</li>
+<li>每对通道经过一个 MZI，通过电热调相器调节相位</li>
+<li>级联的 MZI 网格实现矩阵乘法</li>
+<li>输出光被光电探测器接收，转为电信号</li>
+</ul>
+<p><strong>非酉矩阵的实现</strong>：</p>
+<p>神经网络权重通常不是酉矩阵。实现任意矩阵需要：<br />
+- <strong>SVD 分解</strong>：$\mathbf{W} = \mathbf{U}\mathbf{\Sigma}\mathbf{V}^\dagger$，其中 $\mathbf{U}$ 和 $\mathbf{V}$ 是酉矩阵（用 MZI 实现），$\mathbf{\Sigma}$ 是对角矩阵（用光衰减器实现）<br />
+- 或者直接使用非相干光方案（如 PACE 采用的方案）</p>
+<h4 id="643-pace">6.4.3 非相干光方案：PACE 的技术选择<a class="headerlink" href="#643-pace" title="Permanent link"></a></h4>
+<p>值得注意的是，PACE 采用的是<strong>非相干光</strong>方案（oMAC）：</p>
+<ul>
+<li>利用分束器（Beam Splitter）和光电探测器直接做强度域的乘加运算</li>
+<li>而非 MZI 的相干干涉方案</li>
+</ul>
+<p><strong>为什么选择非相干？</strong></p>
+<p>根据 2025 年发表于 <em>Nature</em> 的论文（Hua et al., Lightelligence）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">相干光方案</th>
+<th style="text-align: left;">非相干光方案（PACE）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">相位噪声敏感性</td>
+<td style="text-align: left;"><strong>高</strong>（需要主动相位稳定）</td>
+<td style="text-align: left;"><strong>低</strong>（强度检测不受相位影响）</td>
+</tr>
+<tr>
+<td style="text-align: left;">温度敏感性</td>
+<td style="text-align: left;">高</td>
+<td style="text-align: left;">低</td>
+</tr>
+<tr>
+<td style="text-align: left;">校准复杂度</td>
+<td style="text-align: left;">复杂（需要相位校准）</td>
+<td style="text-align: left;">简单</td>
+</tr>
+<tr>
+<td style="text-align: left;">精度</td>
+<td style="text-align: left;">理论更高（但受噪声限制）</td>
+<td style="text-align: left;">足够（商用 AI 算法可跑）</td>
+</tr>
+<tr>
+<td style="text-align: left;">规模化</td>
+<td style="text-align: left;">困难</td>
+<td style="text-align: left;">相对容易</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 6.4：相干 vs 非相干光计算方案对比</em></p>
+<p>非相干方案牺牲了部分理论上的并行度（不能利用相位的额外维度），但获得了<strong>热稳定性</strong>和<strong>校准简易性</strong>，这对于商业化至关重要。</p>
+<h4 id="644-pace-2">6.4.4 PACE 2 的技术规格<a class="headerlink" href="#644-pace-2" title="Permanent link"></a></h4>
+<ul>
+<li><strong>128×128 光子矩阵</strong>：全球规模最大的集成光子计算矩阵</li>
+<li><strong>&gt;40,000 个光子器件</strong>：单片集成</li>
+<li><strong>3D TSV 封装</strong>：硅光 PIC 与 CMOS 控制芯片垂直互连</li>
+<li><strong>可编程系数</strong>：支持权重动态更新</li>
+<li><strong>PCIe 接口</strong>：可插入标准服务器</li>
+<li><strong>商用 AI 算法支持</strong>：首次实现复杂商业 AI 模型（而非仅演示特定任务）</li>
+</ul>
+<h3 id="65">6.5 光电混合计算范式详解<a class="headerlink" href="#65" title="Permanent link"></a></h3>
+<h4 id="651">6.5.1 数据流全景<a class="headerlink" href="#651" title="Permanent link"></a></h4>
+<p>一个典型的光电混合计算流程：</p>
+<div class="highlight"><pre><span></span><code>┌─────────────────────────────────────────────────────────────────────┐
+│  [CPU/GPU 内存]                                                     │
+│     │  数据（FP16/FP32）                                            │
+│     ▼                                                               │
+│  [DAC + E/O 调制]  ← 电信号 → 光信号                                 │
+│     │  调制后的光载波                                                │
+│     ▼                                                               │
+│  [光芯片]  ← 线性运算（矩阵乘法）                                    │
+│     │  光信号携带计算结果                                            │
+│     ▼                                                               │
+│  [O/E 探测 + ADC]  ← 光信号 → 电信号                                 │
+│     │  模拟/数字电信号                                               │
+│     ▼                                                               │
+│  [电芯片]  ← 非线性激活（ReLU/GELU） + 控制逻辑                      │
+│     │                                                               │
+│     ▼                                                               │
+│  [缓存/回写内存]                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+</code></pre></div>
+
+<h4 id="652">6.5.2 为什么必须混合<a class="headerlink" href="#652" title="Permanent link"></a></h4>
+<p><strong>光学做线性运算的优势</strong>：<br />
+- 光速传播，延迟极低<br />
+- 大规模并行（一个波前同时与多个权重作用）<br />
+- 运算本身几乎不消耗能量（被动器件）</p>
+<p><strong>光学做非线性激活的困难</strong>：<br />
+- 需要特殊非线性材料或高功率密度<br />
+- 难以实现可编程的非线性响应<br />
+- 温度敏感，难以稳定工作</p>
+<p><strong>电学的互补优势</strong>：<br />
+- CMOS 电路实现非线性激活极其简单（比较器即可做 ReLU）<br />
+- 数字存储和逻辑控制非常成熟<br />
+- 精度高（FP16/BF16 已是标准）</p>
+<p>因此，光电混合是当前最务实的选择。</p>
+<h4 id="653">6.5.3 能效优势<a class="headerlink" href="#653" title="Permanent link"></a></h4>
+<p>根据曦智科技和学术界的公开数据：</p>
+<ul>
+<li><strong>光子 MAC 运算能效</strong>：可达 <strong>亚皮焦耳/操作</strong>（sub-pJ/op）级别</li>
+<li><strong>电子 MAC（7nm CMOS）</strong>：约 0.1-1 pJ/op</li>
+<li><strong>GPU（A100 Tensor Core）</strong>：约 10-100 pJ/op</li>
+</ul>
+<p>这意味着光子计算在理论上可以实现 <strong>10-1000 倍</strong> 的能效提升。</p>
+<p>但实际系统级能效还受限于：<br />
+- 激光器功耗（连续波光源需要持续供电）<br />
+- 电热调相器的功耗<br />
+- E/O 和 O/E 转换效率<br />
+- 控制电路开销</p>
+<p>综合来看，当前光电混合系统的实际能效提升约为 <strong>5-20 倍</strong>。</p>
+<h3 id="66">6.6 与竞品对比<a class="headerlink" href="#66" title="Permanent link"></a></h3>
+<h4 id="661-lightmatter">6.6.1 Lightmatter<a class="headerlink" href="#661-lightmatter" title="Permanent link"></a></h4>
+<p><strong>公司概况</strong>：另一家由 MIT 衍生的光子计算公司，成立于 2017 年（与曦智同年），创始人 Nicholas Harris 也是光子计算领域的重要研究者。</p>
+<p><strong>产品路线</strong>：<br />
+- <strong>Envise</strong>：光子 AI 加速器，采用 MZI 阵列<br />
+- <strong>Passage</strong>：光子互连芯片，用于芯片间通信</p>
+<p><strong>技术差异</strong>：<br />
+- Lightmatter 更侧重于<strong>相干光</strong>方案<br />
+- 在光子互连领域与曦智是直接竞争对手<br />
+- 尚未上市，但估值较高</p>
+<h4 id="662-intel">6.6.2 Intel<a class="headerlink" href="#662-intel" title="Permanent link"></a></h4>
+<p>Intel 在硅光领域有长期布局：<br />
+- <strong>硅光收发器</strong>：用于数据中心光互连（已实现大规模出货）<br />
+- <strong>集成光子研究</strong>：实验室级别的光子计算芯片<br />
+- <strong>OCI（Optical Compute Interconnect）</strong>：共封装光学方案</p>
+<p>与曦智相比，Intel 更侧重<strong>光互连</strong>而非<strong>光计算</strong>，商业化程度更高但创新速度较慢。</p>
+<h4 id="663-nvidia">6.6.3 NVIDIA<a class="headerlink" href="#663-nvidia" title="Permanent link"></a></h4>
+<p>NVIDIA 作为 AI 芯片霸主，也在关注光技术：<br />
+- <strong>Mellanox 互连</strong>：InfiniBand 是数据中心主流互连方案<br />
+- <strong>光互连研究</strong>：探索 CPO 和光 I/O<br />
+- <strong>合作</strong>：与光子公司合作集成光互连</p>
+<p>NVIDIA 的策略是&rdquo;观察+收购&rdquo;，暂时不直接竞争光子计算核心市场。</p>
+<h4 id="664">6.6.4 学术界其他团队<a class="headerlink" href="#664" title="Permanent link"></a></h4>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">团队/机构</th>
+<th style="text-align: left;">代表工作</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">MIT Englund 组</td>
+<td style="text-align: left;">MAFT-ONN (2025)</td>
+<td style="text-align: left;">无线信号分类，~100× 加速</td>
+</tr>
+<tr>
+<td style="text-align: left;">MIT Soljacic 组</td>
+<td style="text-align: left;">D²NN 系列</td>
+<td style="text-align: left;">自由空间衍射神经网络</td>
+</tr>
+<tr>
+<td style="text-align: left;">Stanford Shen 组</td>
+<td style="text-align: left;">光子 AI 加速器</td>
+<td style="text-align: left;">学术研究</td>
+</tr>
+<tr>
+<td style="text-align: left;">Colorado State EPIC Lab</td>
+<td style="text-align: left;">随机光子计算</td>
+<td style="text-align: left;">极低功耗</td>
+</tr>
+<tr>
+<td style="text-align: left;">浙大/清华等</td>
+<td style="text-align: left;">国产硅光芯片</td>
+<td style="text-align: left;">国内研究</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 6.5：主要光子计算研究团队</em></p>
+<h3 id="67">6.7 商业化进展与挑战<a class="headerlink" href="#67" title="Permanent link"></a></h3>
+<h4 id="671">6.7.1 收入结构<a class="headerlink" href="#671" title="Permanent link"></a></h4>
+<p>2025 年曦智科技营收约 1.06 亿元：<br />
+- <strong>光互连（Scale-up）</strong>：8,430 万元（71%）——当前收入支柱<br />
+- <strong>光子计算</strong>：2,020 万元（19%）——高速增长<br />
+- 其他：约 10%</p>
+<p><strong>战略路径</strong>：<br />
+光互连是&rdquo;现金牛&rdquo;，市场需求确定（数据中心互联痛点明确），技术门槛相对可控。光子计算是&rdquo;未来增长引擎&rdquo;，一旦技术成熟，市场空间更大。</p>
+<h4 id="672">6.7.2 主要挑战<a class="headerlink" href="#672" title="Permanent link"></a></h4>
+<ol>
+<li><strong>净亏损扩大</strong>：2025 年净亏损同比增长 131.5%，研发投入巨大</li>
+<li><strong>生态建设</strong>：需要编译器、驱动、SDK 等软件生态支持</li>
+<li><strong>客户验证</strong>：从&rdquo;试用&rdquo;到&rdquo;大规模采购&rdquo;需要时间</li>
+<li><strong>精度限制</strong>：4-8 bit 精度无法满足所有 AI 应用场景</li>
+<li><strong>与 GPU 生态的竞争</strong>：CUDA 生态护城河极深</li>
+</ol>
+<h4 id="673">6.7.3 未来规划<a class="headerlink" href="#673" title="Permanent link"></a></h4>
+<ul>
+<li><strong>2026 H1</strong>：PACE 3 完成 Tape-out</li>
+<li><strong>2027 H1</strong>：PACE 3 工程样片交付客户</li>
+<li><strong>长期</strong>：光子计算从&rdquo;加速器&rdquo;走向&rdquo;主处理器&rdquo;</li>
+</ul>
+<hr />
+<h2 id="ai_1">第七章：自由空间光干涉与 AI 的交叉前沿<a class="headerlink" href="#ai_1" title="Permanent link"></a></h2>
+<p>本章面向你最有直觉的领域——自由空间光学。我们将探讨如何将光干涉、衍射、SLM 等技术与 AI 计算结合，并分析为什么这些技术目前主要在实验室，而集成光子更接近商用。</p>
+<h3 id="71-d2nn">7.1 衍射深度神经网络（D²NN）<a class="headerlink" href="#71-d2nn" title="Permanent link"></a></h3>
+<h4 id="711">7.1.1 核心思想<a class="headerlink" href="#711" title="Permanent link"></a></h4>
+<p>2018 年，MIT 的 Aydogan Ozcan 团队和 UCLA 的 Xing Lin 等人几乎同时提出了 <strong>Diffractive Deep Neural Network（D²NN，衍射深度神经网络）</strong>。</p>
+<p><strong>核心思想</strong>：</p>
+<p>训练一个多层衍射光学元件（DOE）的透射率/相位分布，使得当光穿过这些衍射层后，在输出平面上的光强分布对应于神经网络的输出。</p>
+<p><strong>数学描述</strong>：</p>
+<p>光从第 $l$ 层传播到第 $l+1$ 层的过程：</p>
+<p>$$<br />
+U_{l+1}(x, y) = \iint H(x-x&rsquo;, y-y&rsquo;; \Delta z_l) \cdot t_l(x&rsquo;, y&rsquo;) \cdot U_l(x&rsquo;, y&rsquo;) \, dx&rsquo; dy&rsquo;<br />
+$$</p>
+<p>其中：<br />
+- $U_l(x, y)$ 是第 $l$ 层的复振幅<br />
+- $t_l(x, y)$ 是第 $l$ 层的复透射率（待优化的&rdquo;权重&rdquo;）<br />
+- $H$ 是菲涅尔衍射的脉冲响应函数<br />
+- $\Delta z_l$ 是层间距</p>
+<p>这可以写成：</p>
+<p>$$<br />
+\mathbf{U}_{l+1} = \mathbf{H}_l \odot (\mathbf{T}_l \cdot \mathbf{U}_l)<br />
+$$</p>
+<p>其中 $\mathbf{H}_l$ 是衍射传播矩阵（类似于神经网络的&rdquo;激活&rdquo;），$\mathbf{T}_l$ 是透射率对角矩阵（类似于&rdquo;权重&rdquo;）。</p>
+<h4 id="712">7.1.2 训练方法<a class="headerlink" href="#712" title="Permanent link"></a></h4>
+<p>令人惊讶的是，D²NN 的训练方法与标准神经网络几乎完全相同：</p>
+<ol>
+<li><strong>前向传播</strong>：用角谱法或菲涅尔衍射计算光场传播</li>
+<li><strong>计算损失</strong>：输出平面光强与目标（如分类标签对应的探测器位置）的差异</li>
+<li><strong>反向传播</strong>：利用自动微分（如 PyTorch/TensorFlow）计算每个像素透射率的梯度</li>
+<li><strong>优化</strong>：用 Adam 或 SGD 更新透射率</li>
+</ol>
+<p><strong>关键区别</strong>：<br />
+- 标准 NN：权重任意实数（或复数）<br />
+- D²NN：透射率必须满足物理约束（$|t(x,y)| \leq 1$ 对于被动元件）<br />
+- 标准 NN：激活函数是人为设计的<br />
+- D²NN：&rdquo;激活&rdquo;是光传播的物理过程（包含模平方的非线性）</p>
+<h4 id="713">7.1.3 物理实现的非线性<a class="headerlink" href="#713" title="Permanent link"></a></h4>
+<p>D²NN 中没有显式的非线性激活函数。那么非线性从何而来？</p>
+<p><strong>答案：探测器响应的非线性。</strong></p>
+<p>光电探测器测量的是光强（复振幅的模平方）：</p>
+<p>$$<br />
+I(x, y) = |U(x, y)|^2<br />
+$$</p>
+<p>这个模平方运算是一个非线性操作（对于复数场而言）。多层衍射 + 中间无记录的自由传播本质上是线性的，但最终探测步骤引入了非线性。</p>
+<p>如果希望在层间引入非线性（类似深度 NN 的逐层非线性），需要：<br />
+- 每层后放置可饱和吸收体<br />
+- 使用克尔介质等光学非线性材料<br />
+- 或者采用&rdquo;光电混合&rdquo;层间转换</p>
+<h4 id="714">7.1.4 性能与局限<a class="headerlink" href="#714" title="Permanent link"></a></h4>
+<p><strong>已实现的任务</strong>：<br />
+- MNIST 手写数字分类（准确率 ~91.75%，Lin et al., Science 2018）<br />
+- Fashion-MNIST 分类<br />
+- 全光学图像加密<br />
+- 太赫兹波段分类</p>
+<p><strong>局限</strong>：<br />
+- 精度远低于电子网络（MNIST 上电子 CNN 可达 99%+）<br />
+- 制造后固定，无法重新训练<br />
+- 对波长敏感（单色光要求）<br />
+- 对准和稳定性要求高<br />
+- 难以实现大规模（层数和每层的像素数受限）</p>
+<p><strong>物理直觉</strong>：D²NN 就像一个&rdquo;训练好的全息图&rdquo;——一旦用全息方法记录下来，它就能执行特定计算。但它不像电子神经网络那样可以灵活地更换权重。</p>
+<h3 id="72-4f">7.2 光学 4F 系统做卷积<a class="headerlink" href="#72-4f" title="Permanent link"></a></h3>
+<h4 id="721">7.2.1 傅里叶光学基础<a class="headerlink" href="#721" title="Permanent link"></a></h4>
+<p>4F 系统是光学信息处理中最经典的架构：</p>
+<div class="highlight"><pre><span></span><code>输入平面 P1 → 透镜 L1（焦距 F）→ 傅里叶平面 P2（距离 F）
+→ 透镜 L2（焦距 F）→ 输出平面 P3（距离 F）
+</code></pre></div>
+
+<p>根据傅里叶光学：</p>
+<ul>
+<li>在 P2 平面，光场是 P1 平面光场的<strong>傅里叶变换</strong></li>
+<li>如果在 P2 平面放置一个滤波器 $H(f_x, f_y)$，输出就是输入与滤波器逆傅里叶变换的<strong>卷积</strong></li>
+</ul>
+<p>$$<br />
+U_3(x, y) = U_1(x, y) * h(x, y)<br />
+$$</p>
+<p>其中 $h = \mathcal{F}^{-1}[H]$，$*$ 表示卷积。</p>
+<h4 id="722">7.2.2 频域卷积 = 空域滤波<a class="headerlink" href="#722" title="Permanent link"></a></h4>
+<p>卷积定理告诉我们：</p>
+<p>$$<br />
+g(x, y) * h(x, y) = \mathcal{F}^{-1}[\mathcal{F}[g] \cdot \mathcal{F}[h]]<br />
+$$</p>
+<p>这意味着：<br />
+- <strong>空域卷积</strong>（直接计算）复杂度为 $O(N^2 \cdot M^2)$（对于 $N \times N$ 图像和 $M \times M$ 卷积核）<br />
+- <strong>频域卷积</strong>（4F 系统）复杂度为 $O(N^2)$（一次傅里叶变换 + 逐点乘法 + 逆变换）</p>
+<p>对于大卷积核，频域方法效率更高。</p>
+<h4 id="723-cnn">7.2.3 实现 CNN 的光学层<a class="headerlink" href="#723-cnn" title="Permanent link"></a></h4>
+<p>一个 CNN 层 = 卷积 + 激活 + 池化。</p>
+<p><strong>光学的对应</strong>：<br />
+- <strong>卷积</strong>：4F 系统 + 空间滤波器<br />
+- <strong>激活</strong>：非线性光学元件（困难）或光电转换后电处理<br />
+- <strong>池化</strong>：下采样可以通过几何光学或探测器阵列合并实现</p>
+<p><strong>批量处理</strong>：<br />
+如果使用相干光且输入是复振幅编码的，4F 系统可以自然地处理二维卷积。多个卷积核可以通过多波长（WDM）或多角度复用来实现。</p>
+<h4 id="724-transformer">7.2.4 与 Transformer 的联系<a class="headerlink" href="#724-transformer" title="Permanent link"></a></h4>
+<p>Transformer 中的线性投影（$Q, K, V$ 的计算）可以看作是一组 $1 \times 1$ 卷积。理论上，4F 系统也可以实现这些运算。</p>
+<p>但 Transformer 的核心——注意力机制（$QK^T$）——需要矩阵乘法，而不仅仅是卷积。这需要更复杂的光学架构。</p>
+<h3 id="73-slm">7.3 相位调制神经网络：纯相位 SLM 实现全光推理<a class="headerlink" href="#73-slm" title="Permanent link"></a></h3>
+<h4 id="731">7.3.1 纯相位调制的优势<a class="headerlink" href="#731" title="Permanent link"></a></h4>
+<p>在自由空间光学中，纯相位调制（Phase-Only Modulation）有几个优势：</p>
+<ol>
+<li><strong>能量守恒</strong>：纯相位调制不损失光能（透射率 $|t| = 1$）</li>
+<li><strong>高效率</strong>：光能全部用于计算，不浪费在吸收上</li>
+<li><strong>易于实现</strong>：液晶 SLM（LCoS-SLM）可以独立控制每个像素的相位，精度可达 $2\pi/256$ 或更高</li>
+</ol>
+<h4 id="732">7.3.2 相位调制与酉变换<a class="headerlink" href="#732" title="Permanent link"></a></h4>
+<p>纯相位调制对应于<strong>对角酉矩阵</strong>：</p>
+<p>$$<br />
+\mathbf{T} = \text{diag}(e^{i\phi_1}, e^{i\phi_2}, \ldots, e^{i\phi_N})<br />
+$$</p>
+<p>每个像素引入一个相位延迟 $\phi_n$。</p>
+<p>光从输入到输出的传播可以写成：</p>
+<p>$$<br />
+\mathbf{U}<em L-1="L-1">{\text{out}} = \mathbf{H} \cdot \mathbf{T}_L \cdot \mathbf{H} \cdot \mathbf{T}</em>} \cdots \mathbf{H} \cdot \mathbf{T<em _text_in="\text{in">1 \cdot \mathbf{U}</em>}<br />
+$$</p>
+<p>其中 $\mathbf{H}$ 是衍射传播矩阵。</p>
+<h4 id="733">7.3.3 训练相位掩模<a class="headerlink" href="#733" title="Permanent link"></a></h4>
+<p>训练方法与 D²NN 相同：<br />
+1. 初始化随机相位分布<br />
+2. 前向传播（角谱法）<br />
+3. 计算输出与目标的损失<br />
+4. 反向传播梯度到每个相位像素<br />
+5. 用梯度下降更新相位值（注意约束：$\phi \in [0, 2\pi]$）</p>
+<p><strong>约束优化</strong>：</p>
+<p>相位值需要满足 $0 \leq \phi &lt; 2\pi$。可以用投影梯度下降：</p>
+<p>$$<br />
+\phi \leftarrow \text{mod}(\phi - \eta \nabla_\phi \mathcal{L}, 2\pi)<br />
+$$</p>
+<h4 id="734">7.3.4 实验实现<a class="headerlink" href="#734" title="Permanent link"></a></h4>
+<p>已有多个实验演示了基于 SLM 的全光神经网络：</p>
+<ul>
+<li><strong>Chang et al. (2018)</strong>：用两个 4F 系统和 SLM 实现光学神经网络</li>
+<li><strong>Miscuglio et al. (2020)</strong>：用相变材料实现可重构光学矩阵乘法</li>
+<li><strong>Zuo et al. (2019)</strong>：全光学图像分类器</li>
+</ul>
+<p><strong>关键挑战</strong>：<br />
+- SLM 刷新速率限制（通常 60 Hz，高速 SLM 可达 kHz 级别）<br />
+- 像素尺寸限制分辨率<br />
+- 对准误差影响精度<br />
+- 只能实现被动（无增益）运算</p>
+<h3 id="74-vs">7.4 自由空间 vs 集成光子：为什么商业化路径不同<a class="headerlink" href="#74-vs" title="Permanent link"></a></h3>
+<h4 id="741">7.4.1 自由空间光计算的&rdquo;实验室属性&rdquo;<a class="headerlink" href="#741" title="Permanent link"></a></h4>
+<p>自由空间光计算目前主要在实验室，原因如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">因素</th>
+<th style="text-align: left;">自由空间</th>
+<th style="text-align: left;">集成光子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>体积</strong></td>
+<td style="text-align: left;">大（需要光学平台、透镜、精密位移台）</td>
+<td style="text-align: left;">小（芯片级，毫米-厘米）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>稳定性</strong></td>
+<td style="text-align: left;">差（空气扰动、振动影响光路）</td>
+<td style="text-align: left;">好（固态波导，抗干扰）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>可制造性</strong></td>
+<td style="text-align: left;">低（手工对准，难以批量生产）</td>
+<td style="text-align: left;">高（CMOS 兼容产线）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>可编程性</strong></td>
+<td style="text-align: left;">中等（SLM 可更新，但刷新慢）</td>
+<td style="text-align: left;">好（电热调谐，ms 级）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>扩展性</strong></td>
+<td style="text-align: left;">差（光路复杂，难以扩展）</td>
+<td style="text-align: left;">好（芯片面积决定规模）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>系统集成</strong></td>
+<td style="text-align: left;">差（需要精密机械结构）</td>
+<td style="text-align: left;">好（可封装在标准服务器中）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>非线性</strong></td>
+<td style="text-align: left;">理论上可行（特殊材料）</td>
+<td style="text-align: left;">困难（通常需要电辅助）</td>
+</tr>
+</tbody>
+</table>
+<p><em>表 7.1：自由空间 vs 集成光子对比</em></p>
+<h4 id="742">7.4.2 集成光子的&rdquo;工程优势&rdquo;<a class="headerlink" href="#742" title="Permanent link"></a></h4>
+<p>集成光子计算更接近商用，因为：</p>
+<ol>
+<li><strong>CMOS 兼容制造</strong>：可以利用现有的半导体产线</li>
+<li><strong>标准化封装</strong>：可以做成 PCIe 卡、模块等标准形态</li>
+<li><strong>工程可控性</strong>：片上波导的参数（损耗、色散、串扰）可以精确设计和控制</li>
+<li><strong>生态对接</strong>：可以与现有电子计算系统（服务器、GPU、内存）无缝对接</li>
+</ol>
+<h4 id="743">7.4.3 自由空间光计算的独特价值<a class="headerlink" href="#743" title="Permanent link"></a></h4>
+<p>尽管商业化困难，自由空间光计算仍有不可替代的优势：</p>
+<ol>
+<li><strong>超高并行度</strong>：一个二维光场（如 $1000 \times 1000$ 像素）同时处理，有效算力极高</li>
+<li><strong>无串扰</strong>：自由空间中光束之间没有波导间的模式串扰</li>
+<li><strong>大尺度连接</strong>：理论上可以实现全连接（任意输入到任意输出），不受波导布线限制</li>
+<li><strong>可重构性</strong>：SLM 可以在毫秒-秒级完全重构整个计算函数</li>
+<li><strong>特定应用</strong>：在成像、传感、自适应光学等领域，自由空间光学与 AI 的结合有独特价值</li>
+</ol>
+<p><strong>未来可能的交汇点</strong>：<br />
+- <strong>片上自由空间光学</strong>：利用光芯片中的自由空间区域（如 3D 堆叠 PIC）<br />
+- <strong>微光学 + PIC</strong>：在 PIC 上集成微透镜阵列，实现片上自由空间传播<br />
+- <strong>计算成像 + AI</strong>：自由空间光学做前处理，AI 做后处理（已在压缩感知成像、全息显微中应用）</p>
+<h3 id="75-5-10">7.5 未来 5-10 年的技术预判<a class="headerlink" href="#75-5-10" title="Permanent link"></a></h3>
+<h4 id="751-1-3">7.5.1 短期（1-3 年）：光互连先行<a class="headerlink" href="#751-1-3" title="Permanent link"></a></h4>
+<ul>
+<li><strong>光互连将大规模商用</strong>：CPO、oNOC、光交换将成为数据中心标配</li>
+<li>曦智、Lightmatter、Intel 等公司的光互连产品会快速增长</li>
+<li><strong>光计算加速器小规模部署</strong>：特定场景（低精度推理、边缘 AI）开始使用光子加速器</li>
+</ul>
+<h4 id="752-3-5">7.5.2 中期（3-5 年）：光电混合成熟<a class="headerlink" href="#752-3-5" title="Permanent link"></a></h4>
+<ul>
+<li><strong>光电混合架构标准化</strong>：类似 CUDA 的光计算软件生态出现</li>
+<li><strong>精度提升</strong>：通过算法-硬件协同设计，光计算精度从 4-6 bit 提升到 8 bit</li>
+<li><strong>Transformer 专用光子加速器</strong>：针对 Attention 机制优化的光芯片出现</li>
+<li><strong>自由空间光计算在特定领域应用</strong>：如计算成像、光学加密、光谱分析</li>
+</ul>
+<h4 id="753-5-10">7.5.3 长期（5-10 年）：光计算的可能突破<a class="headerlink" href="#753-5-10" title="Permanent link"></a></h4>
+<ul>
+<li><strong>全光非线性激活</strong>：新材料（2D 材料、拓扑光子学）实现高效光学非线性</li>
+<li><strong>光存储计算融合</strong>：光忆阻器、光子 PCM 实现存内计算</li>
+<li><strong>量子-经典光计算混合</strong>：利用量子光学效应加速特定计算</li>
+<li><strong>自由空间 + 集成光子融合</strong>：3D 光子集成实现超大尺度光计算</li>
+</ul>
+<h4 id="754">7.5.4 对你研究方向的启示<a class="headerlink" href="#754" title="Permanent link"></a></h4>
+<p>如果你的研究背景是自由空间光干涉，以下是几个值得关注的交叉方向：</p>
+<ol>
+<li><strong>计算成像中的 Transformer</strong>：用 Attention 机制做计算成像的图像重建（已有相关工作在 <em>Optica</em>、<em>Nature Photonics</em> 发表）</li>
+<li><strong>可训练光学系统</strong>：用 PyTorch 优化光学系统设计（DOE、全息图、自由曲面），这是 D²NN 思想的延伸</li>
+<li><strong>光神经网络的可解释性</strong>：从物理角度理解光神经网络的内部表示</li>
+<li><strong>SLM + AI 实时系统</strong>：将 SLM 作为可编程光计算前端，配合电子后端实现灵活的全光/光电混合推理</li>
+</ol>
+<hr />
+<h2 id="a">附录 A：关键公式汇总<a class="headerlink" href="#a" title="Permanent link"></a></h2>
+<h3 id="a1">A.1 神经网络基础<a class="headerlink" href="#a1" title="Permanent link"></a></h3>
+<p><strong>感知机</strong>：<br />
+$$<br />
+y = f\left(\sum_{i=1}^{n} w_i x_i + b\right)<br />
+$$</p>
+<p><strong>Sigmoid</strong>：<br />
+$$<br />
+\sigma(x) = \frac{1}{1 + e^{-x}}<br />
+$$</p>
+<p><strong>ReLU</strong>：<br />
+$$<br />
+\text{ReLU}(x) = \max(0, x)<br />
+$$</p>
+<p><strong>Softmax</strong>：<br />
+$$<br />
+\text{Softmax}(z_i) = \frac{e^{z_i}}{\sum_{j} e^{z_j}}<br />
+$$</p>
+<p><strong>交叉熵损失</strong>：<br />
+$$<br />
+\mathcal{L}<em i="i">{\text{CE}} = -\sum</em>)} y_i^{\text{true}} \log(y_i^{\text{pred}<br />
+$$</p>
+<h3 id="a2-transformer">A.2 Transformer<a class="headerlink" href="#a2-transformer" title="Permanent link"></a></h3>
+<p><strong>位置编码</strong>：<br />
+$$<br />
+\text{PE}<em _text_model="\text{model">{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d</em>\right) \}}}<br />
+\text{PE}<em _text_model="\text{model">{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d</em>\right)}}}<br />
+$$</p>
+<p><strong>Scaled Dot-Product Attention</strong>：<br />
+$$<br />
+\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}<br />
+$$</p>
+<p><strong>Multi-Head Attention</strong>：<br />
+$$<br />
+\text{MultiHead} = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\mathbf{W}^O<br />
+$$</p>
+<p><strong>Layer Normalization</strong>：<br />
+$$<br />
+\text{LayerNorm}(\mathbf{x}) = \boldsymbol{\gamma} \odot \frac{\mathbf{x} - \mu}{\sqrt{\sigma^2 + \epsilon}} + \boldsymbol{\beta}<br />
+$$</p>
+<p><strong>FFN</strong>：<br />
+$$<br />
+\text{FFN}(\mathbf{x}) = \max(0, \mathbf{x}\mathbf{W}_1 + \mathbf{b}_1)\mathbf{W}_2 + \mathbf{b}_2<br />
+$$</p>
+<h3 id="a3">A.3 光计算<a class="headerlink" href="#a3" title="Permanent link"></a></h3>
+<p><strong>MZI 传输矩阵</strong>：<br />
+$$<br />
+\mathbf{U}(\theta, \phi) = e^{i\phi} \begin{bmatrix} e^{i\theta} \sin(\theta/2) &amp; e^{i\theta} \cos(\theta/2) \ \cos(\theta/2) &amp; -\sin(\theta/2) \end{bmatrix}<br />
+$$</p>
+<p><strong>菲涅尔衍射（脉冲响应）</strong>：<br />
+$$<br />
+H(x, y; z) = \frac{e^{ikz}}{i\lambda z} e^{i\frac{k}{2z}(x^2+y^2)}<br />
+$$</p>
+<p><strong>角谱传播</strong>：<br />
+$$<br />
+U(x, y, z) = \mathcal{F}^{-1}\left[\mathcal{F}[U(x, y, 0)] \cdot e^{i k_z z}\right]<br />
+$$</p>
+<p>其中 $k_z = \sqrt{k^2 - k_x^2 - k_y^2}$。</p>
+<p><strong>4F 系统频域滤波</strong>：<br />
+$$<br />
+U_{\text{out}} = \mathcal{F}^{-1}[\mathcal{F}[U_{\text{in}}] \cdot H(f_x, f_y)]<br />
+$$</p>
+<hr />
+<h2 id="b">附录 B：术语表（中英文对照）<a class="headerlink" href="#b" title="Permanent link"></a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">中文</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">简要解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">注意力机制</td>
+<td style="text-align: left;">Attention Mechanism</td>
+<td style="text-align: left;">动态地为输入的不同部分分配权重</td>
+</tr>
+<tr>
+<td style="text-align: left;">反向传播</td>
+<td style="text-align: left;">Backpropagation</td>
+<td style="text-align: left;">通过链式法则计算梯度的算法</td>
+</tr>
+<tr>
+<td style="text-align: left;">批归一化</td>
+<td style="text-align: left;">Batch Normalization</td>
+<td style="text-align: left;">对一个 batch 的数据做归一化</td>
+</tr>
+<tr>
+<td style="text-align: left;">层归一化</td>
+<td style="text-align: left;">Layer Normalization</td>
+<td style="text-align: left;">对每个样本独立做归一化</td>
+</tr>
+<tr>
+<td style="text-align: left;">交叉熵</td>
+<td style="text-align: left;">Cross-Entropy</td>
+<td style="text-align: left;">衡量两个概率分布差异的损失函数</td>
+</tr>
+<tr>
+<td style="text-align: left;">衍射深度神经网络</td>
+<td style="text-align: left;">D²NN / Diffractive Deep Neural Network</td>
+<td style="text-align: left;">用衍射屏实现神经网络的光学系统</td>
+</tr>
+<tr>
+<td style="text-align: left;">解码器</td>
+<td style="text-align: left;">Decoder</td>
+<td style="text-align: left;">Transformer 中生成输出的部分</td>
+</tr>
+<tr>
+<td style="text-align: left;">编码器</td>
+<td style="text-align: left;">Encoder</td>
+<td style="text-align: left;">Transformer 中提取输入特征的部分</td>
+</tr>
+<tr>
+<td style="text-align: left;">前馈网络</td>
+<td style="text-align: left;">Feed-Forward Network (FFN)</td>
+<td style="text-align: left;">全连接神经网络层</td>
+</tr>
+<tr>
+<td style="text-align: left;">梯度下降</td>
+<td style="text-align: left;">Gradient Descent</td>
+<td style="text-align: left;">沿梯度反方向更新参数的优化算法</td>
+</tr>
+<tr>
+<td style="text-align: left;">集成光子</td>
+<td style="text-align: left;">Integrated Photonics / PIC</td>
+<td style="text-align: left;">在芯片上集成光学元件的技术</td>
+</tr>
+<tr>
+<td style="text-align: left;">键</td>
+<td style="text-align: left;">Key</td>
+<td style="text-align: left;">注意力机制中用于匹配查询的向量</td>
+</tr>
+<tr>
+<td style="text-align: left;">多头注意力</td>
+<td style="text-align: left;">Multi-Head Attention</td>
+<td style="text-align: left;">并行的多组注意力机制</td>
+</tr>
+<tr>
+<td style="text-align: left;">马赫-曾德尔干涉仪</td>
+<td style="text-align: left;">Mach-Zehnder Interferometer (MZI)</td>
+<td style="text-align: left;">由两个耦合器和相位臂组成的干涉仪</td>
+</tr>
+<tr>
+<td style="text-align: left;">嵌入</td>
+<td style="text-align: left;">Embedding</td>
+<td style="text-align: left;">将离散符号映射到连续向量空间</td>
+</tr>
+<tr>
+<td style="text-align: left;">摩尔定律</td>
+<td style="text-align: left;">Moore&rsquo;s Law</td>
+<td style="text-align: left;">晶体管数量每 18-24 个月翻倍的规律</td>
+</tr>
+<tr>
+<td style="text-align: left;">光电混合</td>
+<td style="text-align: left;">Hybrid Electro-Optical</td>
+<td style="text-align: left;">光域与电域协同计算架构</td>
+</tr>
+<tr>
+<td style="text-align: left;">片上光网络</td>
+<td style="text-align: left;">Optical Network-on-Chip (oNOC)</td>
+<td style="text-align: left;">芯片内部的光互连网络</td>
+</tr>
+<tr>
+<td style="text-align: left;">查询</td>
+<td style="text-align: left;">Query</td>
+<td style="text-align: left;">注意力机制中主动寻找信息的向量</td>
+</tr>
+<tr>
+<td style="text-align: left;">热光调谐</td>
+<td style="text-align: left;">Thermo-Optic Tuning</td>
+<td style="text-align: left;">通过加热改变材料折射率从而调相</td>
+</tr>
+<tr>
+<td style="text-align: left;">软最大化</td>
+<td style="text-align: left;">Softmax</td>
+<td style="text-align: left;">将向量转换为概率分布的函数</td>
+</tr>
+<tr>
+<td style="text-align: left;">损失函数</td>
+<td style="text-align: left;">Loss Function</td>
+<td style="text-align: left;">衡量预测与真实值差异的函数</td>
+</tr>
+<tr>
+<td style="text-align: left;">位置编码</td>
+<td style="text-align: left;">Positional Encoding</td>
+<td style="text-align: left;">为序列注入位置信息的编码</td>
+</tr>
+<tr>
+<td style="text-align: left;">空间光调制器</td>
+<td style="text-align: left;">Spatial Light Modulator (SLM)</td>
+<td style="text-align: left;">可编程调制光场相位/振幅的器件</td>
+</tr>
+<tr>
+<td style="text-align: left;">残差连接</td>
+<td style="text-align: left;">Residual Connection</td>
+<td style="text-align: left;">跳跃连接，缓解梯度消失</td>
+</tr>
+<tr>
+<td style="text-align: left;">自注意力</td>
+<td style="text-align: left;">Self-Attention</td>
+<td style="text-align: left;">序列对自身计算注意力权重</td>
+</tr>
+<tr>
+<td style="text-align: left;">值</td>
+<td style="text-align: left;">Value</td>
+<td style="text-align: left;">注意力机制中被加权聚合的向量</td>
+</tr>
+<tr>
+<td style="text-align: left;">硅光芯片</td>
+<td style="text-align: left;">Silicon Photonic Integrated Circuit</td>
+<td style="text-align: left;">基于硅材料的光子集成电路</td>
+</tr>
+<tr>
+<td style="text-align: left;">波分复用</td>
+<td style="text-align: left;">Wavelength Division Multiplexing (WDM)</td>
+<td style="text-align: left;">不同波长在同一信道传输</td>
+</tr>
+<tr>
+<td style="text-align: left;">共封装光学</td>
+<td style="text-align: left;">Co-Packaged Optics (CPO)</td>
+<td style="text-align: left;">将光模块与芯片封装在一起</td>
+</tr>
+<tr>
+<td style="text-align: left;">存内计算</td>
+<td style="text-align: left;">Processing-In-Memory (PIM)</td>
+<td style="text-align: left;">在存储器中直接完成计算</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="c">附录 C：推荐延伸阅读<a class="headerlink" href="#c" title="Permanent link"></a></h2>
+<h3 id="c1-transformer">C.1 Transformer 与深度学习（必读）<a class="headerlink" href="#c1-transformer" title="Permanent link"></a></h3>
+<ol>
+<li><strong>Vaswani et al. (2017)</strong>. &ldquo;Attention Is All You Need.&rdquo; <em>NeurIPS</em>.</li>
+<li>
+<p>Transformer 的原始论文，必读经典。</p>
+</li>
+<li>
+<p><strong>Devlin et al. (2018)</strong>. &ldquo;BERT: Pre-training of Deep Bidirectional Transformers.&rdquo; <em>NAACL</em>.</p>
+</li>
+<li>
+<p>双向 Transformer Encoder 的里程碑。</p>
+</li>
+<li>
+<p><strong>Brown et al. (2020)</strong>. &ldquo;Language Models are Few-Shot Learners.&rdquo; <em>NeurIPS</em>.</p>
+</li>
+<li>
+<p>GPT-3 论文，展示大规模 Transformer 的涌现能力。</p>
+</li>
+<li>
+<p><strong>Su et al. (2021)</strong>. &ldquo;RoFormer: Enhanced Transformer with Rotary Position Embedding.&rdquo;</p>
+</li>
+<li>RoPE 位置编码，现代 LLM 广泛使用。</li>
+</ol>
+<h3 id="c2">C.2 光计算综述<a class="headerlink" href="#c2" title="Permanent link"></a></h3>
+<ol>
+<li><strong>Hamza (2026)</strong>. &ldquo;Photonic Neural Networks and Optical AI Accelerators: A Comprehensive Review.&rdquo; <em>IJSRET</em>.</li>
+<li>
+<p>光计算全面综述。</p>
+</li>
+<li>
+<p><strong>Li et al. (2025/2026)</strong>. &ldquo;Large-scale integrated photonic accelerators for ultralow-latency and universal AI computing.&rdquo; <em>Journal of Semiconductors</em>.</p>
+</li>
+<li>
+<p>大规模集成光子加速器综述。</p>
+</li>
+<li>
+<p><strong>Wuttig et al. (2024+)</strong>. 光计算硬件-软件协同设计相关论文。</p>
+</li>
+</ol>
+<h3 id="c3">C.3 曦智科技与光计算产品<a class="headerlink" href="#c3" title="Permanent link"></a></h3>
+<ol>
+<li><strong>Hua et al. (2025)</strong>. &ldquo;A photonic computing engine with 16,000 programmable devices.&rdquo; <em>Nature</em>.</li>
+<li>
+<p>曦智 PACE 的 <em>Nature</em> 论文。</p>
+</li>
+<li>
+<p><strong>Lightelligence 招股书</strong>（港交所，2026 年 4 月）。</p>
+</li>
+<li>
+<p>最权威的公司技术和商业信息来源。</p>
+</li>
+<li>
+<p><strong>Lightelligence 官网</strong>：https://www.xztech.ai / https://www.lightelligence.ai</p>
+</li>
+</ol>
+<h3 id="c4-ai">C.4 自由空间光学与 AI<a class="headerlink" href="#c4-ai" title="Permanent link"></a></h3>
+<ol>
+<li>
+<p><strong>Lin et al. (2018)</strong>. &ldquo;All-optical machine learning using diffractive deep neural networks.&rdquo; <em>Science</em>.</p>
+<ul>
+<li>D²NN 的开创性论文。</li>
+</ul>
+</li>
+<li>
+<p><strong>Miscuglio et al. (2020)</strong>. &ldquo;Massively parallel amplitude-only Fourier neural network.&rdquo; <em>Optica</em>.</p>
+<ul>
+<li>光学傅里叶神经网络。</li>
+</ul>
+</li>
+<li>
+<p><strong>Ozcan 团队系列工作</strong>（UCLA）：衍射光学、全息、计算成像与 AI 的交叉。</p>
+</li>
+</ol>
+<h3 id="c4">C.4 在线课程<a class="headerlink" href="#c4" title="Permanent link"></a></h3>
+<ol>
+<li>
+<p><strong>CS224N: Natural Language Processing with Deep Learning</strong>（Stanford）</p>
+<ul>
+<li>Transformer 和 NLP 的经典课程。</li>
+</ul>
+</li>
+<li>
+<p><strong>CS231N: Convolutional Neural Networks for Visual Recognition</strong>（Stanford）</p>
+<ul>
+<li>深度学习视觉基础。</li>
+</ul>
+</li>
+<li>
+<p><strong>3Blue1Brown: Neural Networks Series</strong>（YouTube）</p>
+<ul>
+<li>最直观的神经网络可视化教程。</li>
+</ul>
+</li>
+<li>
+<p><strong>李宏毅机器学习课程</strong>（台湾大学）</p>
+<ul>
+<li>中文讲解 Transformer 最清晰的课程之一。</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="_3">后记<a class="headerlink" href="#_3" title="Permanent link"></a></h2>
+<p>本文档试图搭建一座桥梁——从你熟悉的自由空间光干涉世界，通向正在重塑人类社会的 AI 计算前沿。</p>
+<p>光与计算的交汇，不仅是技术的融合，更是物理直觉与算法思维的碰撞。正如 Transformer 中的注意力机制可以被视为一种&rdquo;虚拟的波场干涉&rdquo;，光计算中的 MZI 阵列本质上就是物理实现的矩阵乘法。这些深层的数学同构性，正是两个领域交叉创新的源泉。</p>
+<p>曦智科技的 IPO 标志着光子计算从实验室走向资本市场的关键一步，但这只是开始。未来 5-10 年，随着光电混合架构的成熟、新材料的出现、以及自由空间光学与集成光子的融合，我们或许会见证计算范式的又一次革命。</p>
+<p>而你的自由空间光干涉背景，在这场变革中可能比想象中更有价值。</p>
+<hr />
+<blockquote>
+<p><strong>文档信息</strong><br />
+- 总字数：约 2.8 万字<br />
+- 章节数：7 章 + 3 附录<br />
+- 引用来源：学术论文、公司招股书、公开技术白皮书<br />
+- 面向读者：具有自由空间光学背景、希望系统理解 AI 与光计算的研究者</p>
+</blockquote>
+  </article>
+  <aside class="toc-sidebar"><div class="toc"><span class="toctitle">目录</span><ul>
+<li><a href="#_1">目录</a></li>
+<li><a href="#ai">第一章：绪论——从光干涉到 AI 计算的桥梁</a><ul>
+<li><a href="#11-ai">1.1 一个光学研究者的 AI 入口</a></li>
+<li><a href="#12-ai">1.2 AI 算力的&rdquo;指数级饥饿&rdquo;</a></li>
+<li><a href="#13">1.3 &ldquo;内存墙&rdquo;：电子计算的瓶颈</a></li>
+<li><a href="#14">1.4 光计算与深度学习的&rdquo;天然联姻&rdquo;</a></li>
+<li><a href="#15">1.5 本文档的阅读指南</a></li>
+</ul>
+</li>
+<li><a href="#transformer">第二章：神经网络基础（为 Transformer 铺垫）</a><ul>
+<li><a href="#21">2.1 从感知机到多层网络</a><ul>
+<li><a href="#211-perceptron">2.1.1 感知机（Perceptron）：最简单的&rdquo;光开关&rdquo;</a></li>
+<li><a href="#212-mlp">2.1.2 多层感知机（MLP）：隐藏层的魔法</a></li>
+</ul>
+</li>
+<li><a href="#22">2.2 激活函数：给光加&rdquo;个性&rdquo;</a><ul>
+<li><a href="#221-sigmoid-tanh">2.2.1 Sigmoid 与 tanh：平滑的饱和</a></li>
+<li><a href="#222-relu">2.2.2 ReLU：简单粗暴但有效</a></li>
+<li><a href="#223-softmax">2.2.3 Softmax：多类分类的概率归一化</a></li>
+</ul>
+</li>
+<li><a href="#23">2.3 损失函数：&rdquo;错得多远&rdquo;的度量</a><ul>
+<li><a href="#231-mse">2.3.1 均方误差（MSE）：回归问题</a></li>
+<li><a href="#232-cross-entropy">2.3.2 交叉熵损失（Cross-Entropy）：分类问题</a></li>
+</ul>
+</li>
+<li><a href="#24">2.4 反向传播：梯度下降的核心引擎</a><ul>
+<li><a href="#241">2.4.1 链式法则的神经网络版本</a></li>
+<li><a href="#242-sgd">2.4.2 梯度下降与随机梯度下降（SGD）</a></li>
+<li><a href="#243">2.4.3 与光学优化的类比：相位恢复算法</a></li>
+</ul>
+</li>
+<li><a href="#25">2.5 本节小结</a></li>
+</ul>
+</li>
+<li><a href="#transformer_1">第三章：深度学习的发展——为什么需要 Transformer</a><ul>
+<li><a href="#31-rnn-lstm">3.1 RNN 与 LSTM：序列建模的先驱</a><ul>
+<li><a href="#311-rnn">3.1.1 循环神经网络（RNN）：记忆是有代价的</a></li>
+<li><a href="#312-lstm-gru">3.1.2 LSTM 与 GRU：门控机制的引入</a></li>
+</ul>
+</li>
+<li><a href="#32-rnnlstm">3.2 RNN/LSTM 的根本困境</a><ul>
+<li><a href="#321">3.2.1 无法并行化</a></li>
+<li><a href="#322">3.2.2 长程依赖仍然受限</a></li>
+</ul>
+</li>
+<li><a href="#33-cnn">3.3 CNN 的尝试与局限</a></li>
+<li><a href="#34">3.4 注意力机制的提出</a><ul>
+<li><a href="#341-bahdanau-2015">3.4.1 Bahdanau 注意力（2015）</a></li>
+<li><a href="#342-luong-2015">3.4.2 Luong 注意力（2015）</a></li>
+</ul>
+</li>
+<li><a href="#35-attention-is-all-you-needtransformer">3.5 &ldquo;Attention Is All You Need&rdquo;：Transformer 的诞生</a></li>
+<li><a href="#36">3.6 本节小结</a></li>
+</ul>
+</li>
+<li><a href="#transformer_2">第四章：Transformer 架构系统详解</a><ul>
+<li><a href="#41">4.1 整体架构</a><ul>
+<li><a href="#411-encoder-decoder">4.1.1 Encoder-Decoder 架构（原始设计）</a></li>
+<li><a href="#412-encoder-onlybert">4.1.2 Encoder-only（BERT 系列）</a></li>
+<li><a href="#413-decoder-onlygpt">4.1.3 Decoder-only（GPT 系列）</a></li>
+</ul>
+</li>
+<li><a href="#42-token-embedding">4.2 输入嵌入（Token Embedding）</a><ul>
+<li><a href="#421-tokenization">4.2.1 分词（Tokenization）</a></li>
+<li><a href="#422">4.2.2 嵌入查找</a></li>
+</ul>
+</li>
+<li><a href="#43-positional-encoding">4.3 位置编码（Positional Encoding）</a><ul>
+<li><a href="#431">4.3.1 为什么需要位置编码</a></li>
+<li><a href="#432">4.3.2 正弦/余弦位置编码（原始设计）</a></li>
+<li><a href="#433-rope">4.3.3 可学习位置编码与 RoPE</a></li>
+</ul>
+</li>
+<li><a href="#44-self-attention">4.4 自注意力机制（Self-Attention）</a><ul>
+<li><a href="#441-query-key-value">4.4.1 Query / Key / Value 的直觉</a></li>
+<li><a href="#442-scaled-dot-product-attention">4.4.2 Scaled Dot-Product Attention：完整数学推导</a></li>
+<li><a href="#443">4.4.3 注意力权重矩阵的可视化</a></li>
+</ul>
+</li>
+<li><a href="#45-multi-head-attention">4.5 多头注意力（Multi-Head Attention）</a><ul>
+<li><a href="#451">4.5.1 为什么需要多个头</a></li>
+<li><a href="#452">4.5.2 数学定义</a></li>
+</ul>
+</li>
+<li><a href="#46">4.6 残差连接与层归一化</a><ul>
+<li><a href="#461-residual-connection">4.6.1 残差连接（Residual Connection）</a></li>
+<li><a href="#462-layer-normalization">4.6.2 层归一化（Layer Normalization）</a></li>
+</ul>
+</li>
+<li><a href="#47-feed-forward-network-ffn">4.7 前馈网络（Feed-Forward Network, FFN）</a></li>
+<li><a href="#48-masked-self-attention-cross-attention">4.8 Masked Self-Attention 与 Cross-Attention</a><ul>
+<li><a href="#481-masked-self-attentiondecoder">4.8.1 Masked Self-Attention（Decoder 独有）</a></li>
+<li><a href="#482-cross-attentionencoder-decoder">4.8.2 Cross-Attention（Encoder-Decoder 模型）</a></li>
+</ul>
+</li>
+<li><a href="#49-bert-gpt">4.9 从 BERT 到 GPT：架构演变</a></li>
+<li><a href="#410-kv-cache">4.10 KV Cache：推理加速的关键</a><ul>
+<li><a href="#4101">4.10.1 自回归生成的计算浪费</a></li>
+<li><a href="#4102-kv-cache">4.10.2 KV Cache 的优化</a></li>
+</ul>
+</li>
+<li><a href="#411">4.11 完整前向传播流程：以翻译为例</a></li>
+<li><a href="#412">4.12 本节小结</a></li>
+</ul>
+</li>
+<li><a href="#_2">第五章：光计算技术路线全景</a><ul>
+<li><a href="#51">5.1 光计算的驱动力：算力需求与&rdquo;后摩尔&rdquo;时代</a><ul>
+<li><a href="#511-ai">5.1.1 AI 算力需求的指数增长</a></li>
+<li><a href="#512">5.1.2 电子计算的根本限制</a></li>
+</ul>
+</li>
+<li><a href="#52">5.2 光计算的分类框架</a><ul>
+<li><a href="#521-free-space-optical-computing">5.2.1 自由空间光计算（Free-Space Optical Computing）</a></li>
+<li><a href="#522-integrated-photonic-computing">5.2.2 集成光子计算（Integrated Photonic Computing）</a></li>
+<li><a href="#523-in-memory-optical-computing">5.2.3 存内光计算（In-Memory Optical Computing）</a></li>
+</ul>
+</li>
+<li><a href="#53">5.3 各路线优劣势对比</a></li>
+<li><a href="#54">5.4 光计算的核心挑战</a><ul>
+<li><a href="#541-snr">5.4.1 模拟精度与信噪比（SNR）</a></li>
+<li><a href="#542">5.4.2 非线性激活的光学实现</a></li>
+<li><a href="#543">5.4.3 光电转换开销</a></li>
+<li><a href="#544">5.4.4 可编程性与灵活性</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#lightelligence">第六章：曦智科技（Lightelligence）深度案例</a><ul>
+<li><a href="#61">6.1 公司背景与发展历程</a><ul>
+<li><a href="#611-mit">6.1.1 起源：MIT 沈亦晨团队</a></li>
+<li><a href="#612">6.1.2 融资与商业化</a></li>
+<li><a href="#613">6.1.3 技术体系：三大核心技术</a></li>
+</ul>
+</li>
+<li><a href="#62">6.2 技术路线总览：光电混合架构</a></li>
+<li><a href="#63-onoc">6.3 核心产品一：光子网络芯片（oNOC）</a><ul>
+<li><a href="#631">6.3.1 问题背景：多卡通信瓶颈</a></li>
+<li><a href="#632-onoc">6.3.2 oNOC 的技术原理</a></li>
+<li><a href="#633-optihummingbird-lightsphere-x">6.3.3 产品形态：OptiHummingbird 与 LightSphere X</a></li>
+<li><a href="#634-xpu-cpo">6.3.4 xPU-CPO：共封装光学的探索</a></li>
+</ul>
+</li>
+<li><a href="#64-pace">6.4 核心产品二：光子计算加速器（PACE 系列）</a><ul>
+<li><a href="#641-pace">6.4.1 PACE 系列演进</a></li>
+<li><a href="#642-mzi">6.4.2 MZI 阵列：矩阵乘法的物理实现</a></li>
+<li><a href="#643-pace">6.4.3 非相干光方案：PACE 的技术选择</a></li>
+<li><a href="#644-pace-2">6.4.4 PACE 2 的技术规格</a></li>
+</ul>
+</li>
+<li><a href="#65">6.5 光电混合计算范式详解</a><ul>
+<li><a href="#651">6.5.1 数据流全景</a></li>
+<li><a href="#652">6.5.2 为什么必须混合</a></li>
+<li><a href="#653">6.5.3 能效优势</a></li>
+</ul>
+</li>
+<li><a href="#66">6.6 与竞品对比</a><ul>
+<li><a href="#661-lightmatter">6.6.1 Lightmatter</a></li>
+<li><a href="#662-intel">6.6.2 Intel</a></li>
+<li><a href="#663-nvidia">6.6.3 NVIDIA</a></li>
+<li><a href="#664">6.6.4 学术界其他团队</a></li>
+</ul>
+</li>
+<li><a href="#67">6.7 商业化进展与挑战</a><ul>
+<li><a href="#671">6.7.1 收入结构</a></li>
+<li><a href="#672">6.7.2 主要挑战</a></li>
+<li><a href="#673">6.7.3 未来规划</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#ai_1">第七章：自由空间光干涉与 AI 的交叉前沿</a><ul>
+<li><a href="#71-d2nn">7.1 衍射深度神经网络（D²NN）</a><ul>
+<li><a href="#711">7.1.1 核心思想</a></li>
+<li><a href="#712">7.1.2 训练方法</a></li>
+<li><a href="#713">7.1.3 物理实现的非线性</a></li>
+<li><a href="#714">7.1.4 性能与局限</a></li>
+</ul>
+</li>
+<li><a href="#72-4f">7.2 光学 4F 系统做卷积</a><ul>
+<li><a href="#721">7.2.1 傅里叶光学基础</a></li>
+<li><a href="#722">7.2.2 频域卷积 = 空域滤波</a></li>
+<li><a href="#723-cnn">7.2.3 实现 CNN 的光学层</a></li>
+<li><a href="#724-transformer">7.2.4 与 Transformer 的联系</a></li>
+</ul>
+</li>
+<li><a href="#73-slm">7.3 相位调制神经网络：纯相位 SLM 实现全光推理</a><ul>
+<li><a href="#731">7.3.1 纯相位调制的优势</a></li>
+<li><a href="#732">7.3.2 相位调制与酉变换</a></li>
+<li><a href="#733">7.3.3 训练相位掩模</a></li>
+<li><a href="#734">7.3.4 实验实现</a></li>
+</ul>
+</li>
+<li><a href="#74-vs">7.4 自由空间 vs 集成光子：为什么商业化路径不同</a><ul>
+<li><a href="#741">7.4.1 自由空间光计算的&rdquo;实验室属性&rdquo;</a></li>
+<li><a href="#742">7.4.2 集成光子的&rdquo;工程优势&rdquo;</a></li>
+<li><a href="#743">7.4.3 自由空间光计算的独特价值</a></li>
+</ul>
+</li>
+<li><a href="#75-5-10">7.5 未来 5-10 年的技术预判</a><ul>
+<li><a href="#751-1-3">7.5.1 短期（1-3 年）：光互连先行</a></li>
+<li><a href="#752-3-5">7.5.2 中期（3-5 年）：光电混合成熟</a></li>
+<li><a href="#753-5-10">7.5.3 长期（5-10 年）：光计算的可能突破</a></li>
+<li><a href="#754">7.5.4 对你研究方向的启示</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#a">附录 A：关键公式汇总</a><ul>
+<li><a href="#a1">A.1 神经网络基础</a></li>
+<li><a href="#a2-transformer">A.2 Transformer</a></li>
+<li><a href="#a3">A.3 光计算</a></li>
+</ul>
+</li>
+<li><a href="#b">附录 B：术语表（中英文对照）</a></li>
+<li><a href="#c">附录 C：推荐延伸阅读</a><ul>
+<li><a href="#c1-transformer">C.1 Transformer 与深度学习（必读）</a></li>
+<li><a href="#c2">C.2 光计算综述</a></li>
+<li><a href="#c3">C.3 曦智科技与光计算产品</a></li>
+<li><a href="#c4-ai">C.4 自由空间光学与 AI</a></li>
+<li><a href="#c4">C.4 在线课程</a></li>
+</ul>
+</li>
+<li><a href="#_3">后记</a></li>
+</ul>
+</div>
+</aside>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>Research Notes &middot; Generated on 2026-05-25</p>
+  </div>
+</footer>
+
+<script>
+
+(function() {
+  // Theme toggle
+  const btn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  function updateIcon() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+  updateIcon();
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateIcon();
+  });
+
+  // TOC active highlight on scroll
+  const toc = document.querySelector('.toc-sidebar');
+  if (toc) {
+    const links = toc.querySelectorAll('a[href^="#"]');
+    const headings = Array.from(document.querySelectorAll('article [id]'));
+    if (headings.length && links.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(l => l.style.color = '');
+            const link = toc.querySelector('a[href="#' + entry.target.id + '"]');
+            if (link) link.style.color = 'var(--accent)';
+          }
+        });
+      }, { rootMargin: '-80px 0px -60% 0px' });
+      headings.forEach(h => observer.observe(h));
+    }
+  }
+})();
+</script>
+</body>
+</html>
