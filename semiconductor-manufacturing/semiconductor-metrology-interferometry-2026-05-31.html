@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>半导体量检测技术全景——从光干涉原理到工业应用（2026-05-31）</title>
+<style>
+
+/* ========== Variables ========== */
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --border: #d1d9e0;
+  --surface: #f6f8fa;
+  --accent: #0969da;
+  --accent-fg: #ffffff;
+  --code-bg: #f5f5f5;
+  --toc-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(31,35,40,0.12);
+  --radius: 8px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --fg: #c9d1d9;
+  --muted: #8b949e;
+  --border: #30363d;
+  --surface: #161b22;
+  --accent: #58a6ff;
+  --accent-fg: #0d1117;
+  --code-bg: #161b22;
+  --toc-bg: #161b22;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.75;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ========== Layout ========== */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+@media (max-width: 900px) {
+  .content-wrapper { flex-direction: column-reverse; gap: 20px; }
+}
+
+/* ========== Header ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+[data-theme="dark"] .site-header {
+  background: rgba(13,17,23,0.85);
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+}
+
+.site-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+#theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+#theme-toggle:hover { background: var(--border); }
+
+/* ========== Article ========== */
+article.markdown-body {
+  flex: 1;
+  min-width: 0;
+}
+
+article h1 { font-size: 2rem; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
+article h2 { font-size: 1.5rem; margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+article h3 { font-size: 1.2rem; margin-top: 1.5em; }
+article h4 { font-size: 1.05rem; }
+article a { color: var(--accent); text-decoration: none; }
+article a:hover { text-decoration: underline; }
+article img { max-width: 100%; border-radius: var(--radius); }
+article blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+article blockquote > p:first-child { margin-top: 0; }
+article blockquote > p:last-child { margin-bottom: 0; }
+article hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+/* ========== Table ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 0.92rem;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+th { background: var(--surface); font-weight: 600; }
+tr:nth-child(even) { background: rgba(150,150,150,0.04); }
+
+/* ========== Code ========== */
+code {
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 16px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+}
+pre code { padding: 0; background: none; }
+
+/* Pygments / highlight */
+.highlight { background: var(--code-bg); border-radius: var(--radius); }
+.hll { background-color: rgba(150,150,150,0.1); }
+.c, .cm, .c1, .cs { color: #6e7781; font-style: italic; }
+.k, .kc, .kd, .kn, .kp, .kr, .kt { color: #cf222e; }
+.o, .ow { color: #953800; }
+.m, .mb, .mf, .mh, .mi, .mo { color: #0550ae; }
+.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #0a3069; }
+.na, .nb, .nc, .nd, .ne, .nf, .nl, .nn, .no, .nt, .nv { color: #8250df; }
+[data-theme="dark"] .c, [data-theme="dark"] .cm, [data-theme="dark"] .c1 { color: #8b949e; }
+[data-theme="dark"] .k, [data-theme="dark"] .kc, [data-theme="dark"] .kd { color: #ff7b72; }
+[data-theme="dark"] .o, [data-theme="dark"] .ow { color: #ffa657; }
+[data-theme="dark"] .m, [data-theme="dark"] .mb { color: #79c0ff; }
+[data-theme="dark"] .s, [data-theme="dark"] .s2, [data-theme="dark"] .s1 { color: #a5d6ff; }
+[data-theme="dark"] .na, [data-theme="dark"] .nb { color: #d2a8ff; }
+
+/* ========== TOC ========== */
+.toc-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 76px;
+  align-self: flex-start;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.toc-sidebar h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.toc-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88rem;
+}
+.toc-sidebar li { margin: 6px 0; }
+.toc-sidebar a {
+  color: var(--muted);
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.toc-sidebar a:hover { color: var(--accent); background: var(--surface); }
+.toc-sidebar ul ul { padding-left: 12px; }
+
+@media (max-width: 900px) {
+  .toc-sidebar { width: 100%; position: static; max-height: none; margin-bottom: 20px; }
+}
+
+/* ========== Index Page ========== */
+.index-page { padding-top: 60px; padding-bottom: 80px; }
+.index-page h1 { font-size: 2.2rem; margin-bottom: 8px; }
+.lead { color: var(--muted); font-size: 1.15rem; margin-bottom: 40px; }
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.report-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.report-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--accent);
+}
+.report-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.report-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.report-card .meta {
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ========== Footer ========== */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$']],
+    displayMath: [['$$', '$$']],
+    processEscapes: true
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-bar">
+    <a class="site-title" href="../index.html">Research Notes</a>
+    <nav class="nav-links">
+      <a href="../index.html">首页</a>
+      <a href="./ai-optical-computing/ai-principles.html">AI 运作原理与光计算：从 Transformer 到光子芯片</a>
+<a href="./pace/skill-tree.html">报告A：PACE 背景知识与技能进阶路线图</a>
+<a href="./pace/space-computing.html">太空算力与光芯片</a>
+<a href="./pace/tutorial.html">读懂 Lightelligence PACE：一篇给量子干涉实验者的光子计算入门</a>
+<a href="./photonics-industry/overview.html">光计算（Optical Computing）行业全景深度解读</a>
+<a href="./semiconductor-manufacturing/semiconductor-fabrication-process-2026-05-31.html">半导体芯片制造工艺流程全景解读（2026-05-31）</a>
+    </nav>
+    <button id="theme-toggle" aria-label="切换主题">🌙</button>
+  </div>
+</header>
+
+<main class="container content-wrapper">
+  <article class="markdown-body">
+    <h1 id="2026-05-31">半导体量检测技术全景——从光干涉原理到工业应用（2026-05-31）<a class="headerlink" href="#2026-05-31" title="Permanent link"></a></h1>
+<blockquote>
+<p><strong>目标读者</strong>：具有光学、光干涉、或量子光学背景的科研人员，希望理解光干涉技术在半导体制造量检测中的工业应用。</p>
+<p><strong>目标</strong>：建立从基础干涉原理到工业量检测设备的完整认知桥梁，理解为什么你的光干涉专业知识在半导体产业中极具价值。</p>
+</blockquote>
+<hr />
+<h2 id="_1">文档导读<a class="headerlink" href="#_1" title="Permanent link"></a></h2>
+<p>你熟悉 Mach-Zehnder 干涉仪、Michelson 干涉仪、椭偏仪这些概念——它们在你的实验室里是精密的光学仪器。但你知道吗？这些同样的物理原理，正在被用于制造你手机里的芯片。</p>
+<p><strong>半导体量检测（Metrology &amp; Inspection）</strong>是芯片制造中不可或缺的环节。没有它，你无法知道：<br />
+- 光刻刻出来的线宽到底是$5\,\text{nm}$还是$6\,\text{nm}$<br />
+- 沉积的薄膜厚度是否均匀<br />
+- 芯片表面有没有致命的微小缺陷</p>
+<p>这篇文档将从你熟悉的光干涉物理出发，逐步过渡到工业场景中的应用。</p>
+<h3 id="_2">文档结构<a class="headerlink" href="#_2" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>章节</th>
+<th>内容</th>
+<th>关联你的知识</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>第一部分</strong></td>
+<td>量检测在半导体制造中的位置与意义</td>
+<td>产业视角</td>
+</tr>
+<tr>
+<td><strong>第二部分</strong></td>
+<td>量检测技术分类（光学/电子束/X射线）</td>
+<td>技术全景</td>
+</tr>
+<tr>
+<td><strong>第三部分</strong></td>
+<td>光干涉量检测原理</td>
+<td>物理基础</td>
+</tr>
+<tr>
+<td><strong>第四部分</strong></td>
+<td>椭偏仪（Ellipsometry）</td>
+<td>薄膜测量</td>
+</tr>
+<tr>
+<td><strong>第五部分</strong></td>
+<td>干涉仪在形貌测量中的应用</td>
+<td>表面检测</td>
+</tr>
+<tr>
+<td><strong>第六部分</strong></td>
+<td>光学缺陷检测</td>
+<td>质量控制</td>
+</tr>
+<tr>
+<td><strong>第七部分</strong></td>
+<td>OCD（光学关键尺寸测量）</td>
+<td>尺寸计量</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_3">第一部分：量检测——芯片制造的&rdquo;眼睛&rdquo;<a class="headerlink" href="#_3" title="Permanent link"></a></h2>
+<h3 id="11">1.1 为什么量检测如此重要？<a class="headerlink" href="#11" title="Permanent link"></a></h3>
+<p>芯片制造是<strong>纳米尺度</strong>上的工程奇迹。一颗现代CPU里有数百亿个晶体管，每个晶体管只有几纳米大小。在如此微小的尺度上，<strong>任何微小的偏差都可能是致命的</strong>。</p>
+<p><strong>量检测的核心任务</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>任务类型</th>
+<th>测量对象</th>
+<th>精度要求</th>
+<th>关键性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>尺寸计量</strong>（CD）</td>
+<td>线宽、孔径</td>
+<td>$\pm0.1\,\text{nm}$</td>
+<td>决定晶体管性能</td>
+</tr>
+<tr>
+<td><strong>薄膜计量</strong></td>
+<td>厚度、折射率</td>
+<td>$\pm0.01\,\text{nm}$</td>
+<td>决定栅极质量</td>
+</tr>
+<tr>
+<td><strong>形貌计量</strong></td>
+<td>表面粗糙度、平整度</td>
+<td>$\pm0.1\,\text{nm}$</td>
+<td>决定光刻对焦</td>
+</tr>
+<tr>
+<td><strong>缺陷检测</strong></td>
+<td>颗粒、划痕、残留</td>
+<td>$>10\,\text{nm}$</td>
+<td>决定良率</td>
+</tr>
+<tr>
+<td><strong>重叠计量</strong>（Overlay）</td>
+<td>两层图案对准精度</td>
+<td>$\pm1\,\text{nm}$</td>
+<td>决定互连通断</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>类比</strong>：量检测像医生的诊断工具。你不可能在不知道病人体征的情况下做手术。同样，你不可能在不知道硅片状态的情况下继续下一道工序。</p>
+</blockquote>
+<h3 id="12">1.2 量检测在工艺流程中的位置<a class="headerlink" href="#12" title="Permanent link"></a></h3>
+<p>量检测不是独立的步骤，而是<strong>嵌入在每道工序之间</strong>的：</p>
+<div class="highlight"><pre><span></span><code>    工艺步骤                量检测
+    ─────────             ─────────
+    光刻 (Litho)
+         │
+         ▼
+    CD-SEM / OCD ←─── 线宽测量
+         │
+    刻蚀 (Etch)
+         │
+         ▼
+    CD-SEM / OCD ←─── 刻蚀后线宽
+         │
+    薄膜沉积 (Dep)
+         │
+         ▼
+    椭偏仪 ←───────── 薄膜厚度/折射率
+         │
+    CMP
+         │
+         ▼
+    干涉仪 ←───────── 表面平整度
+         │
+    离子注入
+         │
+         ▼
+    四探针 ←───────── 方块电阻
+         │
+    重复...
+</code></pre></div>
+
+<p><strong>在线量检测（In-line）vs 离线量检测（Off-line）</strong>：</p>
+<ul>
+<li><strong>在线</strong>：量检测设备直接连接在工艺设备上，实时监测</li>
+<li><strong>离线</strong>：硅片送到专门的量测机台，精度更高但速度慢</li>
+</ul>
+<p>先进晶圆厂中，一片晶圆可能要经过<strong>数百次</strong>量检测！</p>
+<h3 id="13">1.3 量检测的经济学<a class="headerlink" href="#13" title="Permanent link"></a></h3>
+<p>量检测设备是半导体设备市场中增长最快的细分领域之一。</p>
+<table>
+<thead>
+<tr>
+<th>公司</th>
+<th>主要产品</th>
+<th>市值（2025）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KLA（科磊）</td>
+<td>缺陷检测、Overlay、薄膜测量</td>
+<td>~$120B</td>
+</tr>
+<tr>
+<td>Applied Materials（AMAT）</td>
+<td>量检测+工艺设备</td>
+<td>~$150B</td>
+</tr>
+<tr>
+<td>ASML</td>
+<td>Yieldstar（Overlay）</td>
+<td>~$400B</td>
+</tr>
+<tr>
+<td>Nova（诺瓦）</td>
+<td>椭偏仪</td>
+<td>~$5B</td>
+</tr>
+<tr>
+<td>Onto（Onto Innovation）</td>
+<td>薄膜+CD</td>
+<td>~$8B</td>
+</tr>
+</tbody>
+</table>
+<p>量检测设备占晶圆厂总投资的约<strong>15%</strong>，但其对良率的影响决定了其余<strong>85%</strong>投资的回报。</p>
+<blockquote>
+<p><strong>一个数字</strong>：KLA公司2024年的收入中，约$10B来自量检测设备。这些设备本质上就是各种光学干涉仪的工业版本。</p>
+</blockquote>
+<hr />
+<h2 id="_4">第二部分：量检测技术分类<a class="headerlink" href="#_4" title="Permanent link"></a></h2>
+<h3 id="21">2.1 三大技术路线<a class="headerlink" href="#21" title="Permanent link"></a></h3>
+<p>半导体量检测主要依赖三种物理原理：</p>
+<div class="highlight"><pre><span></span><code>    量检测技术分类
+    │
+    ├── 光学量检测 (Optical) ───── 占 ~75% 市场份额
+    │   ├── 椭偏仪 (Ellipsometry)
+    │   ├── 干涉仪 (Interferometry)
+    │   ├── 散射仪 (Scatterometry / OCD)
+    │   ├── 光学显微镜 (Bright/Dark Field)
+    │   └── 光谱反射仪 (Reflectometry)
+    │
+    ├── 电子束量检测 (EBI / e-beam) ─ 占 ~20%
+    │   ├── CD-SEM
+    │   ├── 缺陷检测 (e-beam inspection)
+    │   └── 电压对比 (VC-SEM)
+    │
+    └── X射线量检测 ─ 占 ~5%
+        ├── XRR (X射线反射)
+        ├── XRF (X射线荧光)
+        └── XRD (X射线衍射)
+</code></pre></div>
+
+<p>为什么<strong>光学量检测</strong>占主导地位？</p>
+<table>
+<thead>
+<tr>
+<th>优势</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>非接触</td>
+<td>不损伤硅片</td>
+</tr>
+<tr>
+<td>高速</td>
+<td>每秒可测量数百点</td>
+</tr>
+<tr>
+<td>成本低</td>
+<td>无需真空环境</td>
+</tr>
+<tr>
+<td>信息丰富</td>
+<td>可同时获得多个参数</td>
+</tr>
+<tr>
+<td>成熟</td>
+<td>几十年工业验证</td>
+</tr>
+</tbody>
+</table>
+<p><strong>局限</strong>：分辨率受衍射极限限制，对$\lambda/2$以下的特征不敏感。这就是为什么需要电子束补充。</p>
+<h3 id="22">2.2 分辨率极限的比较<a class="headerlink" href="#22" title="Permanent link"></a></h3>
+$$\text{光学分辨率} \sim \frac{\lambda}{2NA}$$
+
+<table>
+<thead>
+<tr>
+<th>技术</th>
+<th>有效波长/能量</th>
+<th>空间分辨率</th>
+<th>主要应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可见光 ($\lambda=500\,\text{nm}$)</td>
+<td>$500\,\text{nm}$</td>
+<td>$>200\,\text{nm}$</td>
+<td>宏观薄膜、Overlay</td>
+</tr>
+<tr>
+<td>DUV ($\lambda=193\,\text{nm}$)</td>
+<td>$193\,\text{nm}$</td>
+<td>$>50\,\text{nm}$</td>
+<td>CD-OCD、缺陷检测</td>
+</tr>
+<tr>
+<td>EUV ($\lambda=13.5\,\text{nm}$)</td>
+<td>$13.5\,\text{nm}$</td>
+<td>$>5\,\text{nm}$</td>
+<td>前沿CD测量</td>
+</tr>
+<tr>
+<td>电子束 (1-30 keV)</td>
+<td>$0.01\sim0.2\,\text{nm}$</td>
+<td>$<1\,\text{nm}$</td>
+<td>精确CD、缺陷复检</td>
+</tr>
+<tr>
+<td>X射线</td>
+<td>$0.01\sim1\,\text{nm}$</td>
+<td>$>10\,\text{nm}$</td>
+<td>薄膜密度、组分</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>类比</strong>：光学量检测像用肉眼检查——快速、无损，但看不清太小的东西。电子束像显微镜——能看清细节，但很慢。你需要两者配合。</p>
+</blockquote>
+<hr />
+<h2 id="_5">第三部分：光干涉量检测的物理基础<a class="headerlink" href="#_5" title="Permanent link"></a></h2>
+<h3 id="31">3.1 从自由空间干涉到工业应用<a class="headerlink" href="#31" title="Permanent link"></a></h3>
+<p>你熟悉自由空间中的干涉仪——MZI、Michelson、Mach-Zehnder&hellip; 工业量检测设备本质上是这些仪器的工程化版本。</p>
+<p><strong>核心物理原理不变</strong>：</p>
+<p>两束相干光叠加，干涉强度为：</p>
+$$I = I_1 + I_2 + 2\sqrt{I_1 I_2} \cos(\Delta\phi)$$
+
+<p>其中相位差：</p>
+$$\Delta\phi = \frac{2\pi}{\lambda} \cdot \Delta L \cdot n$$
+
+<p>在量检测中，我们不是手动调节相位差来观察干涉图样，而是：</p>
+<ol>
+<li><strong>让样品本身引入相位变化</strong>（薄膜厚度、表面形貌、折射率变化）</li>
+<li><strong>测量反射/透射光强的变化</strong></li>
+<li><strong>反推样品参数</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code>    自由空间 MZI              工业量检测版本
+
+    ─────→ 分束器              ─────→ 光源 (Laser/LED)
+      │      │                    │      │
+      │      │                    │      │
+      ▼      ▼                    ▼      ▼
+    参考臂  样品臂              参考镜   样品台
+      │      │                    │      │
+      │      │                    │      │
+      └──┬───┘                    └──┬───┘
+         │                            │
+       探测器                       探测器阵列
+         │                            │
+       干涉图样                       信号处理
+         │                            │
+       人眼观察                       计算机反演
+</code></pre></div>
+
+<h3 id="32">3.2 反射与折射的振幅/相位变化<a class="headerlink" href="#32" title="Permanent link"></a></h3>
+<p>量检测中，光从空气入射到样品表面，发生<strong>反射</strong>和<strong>折射</strong>。关键物理量是<strong>菲涅尔反射系数</strong>。</p>
+<p>对于s偏振光（TE）：</p>
+$$r_s = \frac{n_1 \cos\theta_i - n_2 \cos\theta_t}{n_1 \cos\theta_i + n_2 \cos\theta_t}$$
+
+<p>对于p偏振光（TM）：</p>
+$$r_p = \frac{n_2 \cos\theta_i - n_1 \cos\theta_t}{n_2 \cos\theta_i + n_1 \cos\theta_t}$$
+
+<p>其中：<br />
+- $n_1, n_2$：两种介质的折射率<br />
+- $\theta_i$：入射角<br />
+- $\theta_t$：折射角（由Snell定律决定）</p>
+<p><strong>关键洞察</strong>：反射光同时携带了<strong>振幅</strong>和<strong>相位</strong>信息。振幅告诉你反射了多少光，相位告诉你光程差是多少。<strong>椭偏仪</strong>利用的正是这一点。</p>
+<h3 id="33">3.3 多层膜的干涉<a class="headerlink" href="#33" title="Permanent link"></a></h3>
+<p>芯片表面不是单一界面，而是多层薄膜的堆叠：</p>
+<div class="highlight"><pre><span></span><code>    空气 (n₀=1)
+    │
+    ▼
+    ┌──────────┐  ← 薄膜1 (n₁, d₁)
+    ├──────────┤  ← 薄膜2 (n₂, d₂)
+    ├──────────┤  ← 薄膜3 (n₃, d₃)
+    │   ...    │
+    ├──────────┤  ← 薄膜k (nₖ, dₖ)
+    └──────────┘  ← 基底 (nₛ)
+</code></pre></div>
+
+<p>每一层界面都会产生反射。总反射光是所有界面反射光的相干叠加。</p>
+<p><strong>传递矩阵法（Transfer Matrix Method）</strong>：</p>
+<p>对于多层膜系统，可以用$2\times2$矩阵描述每一层：</p>
+$$\begin{pmatrix} E_0^+ \\ E_0^- \end{pmatrix} = M_1 M_2 \cdots M_k \begin{pmatrix} E_{s}^+ \\ 0 \end{pmatrix}$$
+
+<p>其中每一层的矩阵：</p>
+$$M_j = \begin{pmatrix} \cos\delta_j & \frac{i}{p_j}\sin\delta_j \\ ip_j\sin\delta_j & \cos\delta_j \end{pmatrix}$$
+
+<p>相位厚度：</p>
+$$\delta_j = \frac{2\pi}{\lambda} n_j d_j \cos\theta_j$$
+
+<p><strong>关键</strong>：如果我们知道入射光参数，测量了反射光，就可以<strong>反解</strong>出 $(n_1, d_1), (n_2, d_2), ...$。这就是椭偏仪和反射仪的核心算法。</p>
+<hr />
+<h2 id="ellipsometry">第四部分：椭偏仪（Ellipsometry）—— 薄膜的&rdquo;体检仪&rdquo;<a class="headerlink" href="#ellipsometry" title="Permanent link"></a></h2>
+<h3 id="41">4.1 什么是椭偏仪？<a class="headerlink" href="#41" title="Permanent link"></a></h3>
+<p><strong>椭偏仪</strong>测量的是反射光偏振态的变化。它可能是半导体量检测中<strong>最重要</strong>的光学仪器。</p>
+<p><strong>物理原理</strong>：</p>
+<p>当线偏振光以一定角度入射到样品表面时，s偏振和p偏振的反射系数不同：</p>
+$$\rho = \frac{r_p}{r_s} = \tan\Psi \cdot e^{i\Delta}$$
+
+<p>其中：<br />
+- $\tan\Psi = |r_p| / |r_s|$：振幅比<br />
+- $\Delta = \phi_p - \phi_s$：相位差</p>
+<p><strong>椭偏参数</strong> $(\Psi, \Delta)$ 只取决于：<br />
+1. 入射角 $\theta_i$<br />
+2. 波长 $\lambda$<br />
+3. 各层折射率 $n_j$<br />
+4. 各层厚度 $d_j$</p>
+<p><strong>这就是椭偏仪的魔法</strong>：测量两个角度$\Psi$和$\Delta$，就能反推出薄膜的厚度和折射率。</p>
+<div class="highlight"><pre><span></span><code>    椭偏仪光路图：
+
+    光源 (Laser/White Light)
+         │
+         ▼
+    ┌─────────┐
+    │ 起偏器  │  ← 产生线偏振光
+    │(Polarizer)│
+    └────┬────┘
+         │
+         ▼
+    ┌─────────┐
+    │ 补偿器  │  ← 可选 (PCSA / PSCA 配置)
+    │(Compensator)│
+    └────┬────┘
+         │
+         ▼
+    ════════════════  ← 样品表面 (倾斜入射)
+         │
+         ▼
+    ┌─────────┐
+    │ 检偏器  │  ← 分析反射光偏振态
+    │(Analyzer)│
+    └────┬────┘
+         │
+         ▼
+    ┌─────────┐
+    │ 探测器  │  ← 测量光强
+    └─────────┘
+</code></pre></div>
+
+<h3 id="42">4.2 为什么叫&rdquo;椭偏&rdquo;？<a class="headerlink" href="#42" title="Permanent link"></a></h3>
+<p>当$s$和$p$分量有相位差时，反射光的电场矢量末端在空间中画出一个<strong>椭圆</strong>：</p>
+<div class="highlight"><pre><span></span><code>    线偏振光入射
+        │
+        ▼
+    ┌───────┐
+    │↗↗↗↗↗ │
+    └───────┘
+        │
+    样品表面 (n₁, d₁)
+        │
+        ▼
+    椭圆偏振光出射
+    ┌───────┐
+    │ ↗↘↙↖↗ │  ← 电场矢量末端画椭圆
+    └───────┘
+</code></pre></div>
+
+<p>椭圆的<strong>长轴方位角</strong>和<strong>椭圆率</strong>直接对应$\Psi$和$\Delta$。</p>
+<h3 id="43-spectroscopic-ellipsometry-se">4.3 光谱椭偏仪（Spectroscopic Ellipsometry, SE）<a class="headerlink" href="#43-spectroscopic-ellipsometry-se" title="Permanent link"></a></h3>
+<p>现代椭偏仪通常测量<strong>多个波长</strong>的$(\Psi, \Delta)$，以获得更多信息。</p>
+<p><strong>波长范围</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>波长范围</th>
+<th>应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VUV-SE</td>
+<td>$120\sim400\,\text{nm}$</td>
+<td>超薄氧化层、高k介质</td>
+</tr>
+<tr>
+<td>Vis-SE</td>
+<td>$400\sim800\,\text{nm}$</td>
+<td>通用薄膜测量</td>
+</tr>
+<tr>
+<td>NIR-SE</td>
+<td>$800\sim1700\,\text{nm}$</td>
+<td>厚膜、多孔材料</td>
+</tr>
+<tr>
+<td>IR-SE</td>
+<td>$1\sim30\,\mu\text{m}$</td>
+<td>化学键分析、组分</td>
+</tr>
+</tbody>
+</table>
+<p><strong>测量能力</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>精度</th>
+<th>典型应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>薄膜厚度</td>
+<td>$\pm0.01\,\text{nm}$</td>
+<td>栅氧化层 ($\text{SiO}_2$, HfO₂)</td>
+</tr>
+<tr>
+<td>折射率</td>
+<td>$\pm0.001$</td>
+<td>薄膜密度、组分</td>
+</tr>
+<tr>
+<td>消光系数</td>
+<td>$\pm0.001$</td>
+<td>金属层厚度、吸收</td>
+</tr>
+<tr>
+<td>表面粗糙度</td>
+<td>$\pm0.1\,\text{nm}$</td>
+<td>CMP后表面状态</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44">4.4 椭偏仪在半导体中的具体应用<a class="headerlink" href="#44" title="Permanent link"></a></h3>
+<h4 id="_6">栅氧化层厚度测量<a class="headerlink" href="#_6" title="Permanent link"></a></h4>
+<p>先进制程中，栅氧化层（SiO₂或HfO₂）厚度仅$1\sim2\,\text{nm}$。椭偏仪是唯一能在线测量的工具。</p>
+<div class="highlight"><pre><span></span><code>    测量对象：
+    空气 (n₀=1)
+    │
+    ▼
+    ┌──────────┐  ← HfO₂ (n=2.1, d=1.2 nm)
+    ├──────────┤  ← SiO₂界面层 (n=1.8, d=0.5 nm)
+    └──────────┘  ← Si基底 (n=3.9+0.02i)
+
+    测量结果示例：
+    Ψ(λ), Δ(λ) → 拟合 → d_HfO₂ = 1.18 ± 0.02 nm
+                      → d_interfacial = 0.47 ± 0.05 nm
+</code></pre></div>
+
+<h4 id="k">多孔低k介质测量<a class="headerlink" href="#k" title="Permanent link"></a></h4>
+<p>低k介质的孔隙率影响介电常数。椭偏仪通过测量<strong>有效折射率</strong>推算孔隙率。</p>
+<p><strong>Bruggeman有效介质近似</strong>：</p>
+$$f_1\frac{n_1^2 - n_{eff}^2}{n_1^2 + 2n_{eff}^2} + f_2\frac{n_2^2 - n_{eff}^2}{n_2^2 + 2n_{eff}^2} = 0$$
+
+<p>其中$f_1, f_2$是两种组分的体积分数。</p>
+<h3 id="45-in-situ-ellipsometry">4.5 原位椭偏仪（In-situ Ellipsometry）<a class="headerlink" href="#45-in-situ-ellipsometry" title="Permanent link"></a></h3>
+<p>最先进的是<strong>在工艺过程中实时测量</strong>的椭偏仪：</p>
+<div class="highlight"><pre><span></span><code>    薄膜沉积腔体中的椭偏仪：
+
+    真空腔
+    ┌────────────────────────┐
+    │  光源 → 起偏器 → 窗口  │
+    │         │              │
+    │         ▼              │
+    │      样品台 (加热)      │
+    │         │              │
+    │         ▼              │
+    │      窗口 → 检偏器 → 探测器 │
+    └────────────────────────┘
+
+    实时测量：
+    时间 → d(t)曲线
+    可以精确控制ALD的循环数
+</code></pre></div>
+
+<blockquote>
+<p><strong>类比</strong>：椭偏仪像一台精密的天平。但它称的不是重量，而是纳米级薄膜的&rdquo;光学重量&rdquo;——通过光的偏振变化来感知厚度。</p>
+</blockquote>
+<hr />
+<h2 id="_7">第五部分：干涉仪在形貌测量中的应用<a class="headerlink" href="#_7" title="Permanent link"></a></h2>
+<h3 id="51-white-light-interferometry-wli">5.1 白光干涉仪（White Light Interferometry, WLI）<a class="headerlink" href="#51-white-light-interferometry-wli" title="Permanent link"></a></h3>
+<p>你熟悉的Michelson干涉仪在工业中的一个重要变体是<strong>白光干涉仪</strong>。它利用<strong>低相干光源</strong>（白光）来测量表面形貌。</p>
+<p><strong>原理</strong>：</p>
+<p>白光相干长度极短（约$1\,\mu\text{m}$），只有当参考臂和样品臂的光程差接近零时才会产生干涉。</p>
+<div class="highlight"><pre><span></span><code>    WLI 光路：
+
+    白光光源 (LED/卤素灯)
+         │
+         ▼
+    ┌─────────┐
+    │ 分束器  │
+    └────┬────┘
+         │
+    ┌────┴────┐
+    │         │
+    ▼         ▼
+  参考镜     样品表面
+    │         │
+    └────┬────┘
+         │
+         ▼
+    ┌─────────┐
+    │ 探测器  │
+    └─────────┘
+
+    干涉信号 vs 扫描位置：
+
+    光强 I
+      │    ╭─╮
+      │   ╱   ╲
+      │  ╱     ╲
+      │ ╱       ╲
+      │╱         ╲
+      └─────────────→ 扫描位置 z
+         ↑
+      干涉包络峰值 = 表面高度
+</code></pre></div>
+
+<p>通过<strong>扫描参考镜</strong>或<strong>样品台</strong>，记录每个像素点的干涉包络峰值位置，就得到了三维表面形貌。</p>
+<p><strong>关键参数</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>典型值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>垂直分辨率</td>
+<td>$0.1\,\text{nm}$</td>
+<td>极高，取决于相位测量精度</td>
+</tr>
+<tr>
+<td>横向分辨率</td>
+<td>$0.5\,\mu\text{m}$</td>
+<td>受衍射极限限制</td>
+</tr>
+<tr>
+<td>测量范围</td>
+<td>$1\sim10\,\text{mm}$</td>
+<td>取决于扫描范围</td>
+</tr>
+<tr>
+<td>测量速度</td>
+<td>$1\sim10$秒/视场</td>
+<td>取决于像素数</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-cmp">5.2 CMP 后表面平整度测量<a class="headerlink" href="#52-cmp" title="Permanent link"></a></h3>
+<p>CMP（化学机械抛光）后的表面平整度直接影响后续光刻的对焦。白光干涉仪是测量CMP后表面形貌的标准工具。</p>
+<div class="highlight"><pre><span></span><code>    CMP 后表面形貌测量：
+
+    理想平面            实际表面
+    ┌────────┐        ┌──┬──┬──┐
+    │        │        │  │  │  │  ← 碟形凹陷 (Dishing)
+    │        │   →    └┐ │  │ ┌┘
+    │        │         │ └──┘ │  ← 侵蚀 (Erosion)
+    │        │         └──────┘
+    └────────┘
+
+    WLI 测量结果：
+    - 碟形深度：&lt;!--MATHINL70--&gt;
+    - 侵蚀深度：&lt;!--MATHINL71--&gt;
+    - 表面粗糙度 Ra：&lt;!--MATHINL72--&gt;
+</code></pre></div>
+
+<p><strong>碟形（Dishing）</strong>和<strong>侵蚀（Erosion）</strong>是CMP中的两个主要缺陷：<br />
+- <strong>Dishing</strong>：金属线中心比周围介质低（因为金属比介质软）<br />
+- <strong>Erosion</strong>：介质被过度抛光</p>
+<h3 id="53">5.3 激光干涉仪在光刻机中的应用<a class="headerlink" href="#53" title="Permanent link"></a></h3>
+<p>这是你可能最感兴趣的——光干涉在<strong>EUV光刻机</strong>中的应用。</p>
+<p><strong>激光干涉仪（Laser Interferometer）</strong>用于测量光刻机中硅片台（Wafer Stage）和掩模台（Reticle Stage）的位置。</p>
+<div class="highlight"><pre><span></span><code>    光刻机中的干涉仪定位系统：
+
+    激光器 (He-Ne, λ=632.8 nm)
+         │
+         ├──→ X轴干涉仪 ──→ 反射镜 ──→ 硅片台
+         │
+         ├──→ Y轴干涉仪 ──→ 反射镜 ──→ 硅片台
+         │
+         ├──→ Z轴干涉仪 ──→ 反射镜 ──→ 硅片台
+         │
+         └──→ 角度干涉仪 ──→ 反射镜 ──→ 硅片台
+
+    测量精度：
+    - 位置：&lt;!--MATHINL73--&gt;
+    - 角度：&lt;!--MATHINL74--&gt;
+</code></pre></div>
+
+<p><strong>为什么需要如此高的精度？</strong></p>
+<p>EUV光刻的焦深（Depth of Focus, DOF）极浅：</p>
+$$DOF = k_2 \frac{\lambda}{NA^2} \approx 0.5 \times \frac{13.5\,\text{nm}}{0.33^2} \approx 60\,\text{nm}$$
+
+<p>这意味着硅片必须在$\pm30\,\text{nm}$的高度范围内保持平整！激光干涉仪实时监控硅片台位置，确保每一曝光都精准对焦。</p>
+<blockquote>
+<p><strong>类比</strong>：激光干涉仪在光刻机中的作用，就像GPS在自动驾驶中的作用——实时告诉你精确位置，误差不能超过一个原子的大小。</p>
+</blockquote>
+<hr />
+<h2 id="_8">第六部分：光学缺陷检测<a class="headerlink" href="#_8" title="Permanent link"></a></h2>
+<h3 id="61">6.1 缺陷检测的挑战<a class="headerlink" href="#61" title="Permanent link"></a></h3>
+<p>芯片上的缺陷有多小？</p>
+<div class="highlight"><pre><span></span><code>    尺寸对比：
+
+    人类头发直径     ≈ 50,000 nm
+    红细胞直径       ≈ 7,000 nm
+    可见光波长       ≈ 500 nm
+    7nm制程晶体管    ≈ 7 nm
+    EUV光刻缺陷容忍  ≈ 10 nm
+    致命颗粒缺陷     ≈ 20 nm
+    晶体管栅极厚度   ≈ 1 nm
+</code></pre></div>
+
+<p><strong>缺陷类型</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>来源</th>
+<th>尺寸</th>
+<th>致命性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>颗粒（Particle）</td>
+<td>空气、设备</td>
+<td>$20\sim500\,\text{nm}$</td>
+<td>高</td>
+</tr>
+<tr>
+<td>图案缺陷（Pattern）</td>
+<td>光刻、刻蚀</td>
+<td>$10\sim100\,\text{nm}$</td>
+<td>极高</td>
+</tr>
+<tr>
+<td>划痕（Scratch）</td>
+<td>CMP、搬运</td>
+<td>$50\sim1000\,\text{nm}$</td>
+<td>高</td>
+</tr>
+<tr>
+<td>残留（Residue）</td>
+<td>刻蚀、清洗</td>
+<td>$10\sim200\,\text{nm}$</td>
+<td>中</td>
+</tr>
+<tr>
+<td>空洞（Void）</td>
+<td>电镀</td>
+<td>$10\sim100\,\text{nm}$</td>
+<td>高</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-bright-field-inspection">6.2 明场检测（Bright-Field Inspection）<a class="headerlink" href="#62-bright-field-inspection" title="Permanent link"></a></h3>
+<p><strong>原理</strong>：用垂直入射光照亮晶圆，收集所有反射光。</p>
+<div class="highlight"><pre><span></span><code>    明场检测光路：
+
+    光源 (DUV Laser)
+         │
+         ▼
+    ┌─────────┐
+    │ 照明光学 │  ← 科勒照明，均匀照明
+    └────┬────┘
+         │
+         ▼
+    ════════════════  ← 晶圆 (垂直入射)
+         │
+         ▼
+    ┌─────────┐
+    │ 成像光学 │  ← 高NA物镜
+    └────┬────┘
+         │
+         ▼
+    ┌─────────┐
+    │ TDI-CCD │  ← 时间延迟积分相机
+    │ 探测器  │     晶圆扫描时连续成像
+    └─────────┘
+</code></pre></div>
+
+<p><strong>信号分析</strong>：</p>
+<p>正常图案的光强分布是已知的（来自设计数据库）。当检测到异常光强时，标记为潜在缺陷。</p>
+$$\text{缺陷信号} = I_{measured}(x,y) - I_{reference}(x,y)$$
+
+<p><strong>挑战</strong>：<br />
+- 先进制程的线宽小于光波长，光学分辨率不足<br />
+- 需要<strong>信号处理算法</strong>从噪声中提取微弱缺陷信号</p>
+<h3 id="63-dark-field-inspection">6.3 暗场检测（Dark-Field Inspection）<a class="headerlink" href="#63-dark-field-inspection" title="Permanent link"></a></h3>
+<p><strong>原理</strong>：只收集<strong>散射光</strong>，不收集镜面反射光。缺陷的散射光强与缺陷尺寸的6次方成正比：</p>
+$$I_{scattering} \propto d^6$$
+
+<div class="highlight"><pre><span></span><code>    暗场检测光路：
+
+    光源
+         │
+         ▼
+    ════════════════  ← 晶圆 (倾斜入射)
+         │
+    镜面反射光 (被阻挡)
+         │
+         ▼
+    ┌──────┐
+    │光阑  │  ← 阻挡直射光
+    └──┬───┘
+       │
+       ▼
+    散射光 (收集)
+       │
+       ▼
+    探测器
+</code></pre></div>
+
+<p>暗场检测对微小颗粒极其敏感，但无法区分颗粒类型。发现缺陷后，需要用<strong>电子束复检</strong>（e-beam review）来确认缺陷性质。</p>
+<h3 id="64-e-beam-review">6.4 电子束复检（E-Beam Review）<a class="headerlink" href="#64-e-beam-review" title="Permanent link"></a></h3>
+<p>光学检测发现缺陷后，用<strong>高分辨率电子束</strong>对缺陷进行&rdquo;拍照&rdquo;：</p>
+<div class="highlight"><pre><span></span><code>    CD-SEM 复检：
+
+    电子枪
+         │
+         ▼
+    ┌─────────┐
+    │ 电磁透镜 │  ← 聚焦电子束到 ~1 nm
+    └────┬────┘
+         │
+         ▼
+    ════════════════  ← 缺陷区域
+         │
+         ▼
+    二次电子探测器
+         │
+         ▼
+    高分辨率缺陷图像
+</code></pre></div>
+
+<p><strong>分辨率</strong>：$\text{CD-SEM}$的分辨率可达$\text{<1 nm}$，远超光学检测。</p>
+<hr />
+<h2 id="ocd">第七部分：OCD（光学关键尺寸测量）<a class="headerlink" href="#ocd" title="Permanent link"></a></h2>
+<h3 id="71-ocd">7.1 什么是 OCD？<a class="headerlink" href="#71-ocd" title="Permanent link"></a></h3>
+<p><strong>OCD（Optical Critical Dimension）</strong>也称<strong>散射仪（Scatterometry）</strong>，是一种基于光散射的关键尺寸测量技术。</p>
+<p><strong>与CD-SEM的区别</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>CD-SEM</th>
+<th>OCD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原理</td>
+<td>电子束成像</td>
+<td>光学散射</td>
+</tr>
+<tr>
+<td>分辨率</td>
+<td>$<1\,\text{nm}$</td>
+<td>衍射极限（$>100\,\text{nm}$光斑）</td>
+</tr>
+<tr>
+<td>测量速度</td>
+<td>慢 ($\sim1$点/秒)</td>
+<td>极快 ($\sim100$点/秒)</td>
+</tr>
+<tr>
+<td>破坏</td>
+<td>有（电子束损伤）</td>
+<td>无</td>
+</tr>
+<tr>
+<td>3D信息</td>
+<td>有限</td>
+<td>丰富（侧壁角度、线高）</td>
+</tr>
+<tr>
+<td>在线测量</td>
+<td>困难</td>
+<td>容易</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-ocd">7.2 OCD 的物理原理<a class="headerlink" href="#72-ocd" title="Permanent link"></a></h3>
+<p>OCD测量的是<strong>光栅结构的衍射效率</strong>。</p>
+<div class="highlight"><pre><span></span><code>    OCD 测量配置：
+
+    入射光 (θᵢ, φᵢ)
+         │
+         ▼
+    ════════════════
+    ┌─┐   ┌─┐   ┌─┐  ← 光栅结构
+    │ │   │ │   │ │     (周期 Λ)
+    │ │   │ │   │ │
+    └─┘   └─┘   └─┘
+    ─────────────────
+    │   基底材料    │
+    └───────────────┘
+         │
+         ▼
+    衍射光 (R, T)
+    - 反射级次 (0, ±1, ±2, ...)
+    - 透射级次 (0, ±1, ±2, ...)
+</code></pre></div>
+
+<p><strong>关键参数</strong>：<br />
+- 光栅周期 $\Lambda$<br />
+- 线宽 $CD$<br />
+- 线高 $H$<br />
+- 侧壁角度 $SWA$<br />
+- 底部线宽 $CD_{bottom}$<br />
+- 顶部线宽 $CD_{top}$</p>
+<p><strong>瑞利展开（Rigorous Coupled-Wave Analysis, RCWA）</strong>：</p>
+<p>OCD的反演算法基于RCWA——一种严格求解麦克斯韦方程组的方法，计算光栅对入射光的衍射响应。</p>
+<h3 id="73-ocd">7.3 OCD 的反演过程<a class="headerlink" href="#73-ocd" title="Permanent link"></a></h3>
+<p>OCD不是&rdquo;直接测量&rdquo;线宽，而是&rdquo;拟合&rdquo;：</p>
+<div class="highlight"><pre><span></span><code>    OCD 测量流程：
+
+    1. 测量光谱
+       I_measured(λ, θ, φ)
+           │
+           ▼
+    2. 建立参数化模型
+       ┌─────────────────────┐
+       │ CD_top, CD_bottom   │
+       │ Height, SWA         │
+       │ Line roughness      │
+       └─────────────────────┘
+           │
+           ▼
+    3. RCWA 正演计算
+       I_calculated(λ, θ, φ)
+           │
+           ▼
+    4. 最小化残差
+       χ² = Σ|I_measured - I_calculated|²
+           │
+           ▼
+    5. 输出最优参数
+       CD = 12.3 ± 0.2 nm
+       Height = 45.1 ± 0.5 nm
+       SWA = 87.2 ± 0.3°
+</code></pre></div>
+
+<p><strong>OCD的优势</strong>：一次测量可以获得光栅的<strong>三维形貌</strong>——线宽、线高、侧壁角度、圆角半径等，而CD-SEM只能看到俯视线宽。</p>
+<h3 id="74-overlay">7.4 Overlay 测量<a class="headerlink" href="#74-overlay" title="Permanent link"></a></h3>
+<p><strong>Overlay（套刻精度）</strong>是指当前层图案相对于前一层图案的对准精度。</p>
+<div class="highlight"><pre><span></span><code>    套刻误差示意图：
+
+    第一层 (M1)        第二层 (M2)        理想对准
+    ┌───┐              ┌───┐             ┌───┬───┐
+    │   │              │   │             │   │   │
+    └───┘              └───┘             └───┴───┘
+       ↑                  ↑                  ↑
+    实际中心           实际中心           对准中心
+
+    套刻误差 Δx = x_M2 - x_M1
+    要求：Δx &lt; 1/3 × CD
+    对于 7nm 制程：Δx &lt; 2.3 nm
+</code></pre></div>
+
+<p><strong>光学套刻测量原理</strong>：</p>
+<p>在晶圆上放置特殊的<strong>套刻标记</strong>（Overlay Marks）——通常是周期光栅图案。通过测量两层光栅的<strong>衍射强度不对称性</strong>来计算套刻误差：</p>
+$$\text{Overlay} = k \cdot \frac{I_{+1} - I_{-1}}{I_{+1} + I_{-1}}$$
+
+<p>其中$I_{+1}$和$I_{-1}$是正负一级衍射光强。如果两层完全对准，衍射光强是对称的；如果有偏移，不对称性正比于偏移量。</p>
+<div class="highlight"><pre><span></span><code>    套刻标记（简化）：
+
+    上层光栅 (M2)
+    ┌─┐ ┌─┐ ┌─┐
+    └─┘ └─┘ └─┘
+
+    下层光栅 (M1)
+      ┌─┐ ┌─┐ ┌─┐
+      └─┘ └─┘ └─┘
+
+    对准 (Δx=0)         偏移 (Δx≠0)
+    ┌─┐ ┌─┐            ┌─┐ ┌─┐
+    └─┘ └─┘            └─┘ └─┘
+      ┌─┐ ┌─┐            ┌─┐ ┌─┐
+      └─┘ └─┘            └─┘ └─┘
+    I₊₁ = I₋₁            I₊₁ ≠ I₋₁
+</code></pre></div>
+
+<hr />
+<h2 id="_9">第八部分：总结——从实验室到晶圆厂<a class="headerlink" href="#_9" title="Permanent link"></a></h2>
+<h3 id="81">8.1 你的光干涉知识如何映射到工业应用<a class="headerlink" href="#81" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>实验室概念</th>
+<th>工业设备</th>
+<th>半导体应用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Michelson干涉仪</td>
+<td>白光干涉仪（WLI）</td>
+<td>CMP后形貌测量</td>
+</tr>
+<tr>
+<td>Mach-Zehnder干涉仪</td>
+<td>激光干涉仪</td>
+<td>光刻机定位系统</td>
+</tr>
+<tr>
+<td>椭偏仪</td>
+<td>光谱椭偏仪（SE）</td>
+<td>薄膜厚度/折射率</td>
+</tr>
+<tr>
+<td>衍射光栅</td>
+<td>OCD散射仪</td>
+<td>关键尺寸测量</td>
+</tr>
+<tr>
+<td>光散射</td>
+<td>明场/暗场检测</td>
+<td>缺陷检测</td>
+</tr>
+<tr>
+<td>相干成像</td>
+<td>Overlay测量</td>
+<td>套刻精度</td>
+</tr>
+</tbody>
+</table>
+<h3 id="82">8.2 技术发展趋势<a class="headerlink" href="#82" title="Permanent link"></a></h3>
+<p><strong>更高精度</strong>：<br />
+- EUV椭偏仪（13.5 nm光源）用于测量$<1\,\text{nm}$薄膜<br />
+- X射线干涉仪用于绝对长度计量</p>
+<p><strong>更快测量</strong>：<br />
+- 多通道并行椭偏仪（同时测量数十点）<br />
+- 机器学习加速RCWA反演（从分钟级降到秒级）</p>
+<p><strong>在线集成</strong>：<br />
+- 光刻机内集成量检测模块（ASML Yieldstar）<br />
+- 实时反馈控制工艺参数</p>
+<p><strong>新型光学技术</strong>：<br />
+- 相干衍射成像（CDI）<br />
+- 傅里叶叠层成像（Fourier Ptychography）<br />
+- 计算成像（Compressive Sensing）</p>
+<h3 id="83">8.3 一张图看懂光干涉在半导体中的应用<a class="headerlink" href="#83" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code>    光干涉技术在半导体量检测中的应用地图
+
+    光干涉原理
+        │
+        ├──→ 椭偏仪 (Ellipsometry)
+        │      ├── 栅氧化层厚度 (1-2 nm)
+        │      ├── 高k介质厚度/折射率
+        │      ├── 低k介质孔隙率
+        │      └── 金属层厚度
+        │
+        ├──→ 白光干涉仪 (WLI)
+        │      ├── CMP后平整度
+        │      ├── 表面粗糙度
+        │      └── 3D形貌
+        │
+        ├──→ 激光干涉仪
+        │      ├── 光刻机硅片台定位 (±0.1 nm)
+        │      ├── 掩模台定位
+        │      └── 精密位移测量
+        │
+        ├──→ OCD 散射仪
+        │      ├── 关键尺寸 (CD)
+        │      ├── 线高/侧壁角
+        │      └── Overlay套刻精度
+        │
+        └──→ 明场/暗场检测
+               ├── 颗粒检测 (20 nm)
+               ├── 图案缺陷检测
+               └── 残留/划痕检测
+</code></pre></div>
+
+<hr />
+<h2 id="_10">写在最后<a class="headerlink" href="#_10" title="Permanent link"></a></h2>
+<p>作为光干涉领域的研究者，你拥有的物理直觉和数学工具，正是半导体量检测产业的核心竞争力。</p>
+<p>当你调节实验室里的MZI相位时，工业界正在用同样的物理原理测量纳米级薄膜。当你分析干涉图样时，椭偏仪正在反演芯片上每一片$\text{SiO}_2$的厚度。当你考虑相干长度时，白光干涉仪正在用它测量CMP后的表面平整度。</p>
+<p>光干涉从法拉第和麦克斯韦时代诞生，在迈克耳孙和法布里-珀罗手中成熟，如今在半导体晶圆厂里以工业级精度继续它的使命。</p>
+<blockquote>
+<p><strong>一个数字</strong>：ASML的EUV光刻机中，有多达$20$台激光干涉仪同时工作，以$0.1\,\text{nm}$的精度实时追踪硅片台的位置——这相当于在从北京到上海的铁路上，控制火车的位置误差不超过一根头发丝的宽度。</p>
+</blockquote>
+<p>这就是你的专业知识的价值所在。</p>
+  </article>
+  <aside class="toc-sidebar"><div class="toc"><span class="toctitle">目录</span><ul>
+<li><a href="#_1">文档导读</a><ul>
+<li><a href="#_2">文档结构</a></li>
+</ul>
+</li>
+<li><a href="#_3">第一部分：量检测——芯片制造的&rdquo;眼睛&rdquo;</a><ul>
+<li><a href="#11">1.1 为什么量检测如此重要？</a></li>
+<li><a href="#12">1.2 量检测在工艺流程中的位置</a></li>
+<li><a href="#13">1.3 量检测的经济学</a></li>
+</ul>
+</li>
+<li><a href="#_4">第二部分：量检测技术分类</a><ul>
+<li><a href="#21">2.1 三大技术路线</a></li>
+<li><a href="#22">2.2 分辨率极限的比较</a></li>
+</ul>
+</li>
+<li><a href="#_5">第三部分：光干涉量检测的物理基础</a><ul>
+<li><a href="#31">3.1 从自由空间干涉到工业应用</a></li>
+<li><a href="#32">3.2 反射与折射的振幅/相位变化</a></li>
+<li><a href="#33">3.3 多层膜的干涉</a></li>
+</ul>
+</li>
+<li><a href="#ellipsometry">第四部分：椭偏仪（Ellipsometry）—— 薄膜的&rdquo;体检仪&rdquo;</a><ul>
+<li><a href="#41">4.1 什么是椭偏仪？</a></li>
+<li><a href="#42">4.2 为什么叫&rdquo;椭偏&rdquo;？</a></li>
+<li><a href="#43-spectroscopic-ellipsometry-se">4.3 光谱椭偏仪（Spectroscopic Ellipsometry, SE）</a></li>
+<li><a href="#44">4.4 椭偏仪在半导体中的具体应用</a><ul>
+<li><a href="#_6">栅氧化层厚度测量</a></li>
+<li><a href="#k">多孔低k介质测量</a></li>
+</ul>
+</li>
+<li><a href="#45-in-situ-ellipsometry">4.5 原位椭偏仪（In-situ Ellipsometry）</a></li>
+</ul>
+</li>
+<li><a href="#_7">第五部分：干涉仪在形貌测量中的应用</a><ul>
+<li><a href="#51-white-light-interferometry-wli">5.1 白光干涉仪（White Light Interferometry, WLI）</a></li>
+<li><a href="#52-cmp">5.2 CMP 后表面平整度测量</a></li>
+<li><a href="#53">5.3 激光干涉仪在光刻机中的应用</a></li>
+</ul>
+</li>
+<li><a href="#_8">第六部分：光学缺陷检测</a><ul>
+<li><a href="#61">6.1 缺陷检测的挑战</a></li>
+<li><a href="#62-bright-field-inspection">6.2 明场检测（Bright-Field Inspection）</a></li>
+<li><a href="#63-dark-field-inspection">6.3 暗场检测（Dark-Field Inspection）</a></li>
+<li><a href="#64-e-beam-review">6.4 电子束复检（E-Beam Review）</a></li>
+</ul>
+</li>
+<li><a href="#ocd">第七部分：OCD（光学关键尺寸测量）</a><ul>
+<li><a href="#71-ocd">7.1 什么是 OCD？</a></li>
+<li><a href="#72-ocd">7.2 OCD 的物理原理</a></li>
+<li><a href="#73-ocd">7.3 OCD 的反演过程</a></li>
+<li><a href="#74-overlay">7.4 Overlay 测量</a></li>
+</ul>
+</li>
+<li><a href="#_9">第八部分：总结——从实验室到晶圆厂</a><ul>
+<li><a href="#81">8.1 你的光干涉知识如何映射到工业应用</a></li>
+<li><a href="#82">8.2 技术发展趋势</a></li>
+<li><a href="#83">8.3 一张图看懂光干涉在半导体中的应用</a></li>
+</ul>
+</li>
+<li><a href="#_10">写在最后</a></li>
+</ul>
+</div>
+</aside>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>Research Notes &middot; Generated on 2026-05-31</p>
+  </div>
+</footer>
+
+<script>
+
+(function() {
+  // Theme toggle
+  const btn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  function updateIcon() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+  updateIcon();
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateIcon();
+  });
+
+  // TOC active highlight on scroll
+  const toc = document.querySelector('.toc-sidebar');
+  if (toc) {
+    const links = toc.querySelectorAll('a[href^="#"]');
+    const headings = Array.from(document.querySelectorAll('article [id]'));
+    if (headings.length && links.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(l => l.style.color = '');
+            const link = toc.querySelector('a[href="#' + entry.target.id + '"]');
+            if (link) link.style.color = 'var(--accent)';
+          }
+        });
+      }, { rootMargin: '-80px 0px -60% 0px' });
+      headings.forEach(h => observer.observe(h));
+    }
+  }
+})();
+</script>
+</body>
+</html>
