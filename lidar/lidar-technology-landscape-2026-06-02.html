@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>激光雷达（LiDAR）技术全景：从光脉冲到三维世界（2026-06-02）</title>
+<style>
+
+/* ========== Variables ========== */
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --border: #d1d9e0;
+  --surface: #f6f8fa;
+  --accent: #0969da;
+  --accent-fg: #ffffff;
+  --code-bg: #f5f5f5;
+  --toc-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(31,35,40,0.12);
+  --radius: 8px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --fg: #c9d1d9;
+  --muted: #8b949e;
+  --border: #30363d;
+  --surface: #161b22;
+  --accent: #58a6ff;
+  --accent-fg: #0d1117;
+  --code-bg: #161b22;
+  --toc-bg: #161b22;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.75;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ========== Layout ========== */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+@media (max-width: 900px) {
+  .content-wrapper { flex-direction: column-reverse; gap: 20px; }
+}
+
+/* ========== Header ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+[data-theme="dark"] .site-header {
+  background: rgba(13,17,23,0.85);
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+}
+
+.site-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+#theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+#theme-toggle:hover { background: var(--border); }
+
+/* ========== Article ========== */
+article.markdown-body {
+  flex: 1;
+  min-width: 0;
+}
+
+article h1 { font-size: 2rem; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
+article h2 { font-size: 1.5rem; margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+article h3 { font-size: 1.2rem; margin-top: 1.5em; }
+article h4 { font-size: 1.05rem; }
+article a { color: var(--accent); text-decoration: none; }
+article a:hover { text-decoration: underline; }
+article img { max-width: 100%; border-radius: var(--radius); }
+article blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+article blockquote > p:first-child { margin-top: 0; }
+article blockquote > p:last-child { margin-bottom: 0; }
+article hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+/* ========== Table ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 0.92rem;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+th { background: var(--surface); font-weight: 600; }
+tr:nth-child(even) { background: rgba(150,150,150,0.04); }
+
+/* ========== Code ========== */
+code {
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 16px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+}
+pre code { padding: 0; background: none; }
+
+/* Pygments / highlight */
+.highlight { background: var(--code-bg); border-radius: var(--radius); }
+.hll { background-color: rgba(150,150,150,0.1); }
+.c, .cm, .c1, .cs { color: #6e7781; font-style: italic; }
+.k, .kc, .kd, .kn, .kp, .kr, .kt { color: #cf222e; }
+.o, .ow { color: #953800; }
+.m, .mb, .mf, .mh, .mi, .mo { color: #0550ae; }
+.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #0a3069; }
+.na, .nb, .nc, .nd, .ne, .nf, .nl, .nn, .no, .nt, .nv { color: #8250df; }
+[data-theme="dark"] .c, [data-theme="dark"] .cm, [data-theme="dark"] .c1 { color: #8b949e; }
+[data-theme="dark"] .k, [data-theme="dark"] .kc, [data-theme="dark"] .kd { color: #ff7b72; }
+[data-theme="dark"] .o, [data-theme="dark"] .ow { color: #ffa657; }
+[data-theme="dark"] .m, [data-theme="dark"] .mb { color: #79c0ff; }
+[data-theme="dark"] .s, [data-theme="dark"] .s2, [data-theme="dark"] .s1 { color: #a5d6ff; }
+[data-theme="dark"] .na, [data-theme="dark"] .nb { color: #d2a8ff; }
+
+/* ========== TOC ========== */
+.toc-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 76px;
+  align-self: flex-start;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.toc-sidebar h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.toc-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88rem;
+}
+.toc-sidebar li { margin: 6px 0; }
+.toc-sidebar a {
+  color: var(--muted);
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.toc-sidebar a:hover { color: var(--accent); background: var(--surface); }
+.toc-sidebar ul ul { padding-left: 12px; }
+
+@media (max-width: 900px) {
+  .toc-sidebar { width: 100%; position: static; max-height: none; margin-bottom: 20px; }
+}
+
+/* ========== Index Page ========== */
+.index-page { padding-top: 60px; padding-bottom: 80px; }
+.index-page h1 { font-size: 2.2rem; margin-bottom: 8px; }
+.lead { color: var(--muted); font-size: 1.15rem; margin-bottom: 40px; }
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.report-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.report-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--accent);
+}
+.report-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.report-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.report-card .meta {
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ========== Footer ========== */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$']],
+    displayMath: [['$$', '$$']],
+    processEscapes: true
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-bar">
+    <a class="site-title" href="../index.html">Research Notes</a>
+    <nav class="nav-links">
+      <a href="../index.html">首页</a>
+      
+    </nav>
+    <button id="theme-toggle" aria-label="切换主题">🌙</button>
+  </div>
+</header>
+
+<main class="container content-wrapper">
+  <article class="markdown-body">
+    <h1 id="lidar2026-06-02">激光雷达（LiDAR）技术全景：从光脉冲到三维世界（2026-06-02）<a class="headerlink" href="#lidar2026-06-02" title="Permanent link"></a></h1>
+<blockquote>
+<p><strong>目标读者</strong>：对激光雷达好奇的技术爱好者、自动驾驶关注者、以及有光学背景想了解产业应用的读者。</p>
+<p><strong>目标</strong>：建立从&rdquo;一束激光怎么测距离&rdquo;到&rdquo;激光雷达如何看懂世界&rdquo;的完整物理直觉，理解不同技术路线背后的取舍逻辑。</p>
+</blockquote>
+<hr />
+<h2 id="_1">文档导读<a class="headerlink" href="#_1" title="Permanent link"></a></h2>
+<p>你可能在新闻里看到过：自动驾驶汽车头顶着一个&rdquo;大花盆&rdquo;，不停地旋转，那就是激光雷达。但激光雷达远不止于此——从无人机测绘到iPhone的Face ID，从气象观测到火星探测，激光雷达正在渗透进我们生活的每个角落。</p>
+<p>这篇文档不讲代码、不讲复杂的算法实现，而是带你理解<strong>物理本质</strong>：</p>
+<ul>
+<li>为什么激光能测距离？光飞出去再飞回来，怎么知道它走了多远？</li>
+<li>为什么有的激光雷达转得像雷达，有的却一动不动？</li>
+<li>1550nm和905nm的激光，差的不只是数字，还有安全性？</li>
+<li>激光雷达看到的&rdquo;点云&rdquo;，和相机拍的照片，到底有什么区别？</li>
+</ul>
+<p>读完之后，你应该能够自信地参与任何关于激光雷达的对话，甚至判断某个激光雷达方案的技术含金量。</p>
+<h3 id="_2">文档结构<a class="headerlink" href="#_2" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>章节</th>
+<th>核心问题</th>
+<th>物理图像</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>第一章</strong></td>
+<td>激光怎么测距离？</td>
+<td>光脉冲的&rdquo;往返旅行&rdquo;</td>
+</tr>
+<tr>
+<td><strong>第二章</strong></td>
+<td>怎么让激光&rdquo;看&rdquo;遍四面八方？</td>
+<td>手电筒扫描房间 vs 照相机拍全景</td>
+</tr>
+<tr>
+<td><strong>第三章</strong></td>
+<td>什么样的激光和眼睛是安全的？</td>
+<td>人眼是一个精密的光学系统</td>
+</tr>
+<tr>
+<td><strong>第四章</strong></td>
+<td>激光雷达&rdquo;看到&rdquo;的世界长什么样？</td>
+<td>从散点云到三维地图</td>
+</tr>
+<tr>
+<td><strong>第五章</strong></td>
+<td>谁在造激光雷达？怎么选路线？</td>
+<td>技术路线背后的物理约束</td>
+</tr>
+<tr>
+<td><strong>第六章</strong></td>
+<td>激光雷达会被摄像头取代吗？</td>
+<td>多传感器融合的物理逻辑</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_3">第一部分：激光测距的物理本质<a class="headerlink" href="#_3" title="Permanent link"></a></h2>
+<h3 id="11">1.1 光速是宇宙的速度极限<a class="headerlink" href="#11" title="Permanent link"></a></h3>
+<p>激光雷达测距的核心原理，比你想象的还要简单——它利用了光速的<strong>有限性</strong>。</p>
+<p>光在真空中的速度是：</p>
+$$c = 299,792,458 \, \text{m/s} \approx 3 \times 10^8 \, \text{m/s}$$
+
+<p>这个速度极快，但并非无限快。一束光从地球到月球只需要约1.3秒，但在激光雷达的尺度上——比如测量30米外的障碍物——光往返只需要：</p>
+$$\Delta t = \frac{2d}{c} = \frac{2 \times 30}{3 \times 10^8} = 200 \, \text{ns}$$
+
+<p>200纳秒！这是人眼根本无法感知的短暂时间。但现代电子设备可以轻松测量它。</p>
+<blockquote>
+<p><strong>类比</strong>：想象你在一个巨大的峡谷里喊话。声音传播的速度约340 m/s，如果你听到回声花了2秒，你知道峡谷对面在340米外。激光雷达做的事情一模一样——只不过它用的是光，而不是声音。</p>
+</blockquote>
+<h3 id="12-tof">1.2 ToF：测量光的&rdquo;往返时间&rdquo;<a class="headerlink" href="#12-tof" title="Permanent link"></a></h3>
+<p><strong>ToF（Time of Flight，飞行时间）</strong>是最直接的测距方法：</p>
+<div class="highlight"><pre><span></span><code>    激光雷达          障碍物          激光雷达
+       │                │                │
+       │  ──────────→   │                │
+       │   t = 0        │                │
+       │                │                │
+       │  ←──────────   │                │
+       │   t = Δt       │                │
+       │                │                │
+
+    距离 d = c × Δt / 2
+</code></pre></div>
+
+<p>激光雷达发射一个极短的光脉冲（通常只有几纳秒宽），同时启动一个高精度的计时器。当反射光返回到探测器时，计时器停止。时间差 $\Delta t$ 的一半乘以光速，就是目标的距离。</p>
+<p><strong>ToF的关键挑战</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>挑战</th>
+<th>原因</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>时间测量精度</td>
+<td>1 ns 误差 = 15 cm 距离误差</td>
+<td>使用SPAD（单光子雪崩二极管）+TDC（时间数字转换器）</td>
+</tr>
+<tr>
+<td>微弱回波信号</td>
+<td>目标可能只反射很少的光</td>
+<td>高灵敏度探测器、多脉冲累积</td>
+</tr>
+<tr>
+<td>多目标重叠</td>
+<td>一个激光束照射到多个物体</td>
+<td>波形分析、多回波检测</td>
+</tr>
+<tr>
+<td>环境光干扰</td>
+<td>阳光也可能触发探测器</td>
+<td>窄带滤光片、时间门控</td>
+</tr>
+</tbody>
+</table>
+<p><strong>一个数字</strong>：高端ToF激光雷达的时间测量精度可达<strong>10皮秒（ps）</strong>，对应<strong>1.5毫米</strong>的距离精度。这意味着它可以分辨出两个相距仅1.5毫米的物体。</p>
+<h3 id="13-fmcw">1.3 FMCW：用频率&rdquo;编码&rdquo;距离<a class="headerlink" href="#13-fmcw" title="Permanent link"></a></h3>
+<p>ToF直接测量时间，但还有另一种更优雅的方法——<strong>FMCW（Frequency Modulated Continuous Wave，调频连续波）</strong>。</p>
+<p><strong>FMCW的核心思想</strong>：不是发射脉冲，而是发射一束<strong>频率在不断变化</strong>的连续激光。</p>
+<div class="highlight"><pre><span></span><code>    FMCW 原理：
+
+    发射光频率
+       │    ╱╲    ╱╲    ╱╲
+       │   ╱  ╲  ╱  ╲  ╱  ╲
+       │  ╱    ╲╱    ╲╱    ╲
+       └────────────────────→ 时间
+            ↑
+         线性调频（Chirp）
+         频率从 f₀ 扫到 f₀+Δf
+
+    回波信号：同样的频率变化，但延迟了 Δt
+
+    发射与回波&quot;混频&quot; → 产生拍频（Beat Frequency）
+
+    f_beat ∝ Δt ∝ 距离
+</code></pre></div>
+
+<p>想象一下：你吹着口哨，音调越来越高。你的口哨声遇到墙壁反射回来。因为你一直在提高音调，反射回来的声音总是比你现在吹的音调低——这个音调差，正比于声音往返的时间，也就是正比于距离。</p>
+<p><strong>数学上</strong>：</p>
+<p>如果发射光的频率线性变化：</p>
+$$f_{TX}(t) = f_0 + \frac{B}{T} \cdot t$$
+
+<p>其中 $B$ 是频率扫描范围，$T$ 是扫描时间。回波信号延迟了 $\Delta t = 2d/c$，其频率为：</p>
+$$f_{RX}(t) = f_0 + \frac{B}{T} \cdot (t - \Delta t)$$
+
+<p>两者混频后产生的拍频：</p>
+$$f_{beat} = f_{TX} - f_{RX} = \frac{B}{T} \cdot \Delta t = \frac{2Bd}{cT}$$
+
+<p><strong>FMCW的魔法</strong>：<br />
+- 直接测量频率（容易且精确），而不是时间（困难）<br />
+- 同时获得<strong>距离</strong>和<strong>速度</strong>（通过多普勒频移）<br />
+- 抗干扰能力极强（只有相干光才能产生拍频）</p>
+<blockquote>
+<p><strong>类比</strong>：ToF像拍球——你拍出去，等它弹回来。FMCW像两个音叉——你发出一个持续变化的声音，听回声和你当前声音的&rdquo;音差&rdquo;来判断距离。</p>
+</blockquote>
+<h3 id="14-tof-vs-fmcw">1.4 ToF vs FMCW：两种哲学的对比<a class="headerlink" href="#14-tof-vs-fmcw" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>ToF（脉冲式）</th>
+<th>FMCW（连续波）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>测距原理</td>
+<td>直接测时间</td>
+<td>间接测拍频</td>
+</tr>
+<tr>
+<td>光源</td>
+<td>脉冲激光器</td>
+<td>窄线宽可调激光器</td>
+</tr>
+<tr>
+<td>探测器</td>
+<td>SPAD、APD</td>
+<td>平衡光电探测器</td>
+</tr>
+<tr>
+<td>同时测速</td>
+<td>❌ 不能</td>
+<td>✅ 能（多普勒）</td>
+</tr>
+<tr>
+<td>抗阳光干扰</td>
+<td>中等</td>
+<td>极强（相干检测）</td>
+</tr>
+<tr>
+<td>技术成熟度</td>
+<td>高（量产）</td>
+<td>中（正在量产）</td>
+</tr>
+<tr>
+<td>代表厂商</td>
+<td>Velodyne、禾赛、速腾</td>
+<td>Aurora、SiLC、Mobileye</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_4">第二部分：扫描——让激光&rdquo;看&rdquo;遍四面八方<a class="headerlink" href="#_4" title="Permanent link"></a></h2>
+<h3 id="21">2.1 为什么需要扫描？<a class="headerlink" href="#21" title="Permanent link"></a></h3>
+<p>一束激光只能照亮一个点。要&rdquo;看到&rdquo;周围的世界，你需要让这束光扫过整个视野——就像你用手电筒在黑暗中扫视房间一样。</p>
+<p><strong>扫描的本质</strong>：在二维或三维空间中，有规律地改变激光束的指向。</p>
+<h3 id="22">2.2 机械旋转式：最经典的&rdquo;大花盆&rdquo;<a class="headerlink" href="#22" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code>    机械旋转式LiDAR侧视图：
+
+         ↑
+        ╱ ╲
+       ╱   ╲     ← 旋转的激光发射/接收模块
+      ╱  ●  ╲        （像旋转木马一样转）
+     ╱       ╲
+    └─────────┘
+         │
+    ┌─────────┐
+    │  电机   │  ← 驱动旋转，通常 5-20 Hz
+    └─────────┘
+         │
+    ┌─────────┐
+    │  基座   │  ← 固定在车顶
+    └─────────┘
+</code></pre></div>
+
+<p>机械式激光雷达把激光发射器和探测器装在一个旋转的平台上，通常以<strong>5-20转/秒</strong>的速度旋转。每转一圈，它发射数千束激光，覆盖360°水平视野。</p>
+<p><strong>优点</strong>：<br />
+- 视野覆盖完整（360°水平）<br />
+- 技术成熟，性能稳定<br />
+- 探测距离远（200m以上）</p>
+<p><strong>缺点</strong>：<br />
+- 机械部件多，可靠性差（振动、磨损）<br />
+- 体积大、成本高（早期Velodyne HDL-64E售价$75,000）<br />
+- 旋转部件寿命有限</p>
+<blockquote>
+<p><strong>类比</strong>：机械旋转式LiDAR像一个旋转的灯塔。灯塔的光束扫过海面，每隔几秒就照亮同一个点一次。激光雷达也一样，只不过它每秒转得更快，光束更细。</p>
+</blockquote>
+<h3 id="23-mems">2.3 MEMS：用芯片上的&rdquo;小镜子&rdquo;扫描<a class="headerlink" href="#23-mems" title="Permanent link"></a></h3>
+<p><strong>MEMS（Micro-Electro-Mechanical Systems，微机电系统）</strong>激光雷达用一块极小的硅镜来代替整个旋转机构。</p>
+<div class="highlight"><pre><span></span><code>    MEMS 微镜扫描：
+
+    激光器 ──→ ╲     ╱  ← MEMS微镜（1-5mm大小）
+                ╲   ╱      绕两个轴快速振动
+                 ╲ ╱
+                  ▼
+               扫描图案
+              （光栅式）
+
+    微镜结构（截面）：
+
+    ┌─────────┐
+    │  硅镜   │  ← 镜面镀有高反射率金属
+    ├─╂─────╂─┤  ← 扭转梁（像弹簧铰链）
+    │ │     │ │
+    └─┴─────┴─┘  ← 硅基底
+</code></pre></div>
+
+<p>这块镜子只有<strong>几毫米</strong>大小，通过静电或电磁力驱动，以<strong>kHz级频率</strong>在两个轴上快速振动。激光照射到镜子上，被反射到不同方向，形成扫描图案。</p>
+<p><strong>优点</strong>：<br />
+- 体积小（可以藏进汽车保险杠）<br />
+- 成本低（可批量生产）<br />
+- 可靠性高（无机械旋转部件）</p>
+<p><strong>缺点</strong>：<br />
+- 视野较窄（通常120°水平 × 25°垂直）<br />
+- 振动角度有限（通常±15°）<br />
+- 探测距离相对较短</p>
+<p><strong>代表厂商</strong>：Luminar、Innoviz、Velodyne Velabit</p>
+<blockquote>
+<p><strong>类比</strong>：MEMS LiDAR像一只快速转动的眼球。你的眼睛不需要转整个头来扫视——只需要转动眼球就能覆盖大部分视野。MEMS微镜就是LiDAR的&rdquo;眼球&rdquo;。</p>
+</blockquote>
+<h3 id="24-opa">2.4 OPA：相控阵——没有活动部件的&rdquo;魔法&rdquo;<a class="headerlink" href="#24-opa" title="Permanent link"></a></h3>
+<p><strong>OPA（Optical Phased Array，光学相控阵）</strong>是激光雷达的&rdquo;终极形态&rdquo;之一。它没有机械运动部件，也没有振动微镜——它用<strong>波的干涉</strong>来控制光的方向。</p>
+<p><strong>核心原理</strong>：</p>
+<p>想象一排人站在泳池边，同时跳入水中。如果所有人都同时跳，波纹会向四面八方传播。但如果让左边的人先跳，右边的人后跳——波纹就会偏向右边传播。</p>
+<p>OPA就是这样做的一排<strong>光发射器</strong>，通过精确控制每个发射器的<strong>相位</strong>，让光波在特定方向上相干增强，其他方向上相互抵消。</p>
+<div class="highlight"><pre><span></span><code>    OPA 原理：
+
+    激光输入
+       │
+       ▼
+    ┌──┬──┬──┬──┬──┐  ← 光分束到 N 个波导
+    │○│○│○│○│○│     （间距 d ≈ λ）
+    └─┴─┴─┴─┴─┘
+       │  │  │  │  │
+       ▼  ▼  ▼  ▼  ▼
+    相位控制器：φ₁, φ₂, φ₃, φ₄, φ₅
+
+    远场干涉图案：
+
+    强度
+      │    ╭─╮
+      │   ╱   ╲
+      │  ╱     ╲
+      │ ╱       ╲
+      │╱    ↑    ╲
+      └─────┼──────→ 角度
+           主瓣方向
+      （由相位梯度决定）
+</code></pre></div>
+
+<p><strong>波束转向方程</strong>：</p>
+<p>相邻发射器之间的相位差为 $\Delta\phi$ 时，主瓣方向为：</p>
+$$\theta = \arcsin\left(\frac{\lambda \cdot \Delta\phi}{2\pi d}\right)$$
+
+<p>通过改变 $\Delta\phi$，就可以<strong>电控</strong>激光束的指向——没有任何机械运动！</p>
+<p><strong>优点</strong>：<br />
+- 无任何活动部件（固态）<br />
+- 扫描速度极快（MHz级）<br />
+- 可任意编程扫描图案</p>
+<p><strong>缺点</strong>：<br />
+- 旁瓣干扰（能量泄漏到其他方向）<br />
+- 工艺难度大（需要精确控制每个通道的相位）<br />
+- 目前探测距离和分辨率还在提升中</p>
+<p><strong>代表厂商</strong>：Aurora、Analog Photonics、Voyant Photonics</p>
+<blockquote>
+<p><strong>类比</strong>：OPA像一支训练有素的合唱队。如果所有人都同时唱，声音均匀传播。但如果指挥让左边的人先开口、右边的人晚一点开口，声音就会&rdquo;偏向&rdquo;右边。OPA通过控制&rdquo;谁先发光&rdquo;来控制激光的方向。</p>
+</blockquote>
+<h3 id="25-flash">2.5 Flash：一次照亮整个场景<a class="headerlink" href="#25-flash" title="Permanent link"></a></h3>
+<p>如果扫描太慢，为什么不一次性照亮整个视野？这就是<strong>Flash LiDAR</strong>的思路。</p>
+<div class="highlight"><pre><span></span><code>    Flash LiDAR：
+
+    宽束激光
+       │
+       ▼
+    ════════════════════  ← 泛光照射整个场景
+       │││││││││││││││
+       ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+    ┌──────────────────┐
+    │                  │
+    │    场景          │
+    │                  │
+    └──────────────────┘
+       │││││││││││││││
+       ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+    ┌──────────────────┐
+    │  SPAD阵列         │  ← 每个像素独立测距
+    │  (如 256×256)     │
+    └──────────────────┘
+</code></pre></div>
+
+<p>Flash LiDAR发射一束发散的激光（像相机的闪光灯），照亮整个场景。然后用一个<strong>二维探测器阵列</strong>（类似相机传感器，但每个像素都能独立测量光的飞行时间）同时接收所有反射光。</p>
+<p><strong>优点</strong>：<br />
+- 无扫描延迟（一帧搞定）<br />
+- 适合高速运动场景<br />
+- 无机械部件</p>
+<p><strong>缺点</strong>：<br />
+- 能量分散，探测距离短（通常&lt;50m）<br />
+- 分辨率受探测器阵列限制<br />
+- 高功耗（需要很强的激光）</p>
+<p><strong>应用</strong>：<br />
+- iPhone Face ID（短距3D感知）<br />
+- 车内手势识别<br />
+- 机器人近距离避障</p>
+<blockquote>
+<p><strong>类比</strong>：Flash LiDAR像相机的闪光灯拍照。普通激光雷达像扫描仪——逐行扫描。Flash LiDAR直接拍一张&rdquo;深度照片&rdquo;。</p>
+</blockquote>
+<h3 id="26">2.6 扫描方式对比总结<a class="headerlink" href="#26" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>活动部件</th>
+<th>视野</th>
+<th>探测距离</th>
+<th>成本</th>
+<th>成熟度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>机械旋转</td>
+<td>有（电机+轴承）</td>
+<td>360°</td>
+<td>&gt;200m</td>
+<td>高</td>
+<td>量产</td>
+</tr>
+<tr>
+<td>MEMS</td>
+<td>有（微镜振动）</td>
+<td>~120°</td>
+<td>~150m</td>
+<td>中</td>
+<td>量产</td>
+</tr>
+<tr>
+<td>OPA</td>
+<td>无（纯固态）</td>
+<td>~120°</td>
+<td>~100m</td>
+<td>中高</td>
+<td>接近量产</td>
+</tr>
+<tr>
+<td>Flash</td>
+<td>无（纯固态）</td>
+<td>~60°</td>
+<td>&lt;50m</td>
+<td>低</td>
+<td>量产</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="lidar">第三部分：激光与探测器——LiDAR的&rdquo;眼睛&rdquo;<a class="headerlink" href="#lidar" title="Permanent link"></a></h2>
+<h3 id="31-905nm-vs-1550nm">3.1 905nm vs 1550nm：不只是数字不同<a class="headerlink" href="#31-905nm-vs-1550nm" title="Permanent link"></a></h3>
+<p>激光雷达使用的激光波长主要有两种：<strong>905nm（近红外）</strong>和<strong>1550nm（短波红外）</strong>。</p>
+<div class="highlight"><pre><span></span><code>    光谱位置：
+
+    400nm   700nm   905nm   1550nm
+     │       │       │       │
+    紫光    可见光   近红外  短波红外
+     └───────┴───────┴───────┘
+                        ↑
+                   人眼不可见
+</code></pre></div>
+
+<p>这两种波长的核心区别在于<strong>人眼安全性</strong>。</p>
+<p><strong>人眼的光学结构</strong>：</p>
+<div class="highlight"><pre><span></span><code>    眼球剖面：
+
+    角膜 ──→ 房水 ──→ 晶状体 ──→ 玻璃体 ──→ 视网膜
+     │                                    │
+     └──── 透明组织（可见光+近红外透过） ──┘
+
+    对于 905nm：
+    角膜和晶状体对它基本透明
+    → 激光直接聚焦到视网膜上
+    → 很小的功率就能灼伤视网膜
+    → **安全功率阈值低**
+
+    对于 1550nm：
+    眼球内的水分子强烈吸收它
+    → 激光在到达视网膜之前就被吸收了
+    → 主要加热的是角膜和晶状体（能散热）
+    → **安全功率阈值高 10-40 倍**
+</code></pre></div>
+
+<p><strong>安全功率对比</strong>（IEC 60825-1 标准）：</p>
+<table>
+<thead>
+<tr>
+<th>波长</th>
+<th>单脉冲安全能量</th>
+<th>相对905nm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>905nm</td>
+<td>~50 nJ</td>
+<td>1×</td>
+</tr>
+<tr>
+<td>1550nm</td>
+<td>~500-2000 nJ</td>
+<td>10-40×</td>
+</tr>
+</tbody>
+</table>
+<p>这意味着1550nm激光雷达可以使用<strong>更强功率的激光</strong>，从而获得<strong>更远的探测距离</strong>，而不会伤害人眼。</p>
+<p><strong>但1550nm也有缺点</strong>：<br />
+- 探测器效率低（需要用InGaAs材料，比硅贵）<br />
+- 激光器效率低、成本高<br />
+- 大气中水蒸气吸收更强（雨天性能下降）</p>
+<blockquote>
+<p><strong>类比</strong>：905nm像紫外线——它穿透玻璃（你的眼球），直接伤害内部。1550nm像微波炉辐射——它被水吸收，停留在表面。所以你用微波炉不会伤眼，但看紫外线灯很危险。</p>
+</blockquote>
+<h3 id="32">3.2 探测器：如何&rdquo;看到&rdquo;单个光子？<a class="headerlink" href="#32" title="Permanent link"></a></h3>
+<p>激光雷达的回波信号可能极其微弱——有时一个激光脉冲只返回<strong>几个光子</strong>！如何检测这么弱的信号？</p>
+<h4 id="pin">PIN 光电二极管<a class="headerlink" href="#pin" title="Permanent link"></a></h4>
+<p>最基础的探测器。光子入射产生电子-空穴对，形成光电流。</p>
+<p><strong>缺点</strong>：无内部增益，对微弱信号不敏感。</p>
+<h4 id="apdavalanche-photodiode">APD（Avalanche Photodiode，雪崩光电二极管）<a class="headerlink" href="#apdavalanche-photodiode" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    APD 原理：
+
+    入射光子
+       │
+       ▼
+    ┌─────────────┐
+    │  吸收区     │  ← 光子产生电子-空穴对
+    ├─────────────┤
+    │  倍增区     │  ← 高电场（~10⁵ V/cm）
+    │  (Avalanche)│     电子加速碰撞 → 产生更多电子
+    ├─────────────┤     （雪崩效应）
+    │  收集区     │
+    └─────────────┘
+
+    增益 M = 10 ~ 100
+    1个光子 → 10-100个电子
+</code></pre></div>
+
+<p>APD在强电场下工作，每个被光子激发的电子在碰撞中释放更多电子，形成&rdquo;电子雪崩&rdquo;。增益可达<strong>10-100倍</strong>。</p>
+<h4 id="spadsingle-photon-avalanche-diode">SPAD（Single-Photon Avalanche Diode，单光子雪崩二极管）<a class="headerlink" href="#spadsingle-photon-avalanche-diode" title="Permanent link"></a></h4>
+<p>APD的升级版，工作在<strong>盖革模式</strong>（Geiger Mode）——电场极强，一个光子就能触发自持雪崩。</p>
+<div class="highlight"><pre><span></span><code>    SPAD 工作循环：
+
+    偏置电压
+       │    ╭──╮
+       │   ╱    ╲     ← 高于击穿电压（盖革模式）
+       │  ╱      ╲________
+       │ ╱                 ╲___ ← 淬灭后降低
+       └────────────────────────→ 时间
+            ↑
+         光子到达 → 雪崩 → 主动淬灭 → 恢复
+
+    时间分辨率：&lt;100 ps
+</code></pre></div>
+
+<p>SPAD的时间分辨率极高（<strong>&lt;100皮秒</strong>），是ToF LiDAR的核心探测器。</p>
+<p><strong>SPAD阵列</strong>：把成千上万个SPAD像素排成阵列，每个像素独立计时。这样就能同时测量整个场景的深度。</p>
+<blockquote>
+<p><strong>类比</strong>：PIN二极管像人眼在白天看东西——足够亮就行。APD像夜视仪——能把微弱的光放大。SPAD像盖革计数器——它能&rdquo;听到&rdquo;单个光子的&rdquo;咔嗒&rdquo;声。</p>
+</blockquote>
+<hr />
+<h2 id="_5">第四部分：点云——激光雷达的&rdquo;视觉语言&rdquo;<a class="headerlink" href="#_5" title="Permanent link"></a></h2>
+<h3 id="41">4.1 什么是点云？<a class="headerlink" href="#41" title="Permanent link"></a></h3>
+<p>激光雷达不输出照片，它输出<strong>点云（Point Cloud）</strong>——三维空间中的一组点，每个点有 $(x, y, z)$ 坐标和反射强度。</p>
+<div class="highlight"><pre><span></span><code>    相机看到的世界（2D）：        LiDAR看到的世界（3D点云）：
+
+    ┌──────────────┐           •        •    •
+    │  🚗  🚶  🌳  │          /|\      /|\   /|\
+    │              │         • • •    • • •  • •
+    │   道路       │        车轮廓    人轮廓   树轮廓
+    └──────────────┘
+    像素网格 (u, v)           三维点 (x, y, z, intensity)
+</code></pre></div>
+
+<p>一个典型的车载激光雷达，每秒输出<strong>数十万到数百万个点</strong>。</p>
+<p><strong>点云 vs 照片</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>相机（照片）</th>
+<th>LiDAR（点云）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>维度</td>
+<td>2D + 颜色</td>
+<td>3D + 反射率</td>
+</tr>
+<tr>
+<td>光照依赖</td>
+<td>强（夜晚/逆光失效）</td>
+<td>弱（主动发光）</td>
+</tr>
+<tr>
+<td>纹理信息</td>
+<td>丰富</td>
+<td>无</td>
+</tr>
+<tr>
+<td>距离信息</td>
+<td>需估计</td>
+<td>直接测量</td>
+</tr>
+<tr>
+<td>计算量</td>
+<td>大（深度学习）</td>
+<td>中等（几何处理）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42">4.2 从原始点云到&rdquo;理解&rdquo;场景<a class="headerlink" href="#42" title="Permanent link"></a></h3>
+<p>原始点云是一堆无序的三维点，计算机需要把它变成&rdquo;有意义&rdquo;的信息。</p>
+<p><strong>处理流程</strong>：</p>
+<div class="highlight"><pre><span></span><code>    原始点云
+       │
+       ▼
+    ┌─────────────┐
+    │  地面分割   │  ← 区分地面点和非地面点
+    │ (RANSAC)    │     （假设地面是平面）
+    └──────┬──────┘
+           │
+           ▼
+    ┌─────────────┐
+    │  聚类       │  ← 把相邻点分成&quot;团&quot;
+    │ (DBSCAN)    │     （每个团可能是一个物体）
+    └──────┬──────┘
+           │
+           ▼
+    ┌─────────────┐
+    │  目标检测   │  ← 识别团是什么：车？人？树？
+    │ (PointNet/  │
+    │  PointPillar)│
+    └──────┬──────┘
+           │
+           ▼
+    ┌─────────────┐
+    │  跟踪       │  ← 跨帧追踪同一个物体
+    │ (卡尔曼滤波)│
+    └──────┬──────┘
+           │
+           ▼
+    带标签的3D物体列表
+    [汽车1: (x,y,z,vx,vy), 汽车2: ..., 行人1: ...]
+</code></pre></div>
+
+<p><strong>RANSAC（Random Sample Consensus）</strong>是地面分割的经典算法：</p>
+<ol>
+<li>随机选3个点，拟合一个平面</li>
+<li>计算有多少点&rdquo;靠近&rdquo;这个平面（距离&lt;阈值）</li>
+<li>重复多次，选&rdquo;支持者&rdquo;最多的平面作为地面</li>
+</ol>
+<blockquote>
+<p><strong>类比</strong>：点云处理像拼图。原始点云是散落在桌上的拼图碎片。地面分割是把&rdquo;蓝色天空&rdquo;的碎片挑出来。聚类是把相邻的碎片拼成小区域。目标检测是看出&rdquo;这片碎片是马的身体&rdquo;。跟踪是&rdquo;这匹马在下一帧跑到了哪里&rdquo;。</p>
+</blockquote>
+<h3 id="43-lidar">4.3 多传感器融合：LiDAR + 相机<a class="headerlink" href="#43-lidar" title="Permanent link"></a></h3>
+<p>激光雷达和相机是<strong>互补</strong>的：</p>
+<ul>
+<li><strong>LiDAR</strong>：精确的距离和形状，但没有颜色纹理</li>
+<li><strong>相机</strong>：丰富的颜色和纹理，但不知道距离</li>
+</ul>
+<p>把它们融合起来：</p>
+<div class="highlight"><pre><span></span><code>    LiDAR点云          相机图像           融合结果
+       │                │                  │
+       ▼                ▼                  ▼
+    •••••••          ┌────────┐         ┌────────┐
+    • 🚗 •           │  🚗🔴  │   →    │ 🚗 距离=15m
+    •••••••          │  红色  │         │ 🚗 颜色=红色
+                     └────────┘         └────────┘
+
+    融合方法：
+    1. 标定（Calibration）：找到LiDAR和相机的坐标变换关系
+    2. 投影：把3D点投影到2D图像上
+    3. 关联：给每个点赋予像素的颜色
+</code></pre></div>
+
+<p><strong>融合的挑战</strong>：<br />
+- 时间同步（LiDAR和相机采集时刻不同）<br />
+- 空间标定（两者的坐标系对齐）<br />
+- 数据表示（如何把稀疏点云和稠密图像结合）</p>
+<hr />
+<h2 id="lidar_1">第五部分：产业格局——谁在造LiDAR？<a class="headerlink" href="#lidar_1" title="Permanent link"></a></h2>
+<h3 id="51">5.1 技术路线之争<a class="headerlink" href="#51" title="Permanent link"></a></h3>
+<p>激光雷达产业正在经历一场&rdquo;路线之争&rdquo;——没有一种方案是完美的，每个厂商都在做不同的取舍。</p>
+<div class="highlight"><pre><span></span><code>    技术路线矩阵：
+
+                 探测距离
+         短 ←─────────────→ 长
+         │
+    低   │  Flash          MEMS
+    成   │  (Face ID)      (Luminar)
+    本   │
+         │        OPA
+         │     (Aurora)
+         │
+    高   │  机械旋转
+    成   │  (Velodyne/禾赛)
+         │
+</code></pre></div>
+
+<p><strong>机械旋转路线</strong>：Velodyne（美国，鼻祖）、禾赛（中国，市占率第一）、速腾聚创（中国）、Ouster（美国，数字LiDAR）</p>
+<p><strong>MEMS路线</strong>：Luminar（美国，1550nm + MEMS，与沃尔沃/奔驰合作）、Innoviz（以色列，与宝马合作）</p>
+<p><strong>OPA路线</strong>：Aurora（美国，收购Blackmore的FMCW + OPA）、Voyant Photonics（美国）</p>
+<p><strong>Flash路线</strong>：Ibeo（德国，被采埃孚收购）、Sense Photonics（美国）</p>
+<h3 id="52">5.2 成本下降曲线<a class="headerlink" href="#52" title="Permanent link"></a></h3>
+<p>激光雷达的成本在过去10年下降了<strong>超过100倍</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>年份</th>
+<th>代表产品</th>
+<th>价格</th>
+<th>技术</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2012</td>
+<td>Velodyne HDL-64E</td>
+<td>$75,000</td>
+<td>机械旋转</td>
+</tr>
+<tr>
+<td>2017</td>
+<td>Velodyne VLP-16</td>
+<td>$7,999</td>
+<td>机械旋转</td>
+</tr>
+<tr>
+<td>2020</td>
+<td>禾赛 Pandar40P</td>
+<td>~$5,000</td>
+<td>机械旋转</td>
+</tr>
+<tr>
+<td>2022</td>
+<td>禾赛 ET25</td>
+<td>~$500</td>
+<td>半固态</td>
+</tr>
+<tr>
+<td>2024</td>
+<td>速腾 M1 Plus</td>
+<td>~$300</td>
+<td>MEMS</td>
+</tr>
+<tr>
+<td>2025+</td>
+<td>多家目标</td>
+<td>&lt;$200</td>
+<td>固态</td>
+</tr>
+</tbody>
+</table>
+<p><strong>成本下降的核心驱动力</strong>：<br />
+1. <strong>芯片化</strong>：把激光器、探测器、驱动电路集成到芯片上<br />
+2. <strong>规模效应</strong>：自动驾驶和ADAS（高级辅助驾驶）需求爆发<br />
+3. <strong>中国供应链</strong>：激光器、探测器、光学元件成本大幅下降</p>
+<blockquote>
+<p><strong>类比</strong>：激光雷达的成本曲线像太阳能电池板——10年前贵得离谱，只适合航天和军事。现在便宜到可以装在你家门上（Face ID）和车顶上（辅助驾驶）。</p>
+</blockquote>
+<h3 id="53">5.3 特斯拉的&rdquo;纯视觉&rdquo;挑战<a class="headerlink" href="#53" title="Permanent link"></a></h3>
+<p>特斯拉是唯一坚持<strong>不装激光雷达</strong>的主流自动驾驶厂商。马斯克曾说&rdquo;LiDAR是傻瓜的差事&rdquo;。</p>
+<p><strong>特斯拉的逻辑</strong>：<br />
+- 人只有两只眼睛就能开车，为什么车需要激光雷达？<br />
+- 摄像头获取的信息密度远高于LiDAR（颜色、纹理、文字）<br />
+- 神经网络可以从2D图像中推断3D信息</p>
+<p><strong>反方观点</strong>：<br />
+- 人眼在夜晚、逆光、强光下也会失效<br />
+- 神经网络推断的深度精度不如LiDAR直接测量<br />
+- 安全关键系统需要冗余（摄像头+LiDAR互补）</p>
+<p><strong>现实</strong>：大多数自动驾驶公司（Waymo、百度、小马智行等）选择<strong>多传感器融合</strong>——既有摄像头，也有LiDAR，还有毫米波雷达。</p>
+<hr />
+<h2 id="lidar_2">第六部分：未来——LiDAR会走向何方？<a class="headerlink" href="#lidar_2" title="Permanent link"></a></h2>
+<h3 id="61-lidar-on-a-chip">6.1 芯片化：LiDAR-on-a-Chip<a class="headerlink" href="#61-lidar-on-a-chip" title="Permanent link"></a></h3>
+<p>未来的激光雷达可能不再是&rdquo;一个盒子&rdquo;，而是<strong>一颗芯片</strong>。</p>
+<div class="highlight"><pre><span></span><code>    LiDAR芯片化演进：
+
+    第一代：分立器件
+    ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐
+    │激光器│ │探测器│ │光学件│ │电路板│
+    └─────┘ └─────┘ └─────┘ └─────┘
+
+    第二代：模块化
+    ┌─────────────────┐
+    │   激光发射模块   │
+    ├─────────────────┤
+    │   探测接收模块   │
+    └─────────────────┘
+
+    第三代：芯片化
+    ┌─────────────────┐
+    │                 │
+    │   LiDAR SoC     │  ← 激光器+探测器+驱动+DSP
+    │   (5×5 mm²)     │     集成在一颗芯片上
+    │                 │
+    └─────────────────┘
+</code></pre></div>
+
+<p><strong>芯片化的关键技术</strong>：<br />
+- 硅光子学（Silicon Photonics）：在硅芯片上集成光器件<br />
+- SPAD阵列CMOS工艺：用标准芯片工艺制造单光子探测器<br />
+- VCSEL（垂直腔面发射激光器）阵列：低成本、高可靠性</p>
+<h3 id="62-4d-lidar">6.2 4D LiDAR：不只是三维<a class="headerlink" href="#62-4d-lidar" title="Permanent link"></a></h3>
+<p>传统的LiDAR输出 $(x, y, z)$ 三维坐标。<strong>4D LiDAR</strong>增加了第四维——<strong>速度</strong>（通过多普勒效应或FMCW实现）。</p>
+<div class="highlight"><pre><span></span><code>    4D LiDAR输出：
+
+    每个点：(x, y, z, v)
+
+    场景：              带速度的点云：
+    🚗 →               🚗 [x=10, y=0, z=0, v=+20m/s]
+    🚶                  🚶 [x=5, y=2, z=0, v=+1m/s]
+    🌳                  🌳 [x=20, y=5, z=0, v=0m/s]
+</code></pre></div>
+
+<p>知道每个点的速度，可以：<br />
+- 更快识别运动物体<br />
+- 预测轨迹（碰撞预警）<br />
+- 过滤静止背景（减少计算量）</p>
+<h3 id="63">6.3 从自动驾驶到万物互联<a class="headerlink" href="#63" title="Permanent link"></a></h3>
+<p>LiDAR的应用正在远远超出自动驾驶：</p>
+<table>
+<thead>
+<tr>
+<th>领域</th>
+<th>应用</th>
+<th>为什么需要LiDAR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>消费电子</td>
+<td>iPhone Face ID、扫地机器人</td>
+<td>近距离3D感知</td>
+</tr>
+<tr>
+<td>测绘</td>
+<td>地形扫描、建筑建模</td>
+<td>高精度三维重建</td>
+</tr>
+<tr>
+<td>农业</td>
+<td>作物高度监测、精准喷洒</td>
+<td>大面积3D测量</td>
+</tr>
+<tr>
+<td>气象</td>
+<td>风速剖面、气溶胶监测</td>
+<td>远程大气探测</td>
+</tr>
+<tr>
+<td>航天</td>
+<td>火星地形测绘、小行星着陆</td>
+<td>无GPS环境下的导航</td>
+</tr>
+<tr>
+<td>安防</td>
+<td>周界监控、人流计数</td>
+<td>全天候3D监控</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_6">写在最后<a class="headerlink" href="#_6" title="Permanent link"></a></h2>
+<p>激光雷达的本质，是人类对&rdquo;光&rdquo;这一最古老物理现象的工程化利用。</p>
+<p>从牛顿用棱镜分解阳光，到爱因斯坦解释光电效应，再到今天我们把激光脉冲的飞行时间测量到皮秒精度——这是数百年物理学积累的结晶。</p>
+<p>当你看到一辆自动驾驶汽车头顶的激光雷达旋转时，请记住：那不是简单的&rdquo;传感器&rdquo;，而是一台精密的光学仪器，它在用光速的有限性丈量世界，用波的相干性控制方向，用量子力学的概率性探测光子。</p>
+<blockquote>
+<p><strong>一个数字</strong>：最先进的激光雷达可以在100米外，分辨出两个相距5厘米的物体——同时以每秒数百万次的频率重复这个过程。这相当于你站在足球场的一端，能看清另一端两根并排的筷子，而且每秒看一百万次。</p>
+</blockquote>
+<p>这就是光的魔力。</p>
+  </article>
+  <aside class="toc-sidebar"><div class="toc"><span class="toctitle">目录</span><ul>
+<li><a href="#_1">文档导读</a><ul>
+<li><a href="#_2">文档结构</a></li>
+</ul>
+</li>
+<li><a href="#_3">第一部分：激光测距的物理本质</a><ul>
+<li><a href="#11">1.1 光速是宇宙的速度极限</a></li>
+<li><a href="#12-tof">1.2 ToF：测量光的&rdquo;往返时间&rdquo;</a></li>
+<li><a href="#13-fmcw">1.3 FMCW：用频率&rdquo;编码&rdquo;距离</a></li>
+<li><a href="#14-tof-vs-fmcw">1.4 ToF vs FMCW：两种哲学的对比</a></li>
+</ul>
+</li>
+<li><a href="#_4">第二部分：扫描——让激光&rdquo;看&rdquo;遍四面八方</a><ul>
+<li><a href="#21">2.1 为什么需要扫描？</a></li>
+<li><a href="#22">2.2 机械旋转式：最经典的&rdquo;大花盆&rdquo;</a></li>
+<li><a href="#23-mems">2.3 MEMS：用芯片上的&rdquo;小镜子&rdquo;扫描</a></li>
+<li><a href="#24-opa">2.4 OPA：相控阵——没有活动部件的&rdquo;魔法&rdquo;</a></li>
+<li><a href="#25-flash">2.5 Flash：一次照亮整个场景</a></li>
+<li><a href="#26">2.6 扫描方式对比总结</a></li>
+</ul>
+</li>
+<li><a href="#lidar">第三部分：激光与探测器——LiDAR的&rdquo;眼睛&rdquo;</a><ul>
+<li><a href="#31-905nm-vs-1550nm">3.1 905nm vs 1550nm：不只是数字不同</a></li>
+<li><a href="#32">3.2 探测器：如何&rdquo;看到&rdquo;单个光子？</a><ul>
+<li><a href="#pin">PIN 光电二极管</a></li>
+<li><a href="#apdavalanche-photodiode">APD（Avalanche Photodiode，雪崩光电二极管）</a></li>
+<li><a href="#spadsingle-photon-avalanche-diode">SPAD（Single-Photon Avalanche Diode，单光子雪崩二极管）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_5">第四部分：点云——激光雷达的&rdquo;视觉语言&rdquo;</a><ul>
+<li><a href="#41">4.1 什么是点云？</a></li>
+<li><a href="#42">4.2 从原始点云到&rdquo;理解&rdquo;场景</a></li>
+<li><a href="#43-lidar">4.3 多传感器融合：LiDAR + 相机</a></li>
+</ul>
+</li>
+<li><a href="#lidar_1">第五部分：产业格局——谁在造LiDAR？</a><ul>
+<li><a href="#51">5.1 技术路线之争</a></li>
+<li><a href="#52">5.2 成本下降曲线</a></li>
+<li><a href="#53">5.3 特斯拉的&rdquo;纯视觉&rdquo;挑战</a></li>
+</ul>
+</li>
+<li><a href="#lidar_2">第六部分：未来——LiDAR会走向何方？</a><ul>
+<li><a href="#61-lidar-on-a-chip">6.1 芯片化：LiDAR-on-a-Chip</a></li>
+<li><a href="#62-4d-lidar">6.2 4D LiDAR：不只是三维</a></li>
+<li><a href="#63">6.3 从自动驾驶到万物互联</a></li>
+</ul>
+</li>
+<li><a href="#_6">写在最后</a></li>
+</ul>
+</div>
+</aside>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>Research Notes &middot; Generated on 2026-06-02</p>
+  </div>
+</footer>
+
+<script>
+
+(function() {
+  // Theme toggle
+  const btn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  function updateIcon() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+  updateIcon();
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateIcon();
+  });
+
+  // TOC active highlight on scroll
+  const toc = document.querySelector('.toc-sidebar');
+  if (toc) {
+    const links = toc.querySelectorAll('a[href^="#"]');
+    const headings = Array.from(document.querySelectorAll('article [id]'));
+    if (headings.length && links.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(l => l.style.color = '');
+            const link = toc.querySelector('a[href="#' + entry.target.id + '"]');
+            if (link) link.style.color = 'var(--accent)';
+          }
+        });
+      }, { rootMargin: '-80px 0px -60% 0px' });
+      headings.forEach(h => observer.observe(h));
+    }
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光通信技术全景：从光纤到芯片的光之旅程（2026-06-02）</title>
+<style>
+
+/* ========== Variables ========== */
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --border: #d1d9e0;
+  --surface: #f6f8fa;
+  --accent: #0969da;
+  --accent-fg: #ffffff;
+  --code-bg: #f5f5f5;
+  --toc-bg: #f6f8fa;
+  --shadow: 0 1px 3px rgba(31,35,40,0.12);
+  --radius: 8px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --fg: #c9d1d9;
+  --muted: #8b949e;
+  --border: #30363d;
+  --surface: #161b22;
+  --accent: #58a6ff;
+  --accent-fg: #0d1117;
+  --code-bg: #161b22;
+  --toc-bg: #161b22;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.75;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ========== Layout ========== */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 40px;
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+@media (max-width: 900px) {
+  .content-wrapper { flex-direction: column-reverse; gap: 20px; }
+}
+
+/* ========== Header ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+[data-theme="dark"] .site-header {
+  background: rgba(13,17,23,0.85);
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+}
+
+.site-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+
+#theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+#theme-toggle:hover { background: var(--border); }
+
+/* ========== Article ========== */
+article.markdown-body {
+  flex: 1;
+  min-width: 0;
+}
+
+article h1 { font-size: 2rem; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
+article h2 { font-size: 1.5rem; margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+article h3 { font-size: 1.2rem; margin-top: 1.5em; }
+article h4 { font-size: 1.05rem; }
+article a { color: var(--accent); text-decoration: none; }
+article a:hover { text-decoration: underline; }
+article img { max-width: 100%; border-radius: var(--radius); }
+article blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+article blockquote > p:first-child { margin-top: 0; }
+article blockquote > p:last-child { margin-bottom: 0; }
+article hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+/* ========== Table ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0;
+  font-size: 0.92rem;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+th { background: var(--surface); font-weight: 600; }
+tr:nth-child(even) { background: rgba(150,150,150,0.04); }
+
+/* ========== Code ========== */
+code {
+  font-family: var(--font-mono);
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 16px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+}
+pre code { padding: 0; background: none; }
+
+/* Pygments / highlight */
+.highlight { background: var(--code-bg); border-radius: var(--radius); }
+.hll { background-color: rgba(150,150,150,0.1); }
+.c, .cm, .c1, .cs { color: #6e7781; font-style: italic; }
+.k, .kc, .kd, .kn, .kp, .kr, .kt { color: #cf222e; }
+.o, .ow { color: #953800; }
+.m, .mb, .mf, .mh, .mi, .mo { color: #0550ae; }
+.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #0a3069; }
+.na, .nb, .nc, .nd, .ne, .nf, .nl, .nn, .no, .nt, .nv { color: #8250df; }
+[data-theme="dark"] .c, [data-theme="dark"] .cm, [data-theme="dark"] .c1 { color: #8b949e; }
+[data-theme="dark"] .k, [data-theme="dark"] .kc, [data-theme="dark"] .kd { color: #ff7b72; }
+[data-theme="dark"] .o, [data-theme="dark"] .ow { color: #ffa657; }
+[data-theme="dark"] .m, [data-theme="dark"] .mb { color: #79c0ff; }
+[data-theme="dark"] .s, [data-theme="dark"] .s2, [data-theme="dark"] .s1 { color: #a5d6ff; }
+[data-theme="dark"] .na, [data-theme="dark"] .nb { color: #d2a8ff; }
+
+/* ========== TOC ========== */
+.toc-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 76px;
+  align-self: flex-start;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.toc-sidebar h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.toc-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88rem;
+}
+.toc-sidebar li { margin: 6px 0; }
+.toc-sidebar a {
+  color: var(--muted);
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.toc-sidebar a:hover { color: var(--accent); background: var(--surface); }
+.toc-sidebar ul ul { padding-left: 12px; }
+
+@media (max-width: 900px) {
+  .toc-sidebar { width: 100%; position: static; max-height: none; margin-bottom: 20px; }
+}
+
+/* ========== Index Page ========== */
+.index-page { padding-top: 60px; padding-bottom: 80px; }
+.index-page h1 { font-size: 2.2rem; margin-bottom: 8px; }
+.lead { color: var(--muted); font-size: 1.15rem; margin-bottom: 40px; }
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.report-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.report-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--accent);
+}
+.report-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.report-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.report-card .meta {
+  margin-top: 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* ========== Footer ========== */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+</style>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$']],
+    displayMath: [['$$', '$$']],
+    processEscapes: true
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-bar">
+    <a class="site-title" href="../index.html">Research Notes</a>
+    <nav class="nav-links">
+      <a href="../index.html">首页</a>
+      
+    </nav>
+    <button id="theme-toggle" aria-label="切换主题">🌙</button>
+  </div>
+</header>
+
+<main class="container content-wrapper">
+  <article class="markdown-body">
+    <h1 id="2026-06-02">光通信技术全景：从光纤到芯片的光之旅程（2026-06-02）<a class="headerlink" href="#2026-06-02" title="Permanent link"></a></h1>
+<blockquote>
+<p><strong>目标读者</strong>：对光学有基础兴趣的技术爱好者，希望建立从光纤到芯片的完整物理认知，理解光如何成为现代信息社会的&rdquo;动脉&rdquo;。</p>
+<p><strong>目标</strong>：建立光通信的完整物理直觉——光如何在光纤中奔跑、如何&rdquo;携带&rdquo;信息、如何跨越海洋连接世界。</p>
+</blockquote>
+<hr />
+<h2 id="_1">文档导读<a class="headerlink" href="#_1" title="Permanent link"></a></h2>
+<p>n<br />
+你可能每天都在使用光通信——刷手机、看视频、发邮件——但从来没有想过，这些信息是如何以<strong>光的速度</strong>传到你面前的。</p>
+<p>从海底光缆到数据中心，从5G基站到你的Wi-Fi路由器，光通信构成了现代数字世界的骨架。这篇文档将带你走完这段&rdquo;光的旅程&rdquo;：</p>
+<ul>
+<li>光为什么能在玻璃丝里跑几千公里不&rdquo;迷路&rdquo;？</li>
+<li>如何把信息&rdquo;写&rdquo;到光上？让光&rdquo;记住&rdquo;比特？</li>
+<li>为什么海底光缆比卫星通信快得多？</li>
+<li>未来的芯片会不会用光来&rdquo;说话&rdquo;？</li>
+</ul>
+<p>读完之后，你应该能够理解任何关于&rdquo;光纤宽带&rdquo;、&rdquo;5G回传&rdquo;、&rdquo;硅光芯片&rdquo;的对话。</p>
+<h3 id="_2">文档结构<a class="headerlink" href="#_2" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>章节</th>
+<th>核心问题</th>
+<th>物理图像</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>第一章</strong></td>
+<td>光如何在光纤中奔跑？</td>
+<td>光在&rdquo;镜面隧道&rdquo;里弹跳</td>
+</tr>
+<tr>
+<td><strong>第二章</strong></td>
+<td>光跑远了为什么会&rdquo;累&rdquo;？</td>
+<td>不同颜色的光跑速不同</td>
+</tr>
+<tr>
+<td><strong>第三章</strong></td>
+<td>如何把信息&rdquo;写&rdquo;到光上？</td>
+<td>手电筒的闪烁 vs 激光的相位旋转</td>
+</tr>
+<tr>
+<td><strong>第四章</strong></td>
+<td>光通信需要哪些&rdquo;器官&rdquo;？</td>
+<td>每个器件在链路中的角色</td>
+</tr>
+<tr>
+<td><strong>第五章</strong></td>
+<td>从数据中心到海底电缆</td>
+<td>信息高速公路的分层图景</td>
+</tr>
+<tr>
+<td><strong>第六章</strong></td>
+<td>芯片上的光路——硅光子学</td>
+<td>电信号跑累了换光信号&rdquo;接力&rdquo;</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_3">第一部分：光如何在光纤中奔跑？<a class="headerlink" href="#_3" title="Permanent link"></a></h2>
+<h3 id="11">1.1 全反射：光的&rdquo;镜面隧道&rdquo;<a class="headerlink" href="#11" title="Permanent link"></a></h3>
+<p>光纤的核心原理是<strong>全反射（Total Internal Reflection）</strong>——这是光在两种介质界面上发生的一种奇妙现象。</p>
+<p><strong>斯涅尔定律（Snell&rsquo;s Law）</strong>：</p>
+$$n_1 \sin\theta_1 = n_2 \sin\theta_2$$
+
+<p>其中 $n_1$ 和 $n_2$ 是两种介质的折射率，$\theta_1$ 和 $\theta_2$ 是入射角和折射角。</p>
+<p><strong>关键条件</strong>：当光从<strong>高折射率</strong>介质射向<strong>低折射率</strong>介质时，如果入射角大于<strong>临界角</strong> $\theta_c$，光就不会折射出去，而是<strong>全部反射回来</strong>：</p>
+$$\theta_c = \arcsin\left(\frac{n_2}{n_1}\right)$$
+
+<div class="highlight"><pre><span></span><code>    全反射示意图：
+
+    高折射率 n₁（玻璃芯）
+    │
+    │   ╲
+    │    ╲  θ₁ &gt; θc
+    │─────╳─────  ← 界面
+    │      ╲
+    │       ╲  （全反射，无折射光）
+    │
+    低折射率 n₂（包层）
+
+    光纤结构：
+    ┌─────────────────┐
+    │   纤芯 (Core)   │  ← 高折射率玻璃，n₁≈1.47
+    │   (~8-50 μm)    │     光在这里传输
+    ├─────────────────┤
+    │  包层 (Cladding)│  ← 低折射率玻璃，n₂≈1.45
+    │  (~125 μm)      │
+    ├─────────────────┤
+    │  涂覆层 (Coating│  ← 塑料保护层
+    │   ~250 μm)      │
+    └─────────────────┘
+</code></pre></div>
+
+<p><strong>光纤的尺度</strong>：<br />
+- 纤芯直径：$8\sim50\,\mu\text{m}$（比头发丝还细！）<br />
+- 包层直径：$125\,\mu\text{m}$（标准尺寸）<br />
+- 涂覆后直径：$250\,\mu\text{m}$（约3根头发丝粗）</p>
+<blockquote>
+<p><strong>类比</strong>：光纤像一条极细的镜面隧道。光在隧道里不断&rdquo;弹跳&rdquo;前进，永远不会撞破墙壁——因为墙壁（包层）的折射率比隧道内部（纤芯）低，光在界面上被&rdquo;弹&rdquo;了回来。</p>
+</blockquote>
+<h3 id="12-vs">1.2 两种光纤：单模 vs 多模<a class="headerlink" href="#12-vs" title="Permanent link"></a></h3>
+<p>根据纤芯粗细，光纤分为两类：</p>
+<div class="highlight"><pre><span></span><code>    多模光纤 (MMF)              单模光纤 (SMF)
+
+    ┌─────────────┐            ┌───┐
+    │             │            │   │
+    │   大纤芯    │            │细芯│
+    │   50 μm     │            │8μm│
+    │             │            │   │
+    └─────────────┘            └───┘
+
+    多束光模式同时传输          只有一束光（基模）
+    模式色散严重                几乎无色散
+    短距离、低成本              长距离、高成本
+    LED光源即可                 需要激光器
+</code></pre></div>
+
+<p><strong>为什么单模光纤更好？</strong></p>
+<p>多模光纤中，不同&rdquo;模式&rdquo;的光走的路径不同——有的走直线，有的走&rdquo;之&rdquo;字形。它们到达时间不同，导致信号&rdquo;模糊&rdquo;。这叫做<strong>模态色散</strong>。</p>
+<p>单模光纤的纤芯极细，只允许一种模式传播，从根本上消除了模态色散。</p>
+<blockquote>
+<p><strong>类比</strong>：多模光纤像一条宽马路，行人可以并排走、斜着走、绕来绕去地走——大家到达时间参差不齐。单模光纤像一条极窄的独木桥——只能排队走，所以 everyone&rsquo;s arrival time is synchronized。</p>
+</blockquote>
+<h3 id="13">1.3 光在光纤中真的在&rdquo;跑&rdquo;吗？<a class="headerlink" href="#13" title="Permanent link"></a></h3>
+<p>光在光纤中的传播速度不是真空光速 $c$，而是：</p>
+$$v = \frac{c}{n} \approx \frac{3 \times 10^8}{1.5} = 2 \times 10^8 \, \text{m/s}$$
+
+<p>也就是说，光在玻璃中慢了约<strong>1/3</strong>。</p>
+<p>但这还不是全部——由于全反射，光走的是&rdquo;之&rdquo;字形路径，实际路径比直线长。有效传播速度约为：</p>
+$$v_{eff} = \frac{c}{n_{eff}} \approx \frac{c}{1.47} \approx 2.04 \times 10^8 \, \text{m/s}$$
+
+<p><strong>一个数字</strong>：从北京到上海约$1200\,\text{km}$，光在光纤中需要约<strong>6毫秒</strong>。这大概就是光在玻璃中&rdquo;奔跑&rdquo;的速度。</p>
+<hr />
+<h2 id="_4">第二部分：色散与损耗——光的&rdquo;疲劳&rdquo;<a class="headerlink" href="#_4" title="Permanent link"></a></h2>
+<h3 id="21">2.1 损耗：光跑远了会变弱<a class="headerlink" href="#21" title="Permanent link"></a></h3>
+<p>即使光纤是极高纯度的玻璃，光在传播中还是会逐渐变弱。这是因为：</p>
+<p><strong>吸收损耗</strong>：<br />
+- <strong>紫外吸收</strong>：玻璃中的电子跃迁吸收紫外光<br />
+- <strong>红外吸收</strong>：Si-O键的分子振动吸收红外光<br />
+- <strong>杂质吸收</strong>：OH⁻（水分子）在$1380\,\text{nm}$处有强吸收峰</p>
+<p><strong>散射损耗</strong>：<br />
+- <strong>瑞利散射</strong>：玻璃分子密度的微观不均匀性散射光。瑞利散射强度与波长的四次方成反比：</p>
+$$\alpha_{Rayleigh} \propto \frac{1}{\lambda^4}$$
+
+<p>这就是为什么：<br />
+- 天空是蓝色的（蓝光波长短，散射强）<br />
+-  sunsets是红色的（红光波长长，散射弱，穿透力强）<br />
+- 光纤通信偏好$1550\,\text{nm}$（损耗最小）</p>
+<div class="highlight"><pre><span></span><code>    光纤损耗谱：
+
+    损耗 (dB/km)
+    0.5 │        ╭────╮
+        │       ╱      ╲
+    0.3 │      ╱   ③   ╲     ③ = 1550 nm (C-band)
+        │  ①  ╱          ╲    损耗 ~0.2 dB/km
+    0.2 │──╮─╱            ╲──
+        │  ╲╱              ②
+        │  ②               ② = 1310 nm
+    0.1 │                    损耗 ~0.35 dB/km
+        │
+        └────────────────────→ 波长 (nm)
+           800  1100  1310  1550  1800
+</code></pre></div>
+
+<p><strong>现代光纤的损耗</strong>：在$1550\,\text{nm}$窗口，优质光纤的损耗低至$0.17\,\text{dB/km}$。</p>
+<p>这意味着光跑$100\,\text{km}$后，功率只衰减到原来的约<strong>4%</strong>。</p>
+<blockquote>
+<p><strong>类比</strong>：光纤损耗像声音在空气中传播。你喊话，远处的人听到的声音越来越小——空气分子散射和吸收了一部分声能。光纤中的玻璃分子对光做同样的事情。</p>
+</blockquote>
+<h3 id="22">2.2 色散：不同颜色的光跑速不同<a class="headerlink" href="#22" title="Permanent link"></a></h3>
+<p>即使你只发射一种颜色的光，光脉冲还是会在传播中&rdquo;变宽&rdquo;。这是因为<strong>色散</strong>——不同频率（颜色）的光在光纤中传播速度不同。</p>
+<p><strong>色散的类型</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>原因</th>
+<th>影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>模态色散</strong></td>
+<td>不同模式走不同路径</td>
+<td>仅多模光纤</td>
+</tr>
+<tr>
+<td><strong>材料色散</strong></td>
+<td>玻璃折射率随波长变化</td>
+<td>所有光纤</td>
+</tr>
+<tr>
+<td><strong>波导色散</strong></td>
+<td>光场分布随波长变化</td>
+<td>所有光纤</td>
+</tr>
+</tbody>
+</table>
+<p><strong>材料色散</strong>：</p>
+<p>玻璃的折射率 $n$ 不是常数，而是随波长变化：</p>
+$$n(\lambda) = n_0 - \frac{\lambda^2}{2} \frac{d^2n}{d\lambda^2}$$
+
+<p>这意味着：<br />
+- 蓝光（短波长）跑得慢<br />
+- 红光（长波长）跑得快</p>
+<div class="highlight"><pre><span></span><code>    色散导致脉冲展宽：
+
+    发射端：                接收端（100 km后）：
+
+    强度                    强度
+    │  ╭╮                   │  ╭────╮
+    │  ││                   │ ╱      ╲
+    │  ││                   │╱        ╲
+    └──┴┴──→ t              └──────────→ t
+       ↑                      ↑    ↑
+    窄脉冲                  脉冲变宽
+                            &quot;0&quot;和&quot;1&quot;重叠
+                            → 误码！
+</code></pre></div>
+
+<p><strong>色散补偿</strong>：</p>
+<ol>
+<li><strong>色散补偿光纤（DCF）</strong>：一段特殊设计的光纤，具有负色散，抵消普通光纤的正色散</li>
+<li><strong>啁啾光纤光栅（FBG）</strong>：用光栅引入波长相关的延迟</li>
+<li><strong>数字信号处理（DSP）</strong>：在接收端用算法&rdquo;反折&rdquo;色散效应</li>
+</ol>
+<blockquote>
+<p><strong>类比</strong>：色散像一群不同速度的人在跑马拉松。发令枪响时大家站成一排（一个窄脉冲），但跑得快的（红光）逐渐领先，跑得慢的（蓝光）落后——到达终点时，队伍已经拉得很长（脉冲展宽）。如果队伍拉得太长，你分不清谁是谁了（误码）。</p>
+</blockquote>
+<h3 id="23">2.3 非线性效应：强光下的&rdquo;脾气&rdquo;<a class="headerlink" href="#23" title="Permanent link"></a></h3>
+<p>当光功率足够高时，光纤会表现出<strong>非线性</strong>行为：</p>
+<p><strong>自相位调制（SPM）</strong>：光自身的强度改变了它自己的相位</p>
+$$\Delta\phi = \frac{2\pi n_2 I L}{\lambda}$$
+
+<p>其中 $n_2$ 是非线性折射率，$I$ 是光强，$L$ 是传播距离。</p>
+<p><strong>受激布里渊散射（SBS）</strong>和<strong>受激拉曼散射（SRS）</strong>：光把能量转移给玻璃分子，产生新的频率成分。</p>
+<p><strong>四波混频（FWM）</strong>：不同波长的光相互作用，产生新的波长。</p>
+<p>这些非线性效应在<strong>WDM系统</strong>（多波长同时传输）中尤其麻烦，会限制系统的传输容量。</p>
+<hr />
+<h2 id="_5">第三部分：如何把信息&rdquo;写&rdquo;到光上？<a class="headerlink" href="#_5" title="Permanent link"></a></h2>
+<h3 id="31">3.1 调制：让光&rdquo;记住&rdquo;比特<a class="headerlink" href="#31" title="Permanent link"></a></h3>
+<p>光本身只是电磁波。要让它携带信息，需要<strong>调制（Modulation）</strong>——改变光的某个属性来表示0和1。</p>
+<p><strong>可调的属性</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>调制方式</th>
+<th>简单性</th>
+<th>抗噪声</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>振幅</td>
+<td>ASK / OOK</td>
+<td>⭐⭐⭐</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td>频率</td>
+<td>FSK</td>
+<td>⭐⭐</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>相位</td>
+<td>PSK / QPSK</td>
+<td>⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>偏振</td>
+<td>PolSK</td>
+<td>⭐</td>
+<td>⭐⭐⭐</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ookon-off-keying">OOK（On-Off Keying，开关键控）<a class="headerlink" href="#ookon-off-keying" title="Permanent link"></a></h4>
+<p>最简单的调制：有光=1，无光=0。</p>
+<div class="highlight"><pre><span></span><code>    OOK调制：
+
+    比特流：  1   0   1   1   0   1   0   0
+             │   │   │   │   │   │   │   │
+    光功率：  ▄   ▁   ▄   ▄   ▁   ▄   ▁   ▁
+             ↑   ↑   ↑   ↑   ↑   ↑   ↑   ↑
+            亮  暗  亮  亮  暗  亮  暗  暗
+
+    就像用手电筒的闪烁传递摩斯电码
+</code></pre></div>
+
+<p>OOK简单，但频谱效率低——每符号只传1比特。</p>
+<h4 id="pam4pulse-amplitude-modulation-4-level">PAM4（Pulse Amplitude Modulation 4-level）<a class="headerlink" href="#pam4pulse-amplitude-modulation-4-level" title="Permanent link"></a></h4>
+<p>用<strong>4个振幅级别</strong>表示2比特：</p>
+<div class="highlight"><pre><span></span><code>    PAM4调制：
+
+    振幅：
+    3 ────  ← 11
+    2 ────  ← 10
+    1 ────  ← 01
+    0 ────  ← 00
+
+    比特：00  10  11  01  00  10
+
+    频谱效率翻倍！但抗噪声能力下降
+    （4个级别挤在同样的振幅空间里）
+</code></pre></div>
+
+<p>PAM4是当前400G/800G光模块的主流调制格式。</p>
+<h4 id="qpskquadrature-phase-shift-keying">QPSK（Quadrature Phase Shift Keying）<a class="headerlink" href="#qpskquadrature-phase-shift-keying" title="Permanent link"></a></h4>
+<p>用<strong>4个相位</strong>表示2比特：</p>
+<div class="highlight"><pre><span></span><code>    QPSK星座图：
+
+    虚部 (Quadrature)
+         │
+    01 ● │ ● 11
+    ─────┼─────→ 实部 (In-phase)
+    00 ● │ ● 10
+         │
+
+    4个相位：45°, 135°, 225°, 315°
+    每符号传2比特
+</code></pre></div>
+
+<p>QPSK的频谱效率比OOK高一倍，而且所有符号的能量相同（恒包络），抗非线性更强。</p>
+<h4 id="qamquadrature-amplitude-modulation">QAM（Quadrature Amplitude Modulation）<a class="headerlink" href="#qamquadrature-amplitude-modulation" title="Permanent link"></a></h4>
+<p>同时调制<strong>振幅和相位</strong>：</p>
+<div class="highlight"><pre><span></span><code>    16-QAM星座图：
+
+         │ ● ● ● ●
+         │ ● ● ● ●
+         │ ● ● ● ●
+         │ ● ● ● ●
+         └────────→
+
+    16个符号，每符号传4比特
+    频谱效率是OOK的4倍！
+    但需要很高的信噪比（SNR）
+</code></pre></div>
+
+<p><strong>相干检测（Coherent Detection）</strong>：</p>
+<p>要解调QPSK和QAM，需要相干检测——在接收端用一束<strong>本振激光</strong>与信号光混频，同时恢复振幅和相位信息。</p>
+<div class="highlight"><pre><span></span><code>    相干接收机：
+
+    信号光 ──→ ┌─────┐
+               │  90° │  ← 光混频器
+    本振光 ──→ │ 耦合 │     (Optical Hybrid)
+               └──┬──┘
+                  │
+           ┌──────┼──────┐
+           ▼      ▼      ▼
+        I路      Q路    相位
+       (实部)   (虚部)  信息
+</code></pre></div>
+
+<p>相干检测可以把光的<strong>全部信息</strong>（振幅、相位、偏振）都提取出来，是长距离高速光通信的核心技术。</p>
+<blockquote>
+<p><strong>类比</strong>：调制像写信。OOK像摩斯电码——只有点和划。PAM4像四级数字密码。QPSK像用方向写字：北=00，东=01，南=10，西=11。QAM像同时用方向和笔的粗细来编码——信息密度最高，但也最容易写错（需要高信噪比）。</p>
+</blockquote>
+<h3 id="32">3.2 复用：一根光纤传多路信号<a class="headerlink" href="#32" title="Permanent link"></a></h3>
+<p>一根光纤的带宽潜力巨大。如何充分利用？答案是<strong>复用</strong>。</p>
+<h4 id="wdmwavelength-division-multiplexing">WDM（Wavelength Division Multiplexing，波分复用）<a class="headerlink" href="#wdmwavelength-division-multiplexing" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    WDM原理：
+
+    不同波长的光，在同一根光纤中独立传输
+
+    功率
+     │  ╭╮  ╭╮  ╭╮  ╭╮  ╭╮  ╭╮  ╭╮  ╭╮
+     │  ││  ││  ││  ││  ││  ││  ││  ││
+     └──┴┴──┴┴──┴┴──┴┴──┴┴──┴┴──┴┴──┴┴──→ λ
+        λ₁  λ₂  λ₃  λ₄  λ₅  λ₆  λ₇  λ₈
+
+    发送端：合波器（MUX）把多路光合并
+    光纤中：各路光互不干扰
+    接收端：分波器（DEMUX）把各路光分开
+</code></pre></div>
+
+<p><strong>WDM的级别</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>波长间隔</th>
+<th>通道数</th>
+<th>总容量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CWDM（粗波分）</td>
+<td>20 nm</td>
+<td>~8</td>
+<td>低</td>
+</tr>
+<tr>
+<td>DWDM（密集波分）</td>
+<td>0.8 nm (100 GHz)</td>
+<td>~80</td>
+<td>高</td>
+</tr>
+<tr>
+<td>UDWDM（超密集）</td>
+<td>0.1 nm</td>
+<td>~1000</td>
+<td>极高</td>
+</tr>
+</tbody>
+</table>
+<p>现代海底光缆使用DWDM，单根光纤可传输<strong>数十Tbps</strong>。</p>
+<h4 id="tdmtime-division-multiplexing">TDM（Time Division Multiplexing，时分复用）<a class="headerlink" href="#tdmtime-division-multiplexing" title="Permanent link"></a></h4>
+<p>把时间切成小片，不同用户轮流使用光纤：</p>
+<div class="highlight"><pre><span></span><code>    TDM：
+
+    时间轴 →
+
+    用户A：█░░░█░░░█░░░█░░░
+    用户B：░█░░░█░░░█░░░█░░
+    用户C：░░█░░░█░░░█░░░█░
+
+    每用户占用一个时隙
+</code></pre></div>
+
+<p>TDM在电域更常见，光域主要用WDM。</p>
+<hr />
+<h2 id="_6">第四部分：光通信的&rdquo;器官&rdquo;——关键器件<a class="headerlink" href="#_6" title="Permanent link"></a></h2>
+<h3 id="41">4.1 激光器：光的&rdquo;心脏&rdquo;<a class="headerlink" href="#41" title="Permanent link"></a></h3>
+<p>光通信需要<strong>单色性好、方向性好、功率稳定</strong>的光源——这就是激光器。</p>
+<h4 id="dfbdistributed-feedback-laser">DFB激光器（Distributed Feedback Laser）<a class="headerlink" href="#dfbdistributed-feedback-laser" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    DFB激光器结构：
+
+    ┌────────────────────────────────┐
+    │  ●━━━━━━━●━━━━━━━●━━━━━━━●   │  ← 光栅（布拉格光栅）
+    │  ↑       ↑       ↑       ↑   │     周期 Λ = λ/2n
+    │  有源区（InGaAsP）            │
+    │        ↓ 电注入               │
+    └────────────────────────────────┘
+
+    光栅提供反馈，选择特定波长
+    线宽 &lt; 0.1 nm
+</code></pre></div>
+
+<p>DFB激光器通过布拉格光栅选择特定波长，线宽极窄（&lt;0.1 nm），是DWDM系统的标准光源。</p>
+<h4 id="vcselvertical-cavity-surface-emitting-laser">VCSEL（Vertical-Cavity Surface-Emitting Laser）<a class="headerlink" href="#vcselvertical-cavity-surface-emitting-laser" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    VCSEL结构（垂直方向发射）：
+
+    ┌─────────┐  ← 上布拉格反射镜
+    │         │
+    │ 有源区  │  ← 薄量子阱（几nm）
+    │         │
+    ├─────────┤  ← 下布拉格反射镜
+    │   衬底  │
+    └─────────┘
+         │
+         ▼
+      光垂直向下发射
+
+    优点：低成本、低功耗、易阵列化
+    应用：数据中心短距互连（几十米）
+</code></pre></div>
+
+<p>VCSEL是数据中心的&rdquo;主力军&rdquo;——便宜、可靠、可以做成阵列。</p>
+<h3 id="42">4.2 调制器：让光&rdquo;说话&rdquo;的器官<a class="headerlink" href="#42" title="Permanent link"></a></h3>
+<p>直接调制激光器（改变注入电流）会产生<strong>啁啾（Chirp）</strong>——频率漂移，导致色散问题。高速系统使用<strong>外部调制器</strong>。</p>
+<h4 id="mzmmach-zehnder-modulator">MZM（Mach-Zehnder Modulator）<a class="headerlink" href="#mzmmach-zehnder-modulator" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    MZM结构：
+
+    光输入
+       │
+       ▼
+    ┌──┴──┐
+    │ 分束 │  →  ────┬────  上臂（施加电压V）
+    └──┬──┘         │
+       │            │  相位差 Δφ = πV/Vπ
+       │            │
+       │           ─┴─   下臂（参考）
+       │            │
+       │            │
+    ┌──┴──┐       ──┴──
+    │ 合束 │  ← 干涉输出
+    └──┬──┘
+       │
+       ▼
+    光输出
+
+    输出强度：I = I₀ cos²(Δφ/2)
+</code></pre></div>
+
+<p>MZM就是你在实验室里熟悉的<strong>Mach-Zehnder干涉仪</strong>——只不过两臂上加了电极，用电场改变折射率，从而改变相位差。</p>
+<p><strong>铌酸锂（LiNbO₃）MZM</strong>：带宽可达$100\,\text{GHz}$以上，是长距离相干通信的核心器件。</p>
+<p><strong>硅光MZM</strong>：在硅芯片上集成，成本低，但性能略逊，适合数据中心。</p>
+<h3 id="43">4.3 探测器：光的&rdquo;耳朵&rdquo;<a class="headerlink" href="#43" title="Permanent link"></a></h3>
+<h4 id="pin">PIN光电二极管<a class="headerlink" href="#pin" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    PIN结构：
+
+    ┌─────┬─────┬─────┐
+    │  P  │  I  │  N  │
+    │重掺杂│本征 │重掺杂│
+    │     │(耗尽层)│   │
+    └─────┴─────┴─────┘
+         ↑
+      光子在这里被吸收
+      产生电子-空穴对
+      形成光电流
+</code></pre></div>
+
+<p><strong>响应度</strong>：</p>
+$$R = \frac{\eta q}{h\nu} \approx \frac{\eta \lambda}{1.24} \, (\text{A/W})$$
+
+<p>其中 $\eta$ 是量子效率。在$1550\,\text{nm}$，硅探测器不工作（带隙太大），需要用<strong>InGaAs</strong>（铟镓砷）。</p>
+<h4 id="apd">APD（雪崩光电二极管）<a class="headerlink" href="#apd" title="Permanent link"></a></h4>
+<p>在PIN基础上增加雪崩倍增区，增益$M = 10\sim100$。</p>
+<p><strong>InGaAs APD</strong>是$1550\,\text{nm}$接收机的标准选择。</p>
+<h3 id="44">4.4 光放大器：给光&rdquo;加油&rdquo;<a class="headerlink" href="#44" title="Permanent link"></a></h3>
+<p>光在光纤中传输会衰减。如果不用放大器，每$100\,\text{km}$信号就会太弱而无法检测。</p>
+<h4 id="edfaerbium-doped-fiber-amplifier">EDFA（Erbium-Doped Fiber Amplifier，掺铒光纤放大器）<a class="headerlink" href="#edfaerbium-doped-fiber-amplifier" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    EDFA结构：
+
+    输入光 ──→ ┌──────────┐ ──→ 输出光
+               │  掺铒光纤 │     （信号被放大）
+               │  (~10m)  │
+               └─────┬────┘
+                     │
+              泵浦激光 (980nm)
+                     │
+                     ▼
+               能量转移：
+               泵浦光 → 铒离子激发 → 信号光受激辐射
+</code></pre></div>
+
+<p><strong>EDFA的魔法</strong>：<br />
+- 直接放大光信号，无需光电转换<br />
+- 增益高达$30\,\text{dB}$（1000倍功率放大）<br />
+- 带宽极宽（$30\,\text{nm}$，覆盖整个C-band）<br />
+- 噪声系数低（$\sim4\,\text{dB}$）</p>
+<p>EDFA是<strong>光通信革命</strong>的关键发明——它让跨洋光缆不需要电子中继器，大大提升了可靠性和容量。</p>
+<blockquote>
+<p><strong>类比</strong>：EDFA像高速公路上的加油站。汽车（光信号）跑远了油（能量）不够了，直接加油继续跑——不需要把油取出来、精炼、再灌回去（光电转换）。</p>
+</blockquote>
+<hr />
+<h2 id="_7">第五部分：从数据中心到海底电缆<a class="headerlink" href="#_7" title="Permanent link"></a></h2>
+<h3 id="51">5.1 光通信的分层图景<a class="headerlink" href="#51" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code>    光通信网络分层：
+
+    ┌─────────────────────────────────────┐
+    │         海底光缆（Submarine）        │
+    │    跨洋距离：数千 ~ 数万公里          │
+    │    单纤容量：数十 Tbps               │
+    │    放大间距：~100 km（EDFA）         │
+    └─────────────────────────────────────┘
+                    │
+    ┌───────────────┴─────────────────────┐
+    │         骨干网（Backbone）            │
+    │    城市间距离：数百 ~ 数千公里        │
+    │    技术：DWDM + 相干检测              │
+    └─────────────────────────────────────┘
+                    │
+    ┌───────────────┴─────────────────────┐
+    │         城域网（Metro）              │
+    │    城市内距离：数十公里              │
+    │    技术：CWDM / DWDM                │
+    └─────────────────────────────────────┘
+                    │
+    ┌───────────────┴─────────────────────┐
+    │         接入网（Access）             │
+    │    到用户距离：数公里               │
+    │    FTTH光纤到户：PON技术            │
+    └─────────────────────────────────────┘
+                    │
+    ┌───────────────┴─────────────────────┐
+    │         数据中心内部（DC Interconnect）│
+    │    机架间距离：数十米               │
+    │    技术：AOC / DAC / CPO            │
+    └─────────────────────────────────────┘
+                    │
+    ┌───────────────┴─────────────────────┐
+    │         芯片间（On-Chip / Chip-to-Chip）│
+    │    距离：毫米 ~ 厘米                │
+    │    技术：硅光波导 / 光互连          │
+    └─────────────────────────────────────┘
+</code></pre></div>
+
+<h3 id="52">5.2 海底光缆：人类最伟大的工程之一<a class="headerlink" href="#52" title="Permanent link"></a></h3>
+<p>全球有<strong>超过500条</strong>海底光缆，总长度超过<strong>130万公里</strong>，承载了<strong>99%</strong>的国际数据流量。</p>
+<div class="highlight"><pre><span></span><code>    海底光缆结构：
+
+    直径 ~20-30 mm（比大拇指粗一点）
+
+    ┌──────────────────────────────────────┐
+    │  聚乙烯护套                          │
+    ├──────────────────────────────────────┤
+    │  钢丝铠装（防鲨鱼咬！）               │
+    ├──────────────────────────────────────┤
+    │  铝制防水护套                        │
+    ├──────────────────────────────────────┤
+    │  铜导线（供电给中继器）               │
+    ├──────────────────────────────────────┤
+    │  光纤束（~4-8对光纤）                │
+    │  每对：一根传、一根收                │
+    │  每根光纤：多芯（多芯光纤）          │
+    └──────────────────────────────────────┘
+</code></pre></div>
+
+<p><strong>跨洋传输系统</strong>：</p>
+<p>一条典型的跨大西洋光缆（如Marea）：<br />
+- 长度：$6600\,\text{km}$<br />
+- 光纤对数：8对<br />
+- 每对光纤容量：$200\,\text{Tbps}$<br />
+- 总容量：$1600\,\text{Tbps}$<br />
+- 中继器间距：$\sim50\,\text{km}$<br />
+- 中继器数量：$\sim130$个</p>
+<p><strong>中继器（Repeater）</strong>：</p>
+<p>海底光缆每$50\,\text{km}$左右需要一个中继器。现代中继器包含：<br />
+- EDFA光放大器（双向）<br />
+- 遥测和监控电路<br />
+- 供电电路（从岸站通过铜导线供电，电压可达$10\,\text{kV}$）</p>
+<div class="highlight"><pre><span></span><code>    海底光缆截面（浅海 vs 深海）：
+
+    浅海（需要防锚、防鲨鱼）：         深海（主要是自重）：
+    ┌────────────┐                    ┌────────────┐
+    │  厚钢铠装   │                    │  薄护套     │
+    │  (~10mm)   │                    │  (~2mm)     │
+    ├────────────┤                    ├────────────┤
+    │  多层护套   │                    │  轻铠装     │
+    ├────────────┤                    ├────────────┤
+    │  光纤束    │                    │  光纤束     │
+    └────────────┘                    └────────────┘
+    直径 ~50mm                        直径 ~20mm
+</code></pre></div>
+
+<blockquote>
+<p><strong>类比</strong>：海底光缆像埋在海床下的信息高速公路。它的直径只有几厘米，但每秒传输的数据量相当于数百万部高清电影。如果你把所有海底光缆并排放在一起，它们的总带宽可以让全世界的人同时视频通话。</p>
+</blockquote>
+<h3 id="53">5.3 数据中心光互连<a class="headerlink" href="#53" title="Permanent link"></a></h3>
+<p>数据中心是光通信增长最快的领域。为什么？</p>
+<p><strong>电信号的瓶颈</strong>：</p>
+<p>当数据速率超过$25\,\text{Gbps}$时，铜线的问题越来越严重：<br />
+- <strong>损耗大</strong>：铜线在$10\,\text{GHz}$以上衰减严重<br />
+- <strong>串扰</strong>：相邻铜线之间的电磁干扰<br />
+- <strong>功耗</strong>：驱动铜线需要大量能量</p>
+<p><strong>光互连的优势</strong>：<br />
+- 低损耗（光纤衰减$\sim0.2\,\text{dB/km}$，铜线在$10\,\text{GHz}$时$\sim100\,\text{dB/km}$）<br />
+- 无串扰（光不互相干扰）<br />
+- 低功耗（光信号传输几乎不耗能）</p>
+<div class="highlight"><pre><span></span><code>    数据中心内部光互连层级：
+
+    机架顶交换机 (ToR)
+         │
+    ┌────┴────┐
+    │ AOC光缆 │  ← 有源光缆（Active Optical Cable）
+    │ ~1-5m  │     光电转换集成在接头里
+    └────┬────┘
+         │
+    服务器网卡
+         │
+    ┌────┴────┐
+    │ 光模块  │  ← QSFP-DD / OSFP，400G/800G
+    │ (可插拔)│
+    └────┬────┘
+         │
+    核心交换机
+         │
+    ┌────┴────┐
+    │ 光纤    │  ← MPO/MTP多芯光纤
+    │ ~10-100m│
+    └────┬────┘
+         │
+    其他核心交换机
+</code></pre></div>
+
+<h4 id="aocactive-optical-cable">AOC（Active Optical Cable）<a class="headerlink" href="#aocactive-optical-cable" title="Permanent link"></a></h4>
+<p>把光纤和光收发器集成在一起，像一根&rdquo;粗一点的网线&rdquo;：</p>
+<div class="highlight"><pre><span></span><code>    AOC结构：
+
+    ┌─────┐══════════════════════┌─────┐
+    │电接头│  光纤 + 光收发器集成  │电接头│
+    │(QSFP)│  在接头内部          │(QSFP)│
+    └─────┘══════════════════════└─────┘
+
+    长度：1-100米
+    速率：100G/400G/800G
+    优点：即插即用，无需单独配光模块
+</code></pre></div>
+
+<h4 id="cpoco-packaged-optics">CPO（Co-Packaged Optics，光电共封装）<a class="headerlink" href="#cpoco-packaged-optics" title="Permanent link"></a></h4>
+<p>下一代技术：把光引擎和交换机芯片封装在一起：</p>
+<div class="highlight"><pre><span></span><code>    传统方案：                     CPO方案：
+
+    ┌─────────────┐              ┌─────────────────┐
+    │  交换机芯片  │              │  ┌───────────┐  │
+    │  (电信号)   │              │  │交换机芯片 │  │
+    └──────┬──────┘              │  │(电接口)   │  │
+           │                     │  └─────┬─────┘  │
+    ┌──────┴──────┐              │        │ 极短走线│
+    │  电走线     │              │  ┌─────┴─────┐  │
+    │  (~10cm)    │              │  │ 光引擎    │  │
+    └──────┬──────┘              │  │(MZM/探测器)│ │
+           │                     │  └─────┬─────┘  │
+    ┌──────┴──────┐              │        │        │
+    │  光模块     │              │    光纤输出     │
+    │(E-O转换)    │              └─────────────────┘
+    └──────┬──────┘
+           │
+        光纤输出
+
+    CPO优势：
+    - 电走线极短（毫米级），功耗大幅下降
+    - 速率可扩展到3.2Tbps+
+</code></pre></div>
+
+<p>CPO预计将在2025-2027年进入大规模商用。</p>
+<hr />
+<h2 id="_8">第六部分：硅光子学——在芯片上造光路<a class="headerlink" href="#_8" title="Permanent link"></a></h2>
+<h3 id="61">6.1 为什么要硅光？<a class="headerlink" href="#61" title="Permanent link"></a></h3>
+<p>电子芯片的速度越来越快，但电信号在长距离传输中遇到了瓶颈：</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>原因</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RC延迟</td>
+<td>导线电阻+寄生电容</td>
+<td>信号边沿变缓</td>
+</tr>
+<tr>
+<td>功耗</td>
+<td>驱动长导线需要能量</td>
+<td>数据中心40%能耗在互连</td>
+</tr>
+<tr>
+<td>串扰</td>
+<td>电磁耦合</td>
+<td>信号完整性下降</td>
+</tr>
+<tr>
+<td>带宽密度</td>
+<td>铜线占面积大</td>
+<td>I/O引脚成为瓶颈</td>
+</tr>
+</tbody>
+</table>
+<p><strong>光的解决方案</strong>：<br />
+- 光信号在波导中传输几乎无损耗<br />
+- 不同波长的光互不干扰（WDM）<br />
+- 光波导可以做得极细（亚微米级）<br />
+- 带宽密度比铜线高$100\times$以上</p>
+<h3 id="62">6.2 硅光波导<a class="headerlink" href="#62" title="Permanent link"></a></h3>
+<p>硅的折射率（$n\approx3.5$）远高于二氧化硅（$n\approx1.5$），所以可以在硅芯片上制作<strong>高折射率对比度</strong>的波导：</p>
+<div class="highlight"><pre><span></span><code>    硅光波导截面：
+
+    ┌─────────────────────┐
+    │   SiO₂ 包层 (n=1.5)  │
+    │  ┌───────────────┐  │
+    │  │  Si 芯层      │  │  ← 高折射率 (n=3.5)
+    │  │  (220×500 nm) │  │     光被约束在内部
+    │  └───────────────┘  │
+    │   SiO₂ 包层 (n=1.5)  │
+    └─────────────────────┘
+         Si 衬底
+
+    约束机制：全反射（与光纤类似）
+    但折射率对比度更高 → 波导可以极细
+</code></pre></div>
+
+<p><strong>SOI（Silicon-on-Insulator）平台</strong>：</p>
+<p>在硅衬底上生长一层薄的$\text{SiO}_2$（ buried oxide，BOX），再在上面沉积一层薄硅（$\sim220\,\text{nm}$）。这层薄硅就是光波导的&rdquo;舞台&rdquo;。</p>
+<h3 id="63">6.3 硅光器件全家福<a class="headerlink" href="#63" title="Permanent link"></a></h3>
+<div class="highlight"><pre><span></span><code>    硅光芯片上的器件：
+
+    激光输入 ──→ ┌─────────────────────────────┐
+                 │                             │
+                 │  ┌───┐  ┌───┐  ┌───┐       │
+                 │  │MZI│  │MZI│  │MZI│ ...   │  ← 调制器阵列
+                 │  └───┘  └───┘  └───┘       │
+                 │     │      │      │         │
+                 │  ┌──┴──┬───┴──┬───┴──┐     │
+                 │  │     │      │      │     │
+                 │  ▼     ▼      ▼      ▼     │
+                 │  ┌─────────────────────┐   │
+                 │  │    波分复用器        │   │  ← AWG / Echelle
+                 │  │   (MUX/DEMUX)       │   │
+                 │  └──────────┬──────────┘   │
+                 │             │              │
+                 │             ▼              │
+                 │         光纤输出           │
+                 │                             │
+                 └─────────────────────────────┘
+</code></pre></div>
+
+<h4 id="directional-coupler">定向耦合器（Directional Coupler）<a class="headerlink" href="#directional-coupler" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    定向耦合器：
+
+    输入1 ──→ ────────┬──────── ──→ 输出1
+                      │  消逝场耦合
+    输入2 ──→ ────────┴──────── ──→ 输出2
+
+    两根波导靠得足够近 → 光&quot;跳&quot;到另一根
+    耦合比例由平行长度和间距决定
+</code></pre></div>
+
+<p>定向耦合器是硅光芯片的&rdquo;基础乐高积木&rdquo;——MZI、耦合器、分束器都靠它实现。</p>
+<h4 id="mzisilicon-photonics-mzm">MZI调制器（Silicon Photonics MZM）<a class="headerlink" href="#mzisilicon-photonics-mzm" title="Permanent link"></a></h4>
+<p>在硅波导两侧加电极，利用<strong>等离子体色散效应</strong>（自由载流子改变折射率）调制相位：</p>
+$$\Delta n = -\frac{e^2 \lambda^2}{8\pi^2 c^2 \varepsilon_0 n}\left(\frac{\Delta N_e}{m_e^*} + \frac{\Delta N_h^{0.8}}{m_h^*}\right)$$
+
+<p>通过改变载流子浓度（注入电流），改变折射率，从而改变相位——这就是硅光MZM的物理原理。</p>
+<p><strong>问题</strong>：载流子寿命限制了调制速度（$\sim1\,\text{GHz}$）。高速应用需要预加重或推挽结构。</p>
+<h4 id="microring-resonator">微环谐振器（Microring Resonator）<a class="headerlink" href="#microring-resonator" title="Permanent link"></a></h4>
+<div class="highlight"><pre><span></span><code>    微环谐振器：
+
+    直波导 ──→ ────────●──────── ──→
+                        │
+                        ↓
+                      ╭───╮
+                     │  ◯  │  ← 微环（半径几微米）
+                      ╰───╯
+                        ↑
+    当环周长 = m·λ时，发生谐振
+    光被&quot;困&quot;在环里，直波导输出被抑制
+
+    应用：
+    - 滤波器（选择特定波长）
+    - 调制器（改变谐振波长）
+    - 传感器（环境变化改变谐振）
+</code></pre></div>
+
+<p>微环是硅光芯片上最紧凑的器件之一——一个环形波导只有几微米大小。</p>
+<h3 id="64">6.4 硅光的挑战<a class="headerlink" href="#64" title="Permanent link"></a></h3>
+<table>
+<thead>
+<tr>
+<th>挑战</th>
+<th>原因</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>硅不发光</td>
+<td>间接带隙</td>
+<td>外部激光器（InP）键合到硅上</td>
+</tr>
+<tr>
+<td>调制速度受限</td>
+<td>载流子寿命</td>
+<td>推挽结构、预加重、GeSi电吸收调制器</td>
+</tr>
+<tr>
+<td>耦合损耗</td>
+<td>光纤模式 vs 硅波导模式不匹配</td>
+<td>光栅耦合器、边缘耦合器</td>
+</tr>
+<tr>
+<td>温度敏感</td>
+<td>硅折射率温度系数高</td>
+<td>温控、设计容差</td>
+</tr>
+</tbody>
+</table>
+<h3 id="65-io">6.5 硅光的未来：光I/O<a class="headerlink" href="#65-io" title="Permanent link"></a></h3>
+<p>未来的CPU/GPU可能直接用光来&rdquo;说话&rdquo;：</p>
+<div class="highlight"><pre><span></span><code>    未来芯片架构：
+
+    ┌─────────────────────────────────────┐
+    │  ┌─────┐  光I/O  ┌─────┐  光I/O  ┌─────┐ │
+    │  │CPU  │←──────→│HBM  │←──────→│GPU  │ │
+    │  │芯片 │  光纤   │存储 │  光纤   │芯片 │ │
+    │  └─────┘         └─────┘         └─────┘ │
+    │       \          │          /       │
+    │        \         │         /        │
+    │         \        │        /         │
+    │          \       │       /          │
+    │           \      │      /           │
+    │            \     │     /            │
+    │         ┌───────┴────┴───────┐      │
+    │         │    光互连交换机     │      │
+    │         │   (Optical Switch) │      │
+    │         └───────────────────┘      │
+    └─────────────────────────────────────┘
+
+    优势：
+    - 芯片间带宽：数Tbps
+    - 延迟：亚微秒
+    - 功耗：比电互连低10倍
+</code></pre></div>
+
+<hr />
+<h2 id="_9">写在最后<a class="headerlink" href="#_9" title="Permanent link"></a></h2>
+<p>光通信是人类工程史上最成功的技术之一。它让信息以光速在全球范围内流动，把世界连接成一个整体。</p>
+<p>从1966年高锟提出光纤通信的理论基础，到今天海底光缆承载99%的国际流量——这是短短60年的奇迹。</p>
+<p>当你下次刷手机、看视频、打视频电话时，请记住：你指尖的信息，正以光的速度，在比头发丝还细的光纤中奔跑，穿过山脉、海洋、城市，最终到达另一块屏幕。</p>
+<p>而未来，光不仅会连接城市，还会连接芯片。硅光子学正在把光路&rdquo;缩小&rdquo;到芯片尺度，让光成为计算机内部的&rdquo;神经纤维&rdquo;。</p>
+<blockquote>
+<p><strong>一个数字</strong>：2024年，全球光纤通信系统的总传输容量已超过1 Zettabyte（$10^{21}$字节）/年。这相当于每秒传输$3\times10^{13}$比特——如果把每个比特比作一粒沙子，每秒传输的沙子可以填满一个标准游泳池。</p>
+</blockquote>
+<p>这就是光的魔力——它不仅是宇宙的速度极限，也是人类信息文明的动脉。</p>
+  </article>
+  <aside class="toc-sidebar"><div class="toc"><span class="toctitle">目录</span><ul>
+<li><a href="#_1">文档导读</a><ul>
+<li><a href="#_2">文档结构</a></li>
+</ul>
+</li>
+<li><a href="#_3">第一部分：光如何在光纤中奔跑？</a><ul>
+<li><a href="#11">1.1 全反射：光的&rdquo;镜面隧道&rdquo;</a></li>
+<li><a href="#12-vs">1.2 两种光纤：单模 vs 多模</a></li>
+<li><a href="#13">1.3 光在光纤中真的在&rdquo;跑&rdquo;吗？</a></li>
+</ul>
+</li>
+<li><a href="#_4">第二部分：色散与损耗——光的&rdquo;疲劳&rdquo;</a><ul>
+<li><a href="#21">2.1 损耗：光跑远了会变弱</a></li>
+<li><a href="#22">2.2 色散：不同颜色的光跑速不同</a></li>
+<li><a href="#23">2.3 非线性效应：强光下的&rdquo;脾气&rdquo;</a></li>
+</ul>
+</li>
+<li><a href="#_5">第三部分：如何把信息&rdquo;写&rdquo;到光上？</a><ul>
+<li><a href="#31">3.1 调制：让光&rdquo;记住&rdquo;比特</a><ul>
+<li><a href="#ookon-off-keying">OOK（On-Off Keying，开关键控）</a></li>
+<li><a href="#pam4pulse-amplitude-modulation-4-level">PAM4（Pulse Amplitude Modulation 4-level）</a></li>
+<li><a href="#qpskquadrature-phase-shift-keying">QPSK（Quadrature Phase Shift Keying）</a></li>
+<li><a href="#qamquadrature-amplitude-modulation">QAM（Quadrature Amplitude Modulation）</a></li>
+</ul>
+</li>
+<li><a href="#32">3.2 复用：一根光纤传多路信号</a><ul>
+<li><a href="#wdmwavelength-division-multiplexing">WDM（Wavelength Division Multiplexing，波分复用）</a></li>
+<li><a href="#tdmtime-division-multiplexing">TDM（Time Division Multiplexing，时分复用）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_6">第四部分：光通信的&rdquo;器官&rdquo;——关键器件</a><ul>
+<li><a href="#41">4.1 激光器：光的&rdquo;心脏&rdquo;</a><ul>
+<li><a href="#dfbdistributed-feedback-laser">DFB激光器（Distributed Feedback Laser）</a></li>
+<li><a href="#vcselvertical-cavity-surface-emitting-laser">VCSEL（Vertical-Cavity Surface-Emitting Laser）</a></li>
+</ul>
+</li>
+<li><a href="#42">4.2 调制器：让光&rdquo;说话&rdquo;的器官</a><ul>
+<li><a href="#mzmmach-zehnder-modulator">MZM（Mach-Zehnder Modulator）</a></li>
+</ul>
+</li>
+<li><a href="#43">4.3 探测器：光的&rdquo;耳朵&rdquo;</a><ul>
+<li><a href="#pin">PIN光电二极管</a></li>
+<li><a href="#apd">APD（雪崩光电二极管）</a></li>
+</ul>
+</li>
+<li><a href="#44">4.4 光放大器：给光&rdquo;加油&rdquo;</a><ul>
+<li><a href="#edfaerbium-doped-fiber-amplifier">EDFA（Erbium-Doped Fiber Amplifier，掺铒光纤放大器）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_7">第五部分：从数据中心到海底电缆</a><ul>
+<li><a href="#51">5.1 光通信的分层图景</a></li>
+<li><a href="#52">5.2 海底光缆：人类最伟大的工程之一</a></li>
+<li><a href="#53">5.3 数据中心光互连</a><ul>
+<li><a href="#aocactive-optical-cable">AOC（Active Optical Cable）</a></li>
+<li><a href="#cpoco-packaged-optics">CPO（Co-Packaged Optics，光电共封装）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_8">第六部分：硅光子学——在芯片上造光路</a><ul>
+<li><a href="#61">6.1 为什么要硅光？</a></li>
+<li><a href="#62">6.2 硅光波导</a></li>
+<li><a href="#63">6.3 硅光器件全家福</a><ul>
+<li><a href="#directional-coupler">定向耦合器（Directional Coupler）</a></li>
+<li><a href="#mzisilicon-photonics-mzm">MZI调制器（Silicon Photonics MZM）</a></li>
+<li><a href="#microring-resonator">微环谐振器（Microring Resonator）</a></li>
+</ul>
+</li>
+<li><a href="#64">6.4 硅光的挑战</a></li>
+<li><a href="#65-io">6.5 硅光的未来：光I/O</a></li>
+</ul>
+</li>
+<li><a href="#_9">写在最后</a></li>
+</ul>
+</div>
+</aside>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>Research Notes &middot; Generated on 2026-06-02</p>
+  </div>
+</footer>
+
+<script>
+
+(function() {
+  // Theme toggle
+  const btn = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) html.setAttribute('data-theme', saved);
+  function updateIcon() {
+    btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+  }
+  updateIcon();
+  btn.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateIcon();
+  });
+
+  // TOC active highlight on scroll
+  const toc = document.querySelector('.toc-sidebar');
+  if (toc) {
+    const links = toc.querySelectorAll('a[href^="#"]');
+    const headings = Array.from(document.querySelectorAll('article [id]'));
+    if (headings.length && links.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(l => l.style.color = '');
+            const link = toc.querySelector('a[href="#' + entry.target.id + '"]');
+            if (link) link.style.color = 'var(--accent)';
+          }
+        });
+      }, { rootMargin: '-80px 0px -60% 0px' });
+      headings.forEach(h => observer.observe(h));
+    }
+  }
+})();
+</script>
+</body>
+</html>
